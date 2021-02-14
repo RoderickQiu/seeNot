@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">见否</string>
+    <string name="help">帮助</string>
+    <string name="app_version">alpha</string>
+    <string name="settings">设置</string>
+    <string name="home">首页</string>
+    <string name="fab_content_desc">新建规则</string>
 </resources>
