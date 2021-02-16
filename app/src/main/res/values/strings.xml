@@ -5,4 +5,6 @@
     <string name="settings">设置</string>
     <string name="home">首页</string>
     <string name="fab_content_desc">新建规则</string>
+    <string name="edit">编辑</string>
+    <string name="delete">删除</string>
 </resources>

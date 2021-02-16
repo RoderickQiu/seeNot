@@ -1,18 +1,26 @@
 package com.scrisstudio.jianfou;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.scrisstudio.jianfou.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
-	private static final String TAG = "Jianfou";
+	private static final String TAG = "Jianfou-MainActivity";
 	ActivityMainBinding binding;
+	private Context context;
+	private List<RuleInfo> list = new ArrayList<>();
 
 	@Override
 	public void onBackPressed() {
@@ -26,9 +34,22 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		context = this;
+
 		binding = ActivityMainBinding.inflate(getLayoutInflater());
 		View view = binding.getRoot();
 		setContentView(view);
+
+		list.add(new RuleInfo(0, "小猿搜题遮罩1", "小猿搜题", "界面级别遮罩"));
+		list.add(new RuleInfo(1, "小猿搜题遮罩2", "小猿搜题", "界面级别遮罩"));
+		list.add(new RuleInfo(2, "小猿搜题遮罩3", "小猿搜题", "界面级别遮罩"));
+
+		RecyclerView recyclerView = binding.ruleList;
+		LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+		layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+		recyclerView.setLayoutManager(layoutManager);
+		RuleInfoAdapter adapter = new RuleInfoAdapter(getBaseContext(), list);
+		recyclerView.setAdapter(adapter);
 
 		binding.topAppBar.setOnMenuItemClickListener(menuItem -> {
 			switch (menuItem.getItemId()) {
@@ -43,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
 		binding.topAppBar.setNavigationOnClickListener(v -> binding.drawerLayout.openDrawer(binding.navigation));
 
 		binding.navigation.setNavigationItemSelectedListener(menuItem -> {
-			for (int i = 0; i < binding.navigation.getMenu().size(); i++)
-				binding.navigation.getMenu().getItem(i).setChecked(false);
-
-			menuItem.setChecked(true);
 			binding.drawerLayout.closeDrawer(binding.navigation);
 
 			switch (menuItem.getItemId()) {
+				case R.id.item_settings:
+					Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+					startActivity(intent);
+					return false;
 				default:
 					Toast.makeText(this.getApplicationContext(), "还没有完成。", Toast.LENGTH_LONG).show();
 					return false;
