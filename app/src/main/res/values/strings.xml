@@ -7,4 +7,7 @@
     <string name="fab_content_desc">新建规则</string>
     <string name="edit">编辑</string>
     <string name="delete">删除</string>
+    <string name="settings_general">通用设置</string>
+    <string name="settings_master_switch">总开关</string>
+    <string name="settings_master_switch_summary">设置见否屏蔽功能是否打开。</string>
 </resources>

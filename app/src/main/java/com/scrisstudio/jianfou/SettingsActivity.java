@@ -19,6 +19,8 @@ public class SettingsActivity extends AppCompatActivity {
 		View view = binding.getRoot();
 		setContentView(view);
 
+		getSupportFragmentManager().beginTransaction().replace(R.id.settings_container, new SettingsFragment()).commit();
+
 		binding.settingsAppBar.setOnMenuItemClickListener(menuItem -> {
 			switch (menuItem.getItemId()) {
 				case R.id.help:
