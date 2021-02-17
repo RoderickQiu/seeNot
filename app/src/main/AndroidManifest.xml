@@ -3,13 +3,14 @@
     package="com.scrisstudio.jianfou">
 
     <application
+        android:name="jianfou"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Jianfou">
-        <activity android:name=".SettingsActivity"></activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".MainActivity" />
         <activity
             android:name=".SplashActivity"
             android:label="@string/app_name"

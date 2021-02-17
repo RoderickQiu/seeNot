@@ -38,12 +38,36 @@
             <!-- Screen content -->
             <!-- Use app:layout_behavior="@string/appbar_scrolling_view_behavior" to fit below top app bar -->
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rule_list"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="12dp"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <com.sergivonavi.materialbanner.Banner
+                    android:id="@+id/banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:buttonLeftText="@string/hide_notification"
+                    app:buttonRightText="@string/reopen_function"
+                    app:icon="@drawable/error_outline_24dp"
+                    app:iconTint="?attr/colorPrimaryVariant"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:messageText="@string/function_closed" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rule_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fadeScrollbars="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/banner" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/floating_action_button"

@@ -10,4 +10,8 @@
     <string name="settings_general">通用设置</string>
     <string name="settings_master_switch">总开关</string>
     <string name="settings_master_switch_summary">设置见否屏蔽功能是否打开。</string>
+    <string name="hide_notification">隐藏通知</string>
+    <string name="reopen_function">打开总开关</string>
+    <string name="function_closed">见否总开关被关闭，任何选项都将不生效。</string>
+    <string name="operation_done">操作已生效。</string>
 </resources>

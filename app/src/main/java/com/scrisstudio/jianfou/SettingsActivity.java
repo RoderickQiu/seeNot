@@ -1,5 +1,6 @@
 package com.scrisstudio.jianfou;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -32,7 +33,8 @@ public class SettingsActivity extends AppCompatActivity {
 		});
 
 		binding.settingsAppBar.setNavigationOnClickListener(v -> {
-			SettingsActivity.this.finish();
+			Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+			startActivity(intent);
 		});
 	}
 }

@@ -7,11 +7,11 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="135dp"
-        android:layout_margin="12dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="0dp"
         android:checkable="true"
         android:clickable="true"
+        android:clipToPadding="false"
         android:focusable="true"
         app:cardBackgroundColor="?attr/colorOnPrimary"
         app:cardElevation="3dp">
@@ -106,7 +106,6 @@
             </RelativeLayout>
 
         </LinearLayout>
-
 
     </com.google.android.material.card.MaterialCardView>
 
