@@ -14,4 +14,5 @@
     <string name="reopen_function">打开总开关</string>
     <string name="function_closed">见否总开关被关闭，任何选项都将不生效。</string>
     <string name="operation_done">操作已生效。</string>
+    <string name="empty_view">列表为空。点击\"+\"按钮新建预设或者查看社区预设。</string>
 </resources>

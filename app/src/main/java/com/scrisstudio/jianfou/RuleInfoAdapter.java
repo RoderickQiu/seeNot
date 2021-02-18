@@ -20,6 +20,8 @@ import java.util.List;
 public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyViewHolder> {
 
 	private static final String TAG = "Jianfou-RuleInfoAdapter";
+	private static final int VIEW_TYPE_EMPTY = 0;
+	private static final int VIEW_TYPE_CARD = 1;
 	private final SharedPreferences sharedPreferences;
 	private final Context context;
 	private final Gson gson;
@@ -35,51 +37,72 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 	@NonNull
 	@Override
 	public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-		View view = LayoutInflater.from(context).inflate(R.layout.rule_card, parent, false);
+		View view;
+		if (viewType == VIEW_TYPE_CARD) {
+			view = LayoutInflater.from(context).inflate(R.layout.rule_card, parent, false);
+		} else {
+			view = LayoutInflater.from(context).inflate(R.layout.empty_recyclerview, parent, false);
+		}
 		return new MyViewHolder(view);
 	}
 
 	@Override
+	public int getItemViewType(int position) {
+		if (mList.size() == 0) {
+			return VIEW_TYPE_EMPTY;
+		} else {
+			return VIEW_TYPE_CARD;
+		}
+	}
+
+	@Override
 	public void onBindViewHolder(MyViewHolder holder, int position) {
-		RuleInfo rule = mList.get(position);
+		int viewType = getItemViewType(position);
+		if (viewType == VIEW_TYPE_CARD) {
+			RuleInfo rule = mList.get(position);
 
-		holder.ruleId.setContentDescription(String.valueOf(rule.getId()));
-		holder.ruleTitle.setText(rule.getTitle());
-		holder.ruleFor.setText(rule.getFor());
-		holder.ruleType.setText(rule.getType());
-		holder.ruleSwitch.setChecked(rule.getStatus());
+			holder.ruleId.setContentDescription(String.valueOf(rule.getId()));
+			holder.ruleTitle.setText(rule.getTitle());
+			holder.ruleFor.setText(rule.getFor());
+			holder.ruleType.setText(rule.getType());
+			holder.ruleSwitch.setChecked(rule.getStatus());
 
-		holder.ruleSwitch.setOnCheckedChangeListener((v, isChecked) -> {
-			SharedPreferences.Editor edit = sharedPreferences.edit();
-			RuleInfo newRule = mList.get(position);
-			newRule.setStatus(isChecked);
-
-			mList.set(position, newRule);
-			edit.putString("rules", gson.toJson(mList));
-			edit.apply();
-		});
-
-		holder.editButton.setOnClickListener(v -> {
-			Toast.makeText(context, "还没有完成。", Toast.LENGTH_LONG).show();
-		});
-
-		holder.deleteButton.setOnClickListener(v -> {
-			try {
+			holder.ruleSwitch.setOnCheckedChangeListener((v, isChecked) -> {
 				SharedPreferences.Editor edit = sharedPreferences.edit();
-				mList.remove(position);
-				notifyDataSetChanged();
+				RuleInfo newRule = mList.get(position);
+				newRule.setStatus(isChecked);
 
+				mList.set(position, newRule);
 				edit.putString("rules", gson.toJson(mList));
 				edit.apply();
-			} catch (Exception e) {
-				Log.e(TAG, String.valueOf(e));
-			}
-		});
+			});
+
+			holder.editButton.setOnClickListener(v -> {
+				Toast.makeText(context, "还没有完成。", Toast.LENGTH_LONG).show();
+			});
+
+			holder.deleteButton.setOnClickListener(v -> {
+				try {
+					SharedPreferences.Editor edit = sharedPreferences.edit();
+					mList.remove(position);
+					notifyDataSetChanged();
+
+					edit.putString("rules", gson.toJson(mList));
+					edit.apply();
+				} catch (Exception e) {
+					Log.e(TAG, String.valueOf(e));
+				}
+			});
+		}
 	}
 
 	@Override
 	public int getItemCount() {
-		return mList.size();
+		if (mList.size() == 0) {
+			return 1;
+		} else {
+			return mList.size();
+		}
 	}
 
 	static class MyViewHolder extends RecyclerView.ViewHolder {
