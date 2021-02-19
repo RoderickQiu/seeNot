@@ -1,7 +1,7 @@
 package com.scrisstudio.jianfou;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,21 +16,24 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.gson.Gson;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyViewHolder> {
 
 	private static final String TAG = "Jianfou-RuleInfoAdapter";
 	private static final int VIEW_TYPE_EMPTY = 0;
 	private static final int VIEW_TYPE_CARD = 1;
+	private static List<RuleInfo> mList = null;
 	private final SharedPreferences sharedPreferences;
 	private final Context context;
 	private final Gson gson;
-	private final List<RuleInfo> mList;
 
 	public RuleInfoAdapter(Context context, List<RuleInfo> list, SharedPreferences sharedPreferences) {
 		this.context = context;
-		this.mList = list;
 		this.sharedPreferences = sharedPreferences;
+		mList = list;
 		gson = new Gson();
 	}
 
@@ -55,6 +58,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 		}
 	}
 
+	@SuppressLint("SetTextI18n")
 	@Override
 	public void onBindViewHolder(MyViewHolder holder, int position) {
 		int viewType = getItemViewType(position);
@@ -63,9 +67,11 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 
 			holder.ruleId.setContentDescription(String.valueOf(rule.getId()));
 			holder.ruleTitle.setText(rule.getTitle());
+			holder.ruleVersion.setText(rule.getVersion());
 			holder.ruleFor.setText(rule.getFor());
-			holder.ruleType.setText(rule.getType());
+			holder.ruleForVersion.setText(" (" + rule.getForVersion() + ")");
 			holder.ruleSwitch.setChecked(rule.getStatus());
+			holder.ruleType.setText(rule.getType());
 
 			holder.ruleSwitch.setOnCheckedChangeListener((v, isChecked) -> {
 				SharedPreferences.Editor edit = sharedPreferences.edit();
@@ -78,22 +84,50 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 			});
 
 			holder.editButton.setOnClickListener(v -> {
-				Toast.makeText(context, "还没有完成。", Toast.LENGTH_LONG).show();
+				MainActivity.openCardEditDialog(position);
 			});
 
+			AtomicInteger deleteButtonTouchCounter = new AtomicInteger();
 			holder.deleteButton.setOnClickListener(v -> {
-				try {
-					SharedPreferences.Editor edit = sharedPreferences.edit();
-					mList.remove(position);
-					notifyDataSetChanged();
+				switch (deleteButtonTouchCounter.get()) {
+					case 0:
+						deleteButtonTouchCounter.set(1);
+						holder.deleteButton.setText(R.string.delete_confirm);
 
-					edit.putString("rules", gson.toJson(mList));
-					edit.apply();
-				} catch (Exception e) {
-					Log.e(TAG, String.valueOf(e));
+						Timer timer = new Timer();
+						timer.schedule(new TimerTask() {
+							@Override
+							public void run() {
+								try {
+									MainActivity.runOnUI(() -> {
+										holder.deleteButton.setText(R.string.delete);
+									});
+									deleteButtonTouchCounter.set(0);
+								} catch (Exception ignored) {}
+							}
+						}, 3000);
+						break;
+					case 1:
+						SharedPreferences.Editor edit = sharedPreferences.edit();
+						mList.remove(position);
+						notifyDataSetChanged();
+
+						edit.putString("rules", gson.toJson(mList));
+						edit.apply();
+
+						Toast.makeText(jianfou.getAppContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
+						break;
+					default:
+						break;
 				}
 			});
 		}
+
+	}
+
+	public void dataChange(List<RuleInfo> l) {
+		mList = l;
+		notifyDataSetChanged();
 	}
 
 	@Override
@@ -106,7 +140,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 	}
 
 	static class MyViewHolder extends RecyclerView.ViewHolder {
-		TextView ruleTitle, ruleFor, ruleType, ruleId;
+		TextView ruleTitle, ruleVersion, ruleFor, ruleForVersion, ruleType, ruleId;
 		Button editButton, deleteButton;
 		SwitchMaterial ruleSwitch;
 
@@ -114,7 +148,9 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 			super(view);
 			ruleId = view.findViewById(R.id.rule_id);
 			ruleTitle = view.findViewById(R.id.rule_title);
+			ruleVersion = view.findViewById(R.id.rule_version);
 			ruleFor = view.findViewById(R.id.rule_for);
+			ruleForVersion = view.findViewById(R.id.rule_for_version);
 			ruleType = view.findViewById(R.id.rule_type);
 			editButton = view.findViewById(R.id.edit_button);
 			deleteButton = view.findViewById(R.id.delete_button);

@@ -15,4 +15,20 @@
     <string name="function_closed">见否总开关被关闭，任何选项都将不生效。</string>
     <string name="operation_done">操作已生效。</string>
     <string name="empty_view">列表为空。点击\"+\"按钮新建预设或者查看社区预设。</string>
+    <string name="edit_dialog_title">编辑规则</string>
+    <string name="save">保存</string>
+    <string name="rule_title">规则名称</string>
+    <string name="rule_version">规则版本号</string>
+    <string name="default_rule_version_number">1.0</string>
+    <string name="rule_for">规则针对程序</string>
+    <string name="rule_for_version">规则针对程序的版本</string>
+    <string name="rule_type">规则种类</string>
+    <string name="rule_extra_settings_tip">保存并使用悬浮窗进行逻辑设置</string>
+    <string name="rule_extra_settings">规则逻辑设置</string>
+    <string name="add_rule_way_type_manual">手动添加规则</string>
+    <string name="add_rule_way_paste">从剪贴板粘贴规则</string>
+    <string name="add_rule_way_community">从预设社区获取规则</string>
+    <string name="add_rule">添加规则</string>
+    <string name="delete_confirm">确认删除</string>
+    <string name="cancel">取消</string>
 </resources>

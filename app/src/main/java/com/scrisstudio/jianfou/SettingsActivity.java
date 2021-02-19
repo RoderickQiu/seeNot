@@ -14,6 +14,13 @@ public class SettingsActivity extends AppCompatActivity {
 	ActivitySettingsBinding binding;
 
 	@Override
+	public void onBackPressed() {
+		//super.onBackPressed();
+		Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+		startActivity(intent);
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		binding = ActivitySettingsBinding.inflate(getLayoutInflater());

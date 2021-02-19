@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="135dp"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginVertical="0dp"
+        android:layout_marginVertical="4dp"
         android:checkable="true"
         android:clickable="true"
         android:clipToPadding="false"
@@ -31,30 +31,80 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="12dp"
                 android:orientation="vertical"
                 android:padding="20dp">
 
                 <!-- Title, secondary and supporting text -->
-                <TextView
-                    android:id="@+id/rule_title"
-                    android:layout_width="wrap_content"
+                <TableLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceHeadline6" />
+                    android:orientation="horizontal"
+                    android:shrinkColumns="0"
+                    android:stretchColumns="2">
 
-                <TextView
-                    android:id="@+id/rule_for"
-                    android:layout_width="wrap_content"
+                    <TableRow>
+
+                        <TextView
+                            android:id="@+id/rule_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:includeFontPadding="false"
+                            android:singleLine="true"
+                            android:textAppearance="?attr/textAppearanceHeadline6" />
+
+                        <TextView
+                            android:id="@+id/rule_version"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:paddingStart="4dp"
+                            android:paddingEnd="0dp"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:visibility="invisible" />
+
+                    </TableRow>
+
+                </TableLayout>
+
+                <TableLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:textAppearance="?attr/textAppearanceBody2"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:orientation="horizontal"
+                    android:shrinkColumns="0"
+                    android:stretchColumns="2">
+
+                    <TableRow>
+
+                        <TextView
+                            android:id="@+id/rule_for"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:includeFontPadding="false"
+                            android:singleLine="true"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                        <TextView
+                            android:id="@+id/rule_for_version"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:paddingStart="4dp"
+                            android:paddingEnd="0dp"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    </TableRow>
+
+                </TableLayout>
 
                 <TextView
                     android:id="@+id/rule_type"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="22dp"
                     android:textAppearance="?attr/textAppearanceBody1"
                     android:textColor="?android:attr/textColorSecondary" />
 
@@ -66,7 +116,9 @@
                 android:layout_gravity="end"
                 android:gravity="end"
                 android:orientation="vertical"
-                android:padding="8dp">
+                android:paddingVertical="8dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="6dp">
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/rule_switch"
@@ -74,8 +126,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginHorizontal="12dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="20dp"
                     android:checked="true" />
 
                 <LinearLayout
@@ -88,7 +140,7 @@
                     <Button
                         android:id="@+id/edit_button"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="60dp"
+                        android:layout_width="78dp"
                         android:layout_height="wrap_content"
                         android:backgroundTint="?attr/colorOnPrimary"
                         android:text="@string/edit" />
@@ -96,7 +148,7 @@
                     <Button
                         android:id="@+id/delete_button"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="60dp"
+                        android:layout_width="78dp"
                         android:layout_height="wrap_content"
                         android:backgroundTint="?attr/colorOnPrimary"
                         android:text="@string/delete" />
