@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -22,6 +23,7 @@ import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.databinding.ActivityMainBinding;
 import com.sergivonavi.materialbanner.Banner;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
 
 	public static void openCardEditDialog(int position) {
 		FullscreenDialogFragment.display(fragmentManager, position, gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {}.getType()));
+	}
+
+	public static void openSimpleDialog(String type, String info) {
+		SimpleDialogFragment.display(fragmentManager, type, info);
 	}
 
 	public static void runOnUI(Runnable runnable) {
@@ -145,6 +151,21 @@ public class MainActivity extends AppCompatActivity {
 				Toast.makeText(jianfou.getAppContext(), "还没有完成。", Toast.LENGTH_LONG).show();
 			}).create();
 			alertDialog.show();
+
+			try {
+				Field mAlert = AlertDialog.class.getDeclaredField("mAlert");
+				mAlert.setAccessible(true);
+				Object mAlertController = mAlert.get(alertDialog);
+				if (mAlertController != null) {
+					Field mTitle = mAlertController.getClass().getDeclaredField("mTitleView");
+					mTitle.setAccessible(true);
+					TextView mTitleView = (TextView) mTitle.get(mAlertController);
+					if (mTitleView != null)
+						mTitleView.setTextAppearance(R.style.TextAppearance_MaterialComponents_Headline6);
+				}
+			} catch (IllegalAccessException | NoSuchFieldException e) {
+				e.printStackTrace();
+			}
 		});
 
 	}

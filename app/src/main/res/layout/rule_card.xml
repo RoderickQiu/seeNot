@@ -31,7 +31,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="3dp"
                 android:orientation="vertical"
                 android:padding="20dp">
 
@@ -127,7 +127,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="2dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginEnd="12dp"
                     android:checked="true" />
 
                 <LinearLayout
@@ -137,21 +137,44 @@
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="5dp">
 
-                    <Button
-                        android:id="@+id/edit_button"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="78dp"
+                    <ImageButton
+                        android:id="@+id/more_button"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="36dp"
                         android:layout_height="wrap_content"
-                        android:backgroundTint="?attr/colorOnPrimary"
-                        android:text="@string/edit" />
+                        android:layout_marginEnd="10dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/expand_more_36dp"
+                        android:tint="?attr/colorPrimary" />
+
+                    <ImageButton
+                        android:id="@+id/edit_button"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="36dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/mode_edit_24dp"
+                        android:tint="?attr/colorPrimary" />
+
+                    <ImageButton
+                        android:id="@+id/delete_button"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="36dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/delete_24dp"
+                        android:tint="?attr/colorPrimary" />
 
                     <Button
-                        android:id="@+id/delete_button"
+                        android:id="@+id/delete_button_recheck"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="78dp"
                         android:layout_height="wrap_content"
                         android:backgroundTint="?attr/colorOnPrimary"
-                        android:text="@string/delete" />
+                        android:text="@string/delete_confirm"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 

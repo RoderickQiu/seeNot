@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,7 +19,6 @@ import com.google.gson.Gson;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyViewHolder> {
 
@@ -83,43 +83,40 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 				edit.apply();
 			});
 
+			holder.moreButton.setOnClickListener(v -> {
+				MainActivity.openSimpleDialog("more-info", MainActivity.resources.getString(R.string.rule_version_info) + rule.getVersion());
+			});
+
 			holder.editButton.setOnClickListener(v -> {
 				MainActivity.openCardEditDialog(position);
 			});
 
-			AtomicInteger deleteButtonTouchCounter = new AtomicInteger();
 			holder.deleteButton.setOnClickListener(v -> {
-				switch (deleteButtonTouchCounter.get()) {
-					case 0:
-						deleteButtonTouchCounter.set(1);
-						holder.deleteButton.setText(R.string.delete_confirm);
+				holder.deleteButton.setVisibility(View.GONE);
+				holder.deleteRecheckButton.setVisibility(View.VISIBLE);
 
-						Timer timer = new Timer();
-						timer.schedule(new TimerTask() {
-							@Override
-							public void run() {
-								try {
-									MainActivity.runOnUI(() -> {
-										holder.deleteButton.setText(R.string.delete);
-									});
-									deleteButtonTouchCounter.set(0);
-								} catch (Exception ignored) {}
-							}
-						}, 3000);
-						break;
-					case 1:
-						SharedPreferences.Editor edit = sharedPreferences.edit();
-						mList.remove(position);
-						notifyDataSetChanged();
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						try {
+							MainActivity.runOnUI(() -> {
+								holder.deleteButton.setVisibility(View.VISIBLE);
+								holder.deleteRecheckButton.setVisibility(View.GONE);
+							});
+						} catch (Exception ignored) {}
+					}
+				}, 3000);
+			});
+			holder.deleteRecheckButton.setOnClickListener(v -> {
+				SharedPreferences.Editor edit = sharedPreferences.edit();
+				mList.remove(position);
+				notifyDataSetChanged();
 
-						edit.putString("rules", gson.toJson(mList));
-						edit.apply();
+				edit.putString("rules", gson.toJson(mList));
+				edit.apply();
 
-						Toast.makeText(jianfou.getAppContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
-						break;
-					default:
-						break;
-				}
+				Toast.makeText(jianfou.getAppContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
 			});
 		}
 
@@ -141,7 +138,8 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 
 	static class MyViewHolder extends RecyclerView.ViewHolder {
 		TextView ruleTitle, ruleVersion, ruleFor, ruleForVersion, ruleType, ruleId;
-		Button editButton, deleteButton;
+		ImageButton moreButton, editButton, deleteButton;
+		Button deleteRecheckButton;
 		SwitchMaterial ruleSwitch;
 
 		public MyViewHolder(View view) {
@@ -152,8 +150,10 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 			ruleFor = view.findViewById(R.id.rule_for);
 			ruleForVersion = view.findViewById(R.id.rule_for_version);
 			ruleType = view.findViewById(R.id.rule_type);
+			moreButton = view.findViewById(R.id.more_button);
 			editButton = view.findViewById(R.id.edit_button);
 			deleteButton = view.findViewById(R.id.delete_button);
+			deleteRecheckButton = view.findViewById(R.id.delete_button_recheck);
 			ruleSwitch = view.findViewById(R.id.rule_switch);
 		}
 	}

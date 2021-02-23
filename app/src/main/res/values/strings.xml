@@ -31,4 +31,7 @@
     <string name="add_rule">添加规则</string>
     <string name="delete_confirm">确认删除</string>
     <string name="cancel">取消</string>
+    <string name="ok">好</string>
+    <string name="more_info">详细信息</string>
+    <string name="rule_version_info">规则版本号：</string>
 </resources>
