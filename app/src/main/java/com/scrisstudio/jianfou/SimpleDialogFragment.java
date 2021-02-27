@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager;
 public class SimpleDialogFragment extends DialogFragment {
 	public static final String TAG = "Jianfou-Dialog";
 	private static String type, info;
+	private static OnSubmitListener callBack;
 	private Button okButton;
 	private TextView textView;
 
@@ -22,6 +23,10 @@ public class SimpleDialogFragment extends DialogFragment {
 		dialog.show(fragmentManager, TAG);
 		type = t;
 		info = i;
+	}
+
+	public static void setOnSubmitListener(OnSubmitListener callback) {
+		callBack = callback;
 	}
 
 	@Override
@@ -42,8 +47,8 @@ public class SimpleDialogFragment extends DialogFragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View view = null;
-		if (type == "more-info") {
-			view = inflater.inflate(R.layout.simple_dialog, container, false);
+		view = inflater.inflate(R.layout.simple_dialog, container, false);
+		if (view != null) {
 			okButton = view.findViewById(R.id.ok_button);
 			textView = view.findViewById(R.id.info_box);
 		}
@@ -57,8 +62,15 @@ public class SimpleDialogFragment extends DialogFragment {
 		textView.setText(info);
 
 		okButton.setOnClickListener((v) -> {
+			callBack.onSubmit();
 			dismiss();
 		});
+	}
+
+	// This interface can be implemented by the Activity, parent Fragment,
+	// or a separate test implementation.
+	public interface OnSubmitListener {
+		void onSubmit();
 	}
 }
 

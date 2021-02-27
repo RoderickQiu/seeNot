@@ -34,4 +34,11 @@
     <string name="ok">好</string>
     <string name="more_info">详细信息</string>
     <string name="rule_version_info">规则版本号：</string>
+    <string name="service_name">见否基础服务</string>
+    <string name="service_description">为了使用见否的功能，就需要开启此服务。此服务不会访问网络，因此你的数据是完全安全的，我们也不会使用任何方法获取你在做什么。我们需要那些权限仅仅是为了解析应用布局以进行遮罩。</string>
+    <string name="service_not_running">见否基本服务当前不在运行，请现在打开。</string>
+    <string name="service_need_open">还需要在本页找到\"见否基本服务\"并打开。</string>
+    <string name="app_dialog_title">提示</string>
+    <string name="service_start_guide">监测到你还没有打开见否基本服务，请点击\"好\"并前往系统无障碍设置处，找到\"见否基本服务\"并打开以使用软件。</string>
+    <string name="settings_modifier_enable_guide">为了可以自动帮你开启见否服务（涉及系统无障碍接口），见否需要修改系统设置权限，我们不会滥用此权限。</string>
 </resources>

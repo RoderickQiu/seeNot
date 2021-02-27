@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
-            android:text="@string/more_info"
+            android:text="@string/app_dialog_title"
             android:textAppearance="?attr/textAppearanceHeadline6" />
 
         <ScrollView

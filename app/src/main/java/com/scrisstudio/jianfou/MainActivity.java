@@ -3,9 +3,12 @@ package com.scrisstudio.jianfou;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,10 +52,35 @@ public class MainActivity extends AppCompatActivity {
 
 	public static void openSimpleDialog(String type, String info) {
 		SimpleDialogFragment.display(fragmentManager, type, info);
+		SimpleDialogFragment.setOnSubmitListener(() -> {});
 	}
 
 	public static void runOnUI(Runnable runnable) {
 		UIHandler.post(runnable);
+	}
+
+	/*private void serviceTrigger() {
+		if (!ActivitySeekerService.isStart()) {
+			SimpleDialogFragment.display(fragmentManager, "service-trigger", resources.getString(R.string.service_start_guide));
+			SimpleDialogFragment.setOnSubmitListener(() -> {
+				try {
+					Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					getBaseContext().startActivity(intent);
+				} catch (Exception e) {
+					startActivity(new Intent("android.settings.SETTINGS"));
+					e.printStackTrace();
+				}
+			});
+		}
+	}*/
+	private void settingModifierTrigger() {
+		SimpleDialogFragment.display(fragmentManager, "service-trigger", resources.getString(R.string.settings_modifier_enable_guide));
+		SimpleDialogFragment.setOnSubmitListener(() -> {
+			Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+			intent.setData(Uri.parse("package:" + getPackageName()));
+			startActivityForResult(intent, 200);
+		});
 	}
 
 	@Override
@@ -65,8 +93,20 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == 200) {
+			if (Settings.System.canWrite(getApplicationContext())) {
+				Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.ActivitySeekerService");
+				Settings.Secure.putString(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, "1");
+			}
+		}
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.e(TAG, "Start testing...");
 
 		binding = ActivityMainBinding.inflate(getLayoutInflater());
 		View view = binding.getRoot();
@@ -90,6 +130,16 @@ public class MainActivity extends AppCompatActivity {
 		edit.apply();*/
 		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {}.getType());
 
+		//TODO this should test more
+		//see also https://blog.csdn.net/weixin_42474371/article/details/104405463
+		//see also https://www.jianshu.com/p/0acb66694860
+		if (!Settings.System.canWrite(getApplicationContext())) {
+			settingModifierTrigger();
+		} else {
+			Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.ActivitySeekerService");
+			Settings.Secure.putString(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, "1");
+		}
+
 		Banner banner = binding.banner;
 		banner.setLeftButtonListener(banner1 -> {
 			banner.dismiss();
@@ -99,10 +149,19 @@ public class MainActivity extends AppCompatActivity {
 			editor.putBoolean("master-switch", true);
 			editor.apply();
 
-			Toast.makeText(this.getApplicationContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
+			if (ActivitySeekerService.isStart()) {
+				Toast.makeText(this.getApplicationContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
+			}/* else {
+				serviceTrigger();
+			}*/
 			banner.dismiss();
 		});
-		if (!sharedPreferences.getBoolean("master-switch", true)) banner.show();
+		if (!sharedPreferences.getBoolean("master-switch", true)) {
+			banner.setMessage(R.string.function_closed);
+			banner.show();
+		}/* else {
+			serviceTrigger();
+		}*/
 
 		RecyclerView recyclerView = binding.ruleList;
 		LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
