@@ -41,4 +41,6 @@
     <string name="app_dialog_title">提示</string>
     <string name="service_start_guide">监测到你还没有打开见否基本服务，请点击\"好\"并前往系统无障碍设置处，找到\"见否基本服务\"并打开以使用软件。</string>
     <string name="settings_modifier_enable_guide">为了可以自动帮你开启见否服务（涉及系统无障碍接口），见否需要修改系统设置权限，我们不会滥用此权限。</string>
+    <string name="service_start_failed">自动开启见否服务失败，请前往系统无障碍设置手动开启</string>
+    <string name="rid">屏蔽</string>
 </resources>
