@@ -1,4 +1,4 @@
-package com.scrisstudio.jianfou;
+package com.scrisstudio.jianfou.ui;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
+
+import com.scrisstudio.jianfou.R;
 
 public class SimpleDialogFragment extends DialogFragment {
 	public static final String TAG = "Jianfou-Dialog";

@@ -1,9 +1,11 @@
-package com.scrisstudio.jianfou;
+package com.scrisstudio.jianfou.ui;
 import android.graphics.Rect;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.scrisstudio.jianfou.activity.MainActivity;
 
 import java.util.Objects;
 

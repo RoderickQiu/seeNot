@@ -1,4 +1,4 @@
-package com.scrisstudio.jianfou;
+package com.scrisstudio.jianfou.maskcreate;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.scrisstudio.jianfou.R;
+import com.scrisstudio.jianfou.activity.MainActivity;
 
 public class FloatingView extends LinearLayout {
 	public static final String TAG = "FloatingView";

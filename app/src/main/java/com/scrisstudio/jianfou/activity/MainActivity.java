@@ -1,4 +1,4 @@
-package com.scrisstudio.jianfou;
+package com.scrisstudio.jianfou.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,7 +23,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.databinding.ActivityMainBinding;
+import com.scrisstudio.jianfou.jianfou;
+import com.scrisstudio.jianfou.maskcreate.ActivitySeekerService;
+import com.scrisstudio.jianfou.ui.CardDecoration;
+import com.scrisstudio.jianfou.ui.FullscreenDialogFragment;
+import com.scrisstudio.jianfou.ui.RuleInfo;
+import com.scrisstudio.jianfou.ui.RuleInfoAdapter;
+import com.scrisstudio.jianfou.ui.SimpleDialogFragment;
 import com.sergivonavi.materialbanner.Banner;
 
 import java.lang.reflect.Field;
@@ -71,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private void settingModifier() {
 		try {
-			Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.ActivitySeekerService");
+			Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.maskcreate.ActivitySeekerService");
 			Settings.Secure.putString(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, "1");
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();

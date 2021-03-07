@@ -1,4 +1,4 @@
-package com.scrisstudio.jianfou;
+package com.scrisstudio.jianfou.ui;
 
 import android.app.Dialog;
 import android.content.SharedPreferences;
@@ -15,6 +15,8 @@ import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
+import com.scrisstudio.jianfou.R;
+import com.scrisstudio.jianfou.jianfou;
 
 import java.util.ArrayList;
 import java.util.List;

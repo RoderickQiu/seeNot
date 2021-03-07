@@ -1,4 +1,4 @@
-package com.scrisstudio.jianfou;
+package com.scrisstudio.jianfou.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.gson.Gson;
+import com.scrisstudio.jianfou.R;
+import com.scrisstudio.jianfou.activity.MainActivity;
+import com.scrisstudio.jianfou.jianfou;
 
 import java.util.List;
 import java.util.Timer;

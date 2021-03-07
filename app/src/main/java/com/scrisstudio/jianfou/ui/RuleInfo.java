@@ -1,4 +1,4 @@
-package com.scrisstudio.jianfou;
+package com.scrisstudio.jianfou.ui;
 public class RuleInfo {
 	private final int id;
 	private boolean status;

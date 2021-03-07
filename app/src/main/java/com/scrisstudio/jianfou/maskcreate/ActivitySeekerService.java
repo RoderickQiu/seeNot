@@ -1,4 +1,4 @@
-package com.scrisstudio.jianfou;
+package com.scrisstudio.jianfou.maskcreate;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.ComponentName;

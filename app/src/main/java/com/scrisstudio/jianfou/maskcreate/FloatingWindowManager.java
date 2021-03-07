@@ -1,10 +1,12 @@
-package com.scrisstudio.jianfou;
+package com.scrisstudio.jianfou.maskcreate;
 
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+
+import com.scrisstudio.jianfou.R;
 
 public class FloatingWindowManager {
 	private static final WindowManager.LayoutParams layoutParams;
