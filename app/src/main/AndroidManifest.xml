@@ -30,7 +30,7 @@
         </activity>
 
         <service
-            android:name=".maskcreate.ActivitySeekerService"
+            android:name=".mask.ActivitySeekerService"
             android:label="@string/service_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>

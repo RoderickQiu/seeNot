@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -16,7 +15,7 @@ import androidx.fragment.app.FragmentManager;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.scrisstudio.jianfou.R;
-import com.scrisstudio.jianfou.jianfou;
+import com.scrisstudio.jianfou.mask.MaskAssignerUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +69,17 @@ public class FullscreenDialogFragment extends DialogFragment {
 		return view;
 	}
 
+	private void submitData(@NonNull View view) {
+		RuleInfo rule = list.get(position);
+		rule.setTitle(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_name)).getEditText()).getText()));
+		rule.setVersion(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_version)).getEditText()).getText()));
+		rule.setFor(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_for)).getEditText()).getText()));
+		rule.setForVersion(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_for_version)).getEditText()).getText()));
+		list.set(position, rule);
+
+		callBack.onSubmit(position, list);
+	}
+
 	@Override
 	public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -77,20 +87,13 @@ public class FullscreenDialogFragment extends DialogFragment {
 		toolbar.setTitle(R.string.edit_dialog_title);
 		toolbar.inflateMenu(R.menu.top_dialog_bar);
 		toolbar.setOnMenuItemClickListener(item -> {
-			RuleInfo rule = list.get(position);
-			rule.setTitle(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_name)).getEditText()).getText()));
-			rule.setVersion(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_version)).getEditText()).getText()));
-			rule.setFor(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_for)).getEditText()).getText()));
-			rule.setForVersion(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_for_version)).getEditText()).getText()));
-			list.set(position, rule);
-
-			callBack.onSubmit(position, list);
-			dismiss();
+			submitData(view);
 			return true;
 		});
 
 		view.findViewById(R.id.rule_extra_settings_tip).setOnClickListener(v -> {
-			Toast.makeText(jianfou.getAppContext(), "还没有完成。", Toast.LENGTH_LONG).show();
+			submitData(view);
+			MaskAssignerUtils.showActivityCustomizationDialog();
 			dismiss();
 		});
 

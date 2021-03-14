@@ -1,4 +1,4 @@
-package com.scrisstudio.jianfou.maskcreate;
+package com.scrisstudio.jianfou.mask;
 
 import android.content.Context;
 import android.view.View;

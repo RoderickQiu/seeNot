@@ -43,4 +43,17 @@
     <string name="settings_modifier_enable_guide">为了可以自动帮你开启见否服务（涉及系统无障碍接口），见否需要修改系统设置权限，我们不会滥用此权限。</string>
     <string name="service_start_failed">自动开启见否服务失败，请前往系统无障碍设置手动开启</string>
     <string name="rid">屏蔽</string>
+    <string name="exit">退出</string>
+    <string name="show_target">显示准心</string>
+    <string name="show_outline">显示布局</string>
+    <string name="show_position_info">显示坐标信息</string>
+    <string name="position_info">坐标：</string>
+    <string name="show_widget_info">显示控件信息</string>
+    <string name="widget">控件：</string>
+    <string name="show_activity_name">显示当前页面的活动名</string>
+    <string name="activity_name">活动：</string>
+    <string name="package_name">包名：</string>
+    <string name="show_package_name">显示当前应用的包名</string>
+    <string name="re_get">重新获取</string>
+    <string name="add_widget">添加控件</string>
 </resources>

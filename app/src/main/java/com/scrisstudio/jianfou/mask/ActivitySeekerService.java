@@ -1,4 +1,4 @@
-package com.scrisstudio.jianfou.maskcreate;
+package com.scrisstudio.jianfou.mask;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.ComponentName;
@@ -12,11 +12,10 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 public class ActivitySeekerService extends AccessibilityService {
 	public static ActivitySeekerService mService;
+	public static String foregroundClassName = "", foregroundPackageName = "";
 	private final String TAG = "Jianfou-AccessibilityService";
-	FloatingWindowManager mWindowManager;
+	private FloatingWindowManager mWindowManager;
 	private boolean isMaskOn = false, isWordFound = false;
-	private String foregroundClassName = new String(), foregroundPackageName = new String();
-
 	private int x = -1, y = -1, width = -1, height = -1;
 	private int defaultX = 0, defaultY = 204 - 72, defaultWidth = 1080, defaultHeight = 1986;
 	private int xBuffer = -20, yBuffer = -0, widthBuffer = -20, heightBuffer = -12 + 150;
@@ -51,7 +50,6 @@ public class ActivitySeekerService extends AccessibilityService {
 				foregroundPackageName = event.getPackageName().toString();
 			}
 			ComponentName cName = new ComponentName(foregroundPackageName, foregroundClassName);
-
 			//Best solution til now
 			if (foregroundPackageName.equals("com.zhihu.android")) {
 				if (tryGetActivity(cName) != null) {
@@ -66,18 +64,18 @@ public class ActivitySeekerService extends AccessibilityService {
 			} else if (isMaskOn) maskCreator(false);
 		} else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
 			ComponentName cName = new ComponentName(foregroundPackageName, event.getClassName().toString());
-			if (foregroundPackageName.equals("com.zhihu.android")) {
-				if (tryGetActivity(cName) != null) {
-					if (isCapableClass(event.getClassName().toString()))
-						foregroundClassName = event.getClassName().toString();
-					Log.e(TAG, foregroundClassName);
-					if (foregroundClassName.equals("com.zhihu.android.app.ui.activity.MainActivity")) {
-						maskSet();
-					} else {
-						if (isMaskOn) maskCreator(false);
-					}
+			//if (foregroundPackageName.equals("com.zhihu.android")) {
+			if (tryGetActivity(cName) != null) {
+				if (isCapableClass(event.getClassName().toString()))
+					foregroundClassName = event.getClassName().toString();
+				Log.e(TAG, foregroundClassName);
+				if (foregroundClassName.equals("com.zhihu.android.app.ui.activity.MainActivity")) {
+					maskSet();
+				} else {
+					if (isMaskOn) maskCreator(false);
 				}
-			} else if (isMaskOn) maskCreator(false);
+			}
+			//} else if (isMaskOn) maskCreator(false);
 		}
 	}
 
@@ -93,7 +91,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	private boolean isCapableClass(String className) {
 		if (className == null) return false;
 		else if (className.contains("Activity")) return true;
-		else if (className.startsWith("android.widget.") || className.startsWith("android.view."))
+		else if (className.startsWith("android.widget.") || className.startsWith("android.view.") || className.startsWith("androidx."))
 			return false;
 		else return true;
 	}

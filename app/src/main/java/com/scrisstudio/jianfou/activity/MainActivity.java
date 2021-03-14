@@ -10,23 +10,21 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.databinding.ActivityMainBinding;
 import com.scrisstudio.jianfou.jianfou;
-import com.scrisstudio.jianfou.maskcreate.ActivitySeekerService;
+import com.scrisstudio.jianfou.mask.ActivitySeekerService;
+import com.scrisstudio.jianfou.mask.MaskAssignerUtils;
 import com.scrisstudio.jianfou.ui.CardDecoration;
 import com.scrisstudio.jianfou.ui.FullscreenDialogFragment;
 import com.scrisstudio.jianfou.ui.RuleInfo;
@@ -34,7 +32,6 @@ import com.scrisstudio.jianfou.ui.RuleInfoAdapter;
 import com.scrisstudio.jianfou.ui.SimpleDialogFragment;
 import com.sergivonavi.materialbanner.Banner;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private void settingModifier() {
 		try {
-			Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.maskcreate.ActivitySeekerService");
+			Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.mask.ActivitySeekerService");
 			Settings.Secure.putString(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, "1");
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
@@ -207,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 		});
 
 		binding.floatingActionButton.setOnClickListener(v -> {
-			final CharSequence[] choices = {resources.getString(R.string.add_rule_way_type_manual), resources.getString(R.string.add_rule_way_paste), resources.getString(R.string.add_rule_way_community)};
+			/*final CharSequence[] choices = {resources.getString(R.string.add_rule_way_type_manual), resources.getString(R.string.add_rule_way_paste), resources.getString(R.string.add_rule_way_community)};
 
 			AlertDialog alertDialog = new MaterialAlertDialogBuilder(this).setTitle(R.string.add_rule).setItems(choices, (dialog, which) -> {
 				Toast.makeText(jianfou.getAppContext(), "还没有完成。", Toast.LENGTH_LONG).show();
@@ -227,7 +224,9 @@ public class MainActivity extends AppCompatActivity {
 				}
 			} catch (IllegalAccessException | NoSuchFieldException e) {
 				e.printStackTrace();
-			}
+			}*/
+
+			MaskAssignerUtils.showActivityCustomizationDialog();
 		});
 
 	}
