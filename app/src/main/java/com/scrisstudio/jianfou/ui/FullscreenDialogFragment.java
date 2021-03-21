@@ -93,7 +93,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 
 		view.findViewById(R.id.rule_extra_settings_tip).setOnClickListener(v -> {
 			submitData(view);
-			MaskAssignerUtils.showActivityCustomizationDialog();
+			MaskAssignerUtils.showActivityCustomizationDialog(position);
 			dismiss();
 		});
 

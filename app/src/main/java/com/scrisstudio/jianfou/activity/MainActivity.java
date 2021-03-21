@@ -2,6 +2,8 @@ package com.scrisstudio.jianfou.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,21 +12,23 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.databinding.ActivityMainBinding;
 import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.mask.ActivitySeekerService;
-import com.scrisstudio.jianfou.mask.MaskAssignerUtils;
 import com.scrisstudio.jianfou.ui.CardDecoration;
 import com.scrisstudio.jianfou.ui.FullscreenDialogFragment;
 import com.scrisstudio.jianfou.ui.RuleInfo;
@@ -32,6 +36,7 @@ import com.scrisstudio.jianfou.ui.RuleInfoAdapter;
 import com.scrisstudio.jianfou.ui.SimpleDialogFragment;
 import com.sergivonavi.materialbanner.Banner;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +47,9 @@ public class MainActivity extends AppCompatActivity {
 	public static Resources resources;
 	public static Handler UIHandler = new Handler(Looper.getMainLooper());
 	public static Resources.Theme theme;
+	public static SharedPreferences sharedPreferences;
+	public static String currentHomePackage;
 	private static FragmentManager fragmentManager;
-	private static SharedPreferences sharedPreferences;
 	private ActivityMainBinding binding;
 	private List<RuleInfo> list = new ArrayList<>();
 
@@ -107,6 +113,11 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		Log.e(TAG, "Start testing...");
 
+		Intent intent = new Intent(Intent.ACTION_MAIN);
+		intent.addCategory(Intent.CATEGORY_HOME);
+		ResolveInfo resolveInfo = getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+		currentHomePackage = resolveInfo.activityInfo.packageName;
+
 		binding = ActivityMainBinding.inflate(getLayoutInflater());
 		View view = binding.getRoot();
 		setContentView(view);
@@ -151,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
 		banner.setRightButtonListener(banner2 -> {
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("master-switch", true);
+			ActivitySeekerService.isServiceRunning = true;
 			editor.apply();
 
 			if (ActivitySeekerService.isStart()) {
@@ -180,13 +192,11 @@ public class MainActivity extends AppCompatActivity {
 		});
 
 		binding.topAppBar.setOnMenuItemClickListener(menuItem -> {
-			switch (menuItem.getItemId()) {
-				case R.id.help:
-					Toast.makeText(this.getApplicationContext(), "还没有完成。", Toast.LENGTH_LONG).show();
-					return true;
-				default:
-					return false;
+			if (menuItem.getItemId() == R.id.help) {
+				Toast.makeText(this.getApplicationContext(), "还没有完成。", Toast.LENGTH_LONG).show();
+				return true;
 			}
+			return false;
 		});
 
 		binding.topAppBar.setNavigationOnClickListener(v -> binding.drawerLayout.openDrawer(binding.navigation));
@@ -195,8 +205,8 @@ public class MainActivity extends AppCompatActivity {
 			binding.drawerLayout.closeDrawer(binding.navigation);
 
 			if (menuItem.getItemId() == R.id.item_settings) {
-				Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-				startActivity(intent);
+				Intent settingsOpener = new Intent(MainActivity.this, SettingsActivity.class);
+				startActivity(settingsOpener);
 				return false;
 			} else {
 				return true;
@@ -204,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
 		});
 
 		binding.floatingActionButton.setOnClickListener(v -> {
-			/*final CharSequence[] choices = {resources.getString(R.string.add_rule_way_type_manual), resources.getString(R.string.add_rule_way_paste), resources.getString(R.string.add_rule_way_community)};
+			final CharSequence[] choices = {resources.getString(R.string.add_rule_way_type_manual), resources.getString(R.string.add_rule_way_paste), resources.getString(R.string.add_rule_way_community)};
 
 			AlertDialog alertDialog = new MaterialAlertDialogBuilder(this).setTitle(R.string.add_rule).setItems(choices, (dialog, which) -> {
 				Toast.makeText(jianfou.getAppContext(), "还没有完成。", Toast.LENGTH_LONG).show();
@@ -224,9 +234,7 @@ public class MainActivity extends AppCompatActivity {
 				}
 			} catch (IllegalAccessException | NoSuchFieldException e) {
 				e.printStackTrace();
-			}*/
-
-			MaskAssignerUtils.showActivityCustomizationDialog();
+			}
 		});
 
 	}

@@ -1,17 +1,27 @@
 package com.scrisstudio.jianfou.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.databinding.ActivitySettingsBinding;
+import com.scrisstudio.jianfou.mask.ActivitySeekerService;
+
+import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
 
+	private final SharedPreferences.OnSharedPreferenceChangeListener mListener = (sharedPreferences, key) -> {
+		if (Objects.equals(key, "master-switch")) {
+			ActivitySeekerService.isServiceRunning = sharedPreferences.getBoolean(key, true);
+		}
+	};
 	ActivitySettingsBinding binding;
 
 	@Override
@@ -19,6 +29,20 @@ public class SettingsActivity extends AppCompatActivity {
 		//super.onBackPressed();
 		Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
 		startActivity(intent);
+	}
+
+	@Override
+	protected void onResume() {
+		PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).
+				registerOnSharedPreferenceChangeListener(mListener);
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).
+				unregisterOnSharedPreferenceChangeListener(mListener);
+		super.onPause();
 	}
 
 	@Override

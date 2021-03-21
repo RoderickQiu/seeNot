@@ -1,6 +1,7 @@
 package com.scrisstudio.jianfou.mask;
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
@@ -16,11 +17,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
+import com.scrisstudio.jianfou.activity.MainActivity;
 import com.scrisstudio.jianfou.jianfou;
+import com.scrisstudio.jianfou.ui.RuleInfo;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.scrisstudio.jianfou.mask.ActivitySeekerService.mService;
@@ -28,11 +31,14 @@ import static com.scrisstudio.jianfou.mask.ActivitySeekerService.mService;
 public class MaskAssignerUtils {
 
 	@SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
-	public static void showActivityCustomizationDialog() {
+	public static void showActivityCustomizationDialog(int position) {
 		// show activity customization window
 		final WindowManager windowManager = (WindowManager) mService.getSystemService(AccessibilityService.WINDOW_SERVICE);
 		final DisplayMetrics metrics = new DisplayMetrics();
 		jianfou.getAppContext().getDisplay().getRealMetrics(metrics);
+		final SharedPreferences sharedPreferences = MainActivity.sharedPreferences;
+		final Gson gson = new Gson();
+		ActivitySeekerService.isServiceRunning = false;
 
 		boolean b = metrics.heightPixels > metrics.widthPixels;
 		final int width = b ? metrics.widthPixels : metrics.heightPixels;
@@ -154,23 +160,20 @@ public class MaskAssignerUtils {
 				return true;
 			}
 		});
-		btAddWidget.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				/*PackageWidgetDescription temWidget = new PackageWidgetDescription(widgetDescription);
-				Set<PackageWidgetDescription> set = mapPackageWidgets.get(widgetDescription.packageName);
-				if (set == null) {
-					set = new HashSet<>();
-					set.add(temWidget);
-					mapPackageWidgets.put(widgetDescription.packageName, set);
-				} else {
-					set.add(temWidget);
-				}
-				btAddWidget.setEnabled(false);
-				tvPackageName.setText(widgetDescription.packageName + " (以下控件数据已保存)");
-				// save
-				Settings.getInstance().setPackageWidgets(mapPackageWidgets);*/
-			}
+		btAddWidget.setOnClickListener(v -> {
+			PackageWidgetDescription temWidget = new PackageWidgetDescription(widgetDescription);
+
+			List<RuleInfo> list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {}.getType());
+			RuleInfo rule = list.get(position);
+			rule.setFilter(temWidget);
+			list.set(position, rule);
+			ActivitySeekerService.setRulesList(list);
+			SharedPreferences.Editor ruleEditor = sharedPreferences.edit();
+			ruleEditor.putString("rules", gson.toJson(list));
+			ruleEditor.apply();
+
+			btAddWidget.setEnabled(false);
+			tvPackageName.setText(widgetDescription.packageName + " (以下控件数据已保存)");
 		});
 		btShowOutline.setOnClickListener(v -> {
 			Button button = (Button) v;
@@ -184,7 +187,7 @@ public class MaskAssignerUtils {
 				roots.add(root);
 				ArrayList<AccessibilityNodeInfo> nodeList = new ArrayList<>();
 				findAllNode(roots, nodeList, "");
-				Collections.sort(nodeList, (a, b1) -> {
+				nodeList.sort((a, b1) -> {
 					Rect rectA = new Rect();
 					Rect rectB = new Rect();
 					a.getBoundsInScreen(rectA);
@@ -200,7 +203,7 @@ public class MaskAssignerUtils {
 					final ImageView img = new ImageView(mService);
 					img.setBackgroundResource(R.drawable.node);
 					img.setFocusableInTouchMode(true);
-					img.setOnClickListener(v12 -> v12.requestFocus());
+					img.setOnClickListener(View::requestFocus);
 					img.setOnFocusChangeListener((v1, hasFocus) -> {
 						if (hasFocus) {
 							widgetDescription.position = temRect;
@@ -244,10 +247,10 @@ public class MaskAssignerUtils {
 			tvActivityName.setText(positionDescription.activityName);
 		});*/
 		btQuit.setOnClickListener(v -> {
-			Gson gson = new Gson();
 			windowManager.removeViewImmediate(viewTarget);
 			windowManager.removeViewImmediate(viewCustomization);
 			windowManager.removeViewImmediate(imageTarget);
+			ActivitySeekerService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
 		});
 		windowManager.addView(viewTarget, outlineParams);
 		windowManager.addView(viewCustomization, customizationParams);

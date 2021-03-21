@@ -1,4 +1,5 @@
 package com.scrisstudio.jianfou.ui;
+import com.scrisstudio.jianfou.mask.PackageWidgetDescription;
 public class RuleInfo {
 	private final int id;
 	private boolean status;
@@ -7,8 +8,9 @@ public class RuleInfo {
 	private String ruleFor;
 	private String ruleForVersion;
 	private String ruleType;
+	private PackageWidgetDescription filter;
 
-	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion, String ruleType) {
+	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion, String ruleType, PackageWidgetDescription filter) {
 		this.status = status;
 		this.id = id;
 		this.ruleTitle = ruleTitle;
@@ -16,6 +18,7 @@ public class RuleInfo {
 		this.ruleFor = ruleFor;
 		this.ruleForVersion = ruleForVersion;
 		this.ruleType = ruleType;
+		this.filter = filter;
 	}
 
 	public boolean getStatus() {return status;}
@@ -43,4 +46,8 @@ public class RuleInfo {
 	public String getType() {return ruleType;}
 
 	public void setType(String ruleType) {this.ruleType = ruleType;}
+
+	public PackageWidgetDescription getFilter() {return filter;}
+
+	public void setFilter(PackageWidgetDescription filter) {this.filter = filter;}
 }
