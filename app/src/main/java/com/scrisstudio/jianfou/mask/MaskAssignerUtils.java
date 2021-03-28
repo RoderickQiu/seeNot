@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -24,8 +25,10 @@ import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.ui.RuleInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import static com.scrisstudio.jianfou.mask.ActivitySeekerService.TAG;
 import static com.scrisstudio.jianfou.mask.ActivitySeekerService.mService;
 
 public class MaskAssignerUtils {
@@ -39,6 +42,7 @@ public class MaskAssignerUtils {
 		final SharedPreferences sharedPreferences = MainActivity.sharedPreferences;
 		final Gson gson = new Gson();
 		ActivitySeekerService.isServiceRunning = false;
+		Log.i(TAG, "Assigner running.");
 
 		boolean b = metrics.heightPixels > metrics.widthPixels;
 		final int width = b ? metrics.widthPixels : metrics.heightPixels;
@@ -206,7 +210,25 @@ public class MaskAssignerUtils {
 					img.setOnClickListener(View::requestFocus);
 					img.setOnFocusChangeListener((v1, hasFocus) -> {
 						if (hasFocus) {
+							AccessibilityNodeInfo tempNode = e;
+							ArrayList<Integer> indicesList = new ArrayList<Integer>();
+							while (true) {
+								for (int i = 0; i < tempNode.getParent().getChildCount(); i++) {
+									if (tempNode.getParent().getChild(i).equals(tempNode)) {
+										indicesList.add(i);
+										break;
+									}
+								}
+								tempNode = tempNode.getParent();
+
+								if (tempNode.equals(root)) {
+									Collections.reverse(indicesList);
+									break;
+								}
+							}
+
 							widgetDescription.position = temRect;
+							widgetDescription.indices = indicesList;
 							widgetDescription.clickable = e.isClickable();
 							widgetDescription.className = e.getClassName().toString();
 							CharSequence cId = e.getViewIdResourceName();

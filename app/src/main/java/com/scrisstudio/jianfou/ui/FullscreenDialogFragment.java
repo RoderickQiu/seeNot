@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -15,6 +16,8 @@ import androidx.fragment.app.FragmentManager;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.scrisstudio.jianfou.R;
+import com.scrisstudio.jianfou.jianfou;
+import com.scrisstudio.jianfou.mask.ActivitySeekerService;
 import com.scrisstudio.jianfou.mask.MaskAssignerUtils;
 
 import java.util.ArrayList;
@@ -92,8 +95,16 @@ public class FullscreenDialogFragment extends DialogFragment {
 		});
 
 		view.findViewById(R.id.rule_extra_settings_tip).setOnClickListener(v -> {
-			submitData(view);
-			MaskAssignerUtils.showActivityCustomizationDialog(position);
+			try {
+				if (ActivitySeekerService.isServiceRunning) {
+					submitData(view);
+					MaskAssignerUtils.showActivityCustomizationDialog(position);
+				} else {
+					Toast.makeText(jianfou.getAppContext(), R.string.cannot_open_assigner, Toast.LENGTH_LONG).show();
+				}
+			} catch (Exception e) {
+				Toast.makeText(jianfou.getAppContext(), R.string.cannot_open_assigner, Toast.LENGTH_LONG).show();
+			}
 			dismiss();
 		});
 

@@ -2,11 +2,13 @@ package com.scrisstudio.jianfou.mask;
 
 import android.graphics.Rect;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class PackageWidgetDescription {
 	public String packageName, activityName, className, idName, description, text;
 	public Rect position;
+	public ArrayList<Integer> indices;
 	public boolean clickable, onlyClick;
 
 	public PackageWidgetDescription() {
@@ -17,11 +19,12 @@ public class PackageWidgetDescription {
 		this.description = "";
 		this.text = "";
 		this.position = new Rect();
+		this.indices = new ArrayList<Integer>();
 		this.clickable = false;
 		this.onlyClick = false;
 	}
 
-	public PackageWidgetDescription(String packageName, String activityName, String className, String idName, String description, String text, Rect position, boolean clickable, boolean onlyClick) {
+	public PackageWidgetDescription(String packageName, String activityName, String className, String idName, String description, String text, Rect position, ArrayList<Integer> indices, boolean clickable, boolean onlyClick) {
 		this.packageName = packageName;
 		this.activityName = activityName;
 		this.className = className;
@@ -29,6 +32,7 @@ public class PackageWidgetDescription {
 		this.description = description;
 		this.text = text;
 		this.position = position;
+		this.indices = indices;
 		this.clickable = clickable;
 		this.onlyClick = onlyClick;
 	}
@@ -40,10 +44,10 @@ public class PackageWidgetDescription {
 		this.idName = widgetDescription.idName;
 		this.description = widgetDescription.description;
 		this.text = widgetDescription.text;
+		this.indices = widgetDescription.indices;
 		this.position = new Rect(widgetDescription.position);
 		this.clickable = widgetDescription.clickable;
 		this.onlyClick = widgetDescription.onlyClick;
-
 	}
 
 	@Override

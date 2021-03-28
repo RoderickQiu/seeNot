@@ -56,4 +56,5 @@
     <string name="show_package_name">显示当前应用的包名</string>
     <string name="re_get">重新获取</string>
     <string name="add_widget">添加控件</string>
+    <string name="cannot_open_assigner">已经打开设置窗口或服务未运行，请检查</string>
 </resources>
