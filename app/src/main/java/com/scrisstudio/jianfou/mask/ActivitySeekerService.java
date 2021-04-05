@@ -24,6 +24,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static List<RuleInfo> rulesList;
 	public static boolean isServiceRunning;
 	public static String foregroundClassName = "", foregroundPackageName = "";
+	private static String windowOrientation = "portrait";
 	private FloatingWindowManager mWindowManager;
 	private boolean isMaskOn = false;
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
@@ -63,6 +64,41 @@ public class ActivitySeekerService extends AccessibilityService {
 	@Override
 	public void onAccessibilityEvent(AccessibilityEvent event) {
 		if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
+			try {
+				Rect rect = new Rect();
+				event.getSource().getBoundsInScreen(rect);
+				if (rect.width() == MainActivity.windowTrueWidth) {
+					if (windowOrientation.equals("landscape")) {
+						windowOrientation = "portrait";
+						Log.e(TAG, "Change to Portrait");
+						if (isMaskOn)
+							for (int i = 0; i < rulesList.size(); i++) {
+								if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName)) {
+									if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
+										maskSet(rulesList.get(i).getFilter(), i, true);
+										break;
+									}
+								}
+							}
+					}
+				} else if (rect.width() == MainActivity.windowTrueHeight) {
+					if (windowOrientation.equals("portrait")) {
+						windowOrientation = "landscape";
+						Log.e(TAG, "Change to Landscape");
+						if (isMaskOn)
+							for (int i = 0; i < rulesList.size(); i++) {
+								if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName)) {
+									if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
+										maskSet(rulesList.get(i).getFilter(), i, true);
+										break;
+									}
+								}
+							}
+					}
+				}
+			} catch (Exception e) {
+				Log.i(TAG, "Failed to get orientation");
+			}
 			try {
 				foregroundPackageName = getRootInActiveWindow().getPackageName().toString();
 			} catch (Exception e) {

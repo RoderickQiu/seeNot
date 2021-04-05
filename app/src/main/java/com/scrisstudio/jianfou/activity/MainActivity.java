@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 	public static Resources resources;
 	public static Handler UIHandler = new Handler(Looper.getMainLooper());
 	public static Resources.Theme theme;
+	public static int windowTrueWidth, windowTrueHeight;
 	public static SharedPreferences sharedPreferences;
 	public static String currentHomePackage;
 	private static FragmentManager fragmentManager;
@@ -129,6 +131,11 @@ public class MainActivity extends AppCompatActivity {
 		resources = this.getResources();
 		theme = this.getTheme();
 		fragmentManager = getSupportFragmentManager();
+
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+		windowTrueWidth = dm.widthPixels;
+		windowTrueHeight = dm.heightPixels;
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		if (!sharedPreferences.contains("rules")) {
