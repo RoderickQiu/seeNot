@@ -39,6 +39,8 @@ import com.sergivonavi.materialbanner.Banner;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,12 +61,14 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public static void openCardEditDialog(int position) {
-		FullscreenDialogFragment.display(fragmentManager, position, gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {}.getType()));
+		FullscreenDialogFragment.display(fragmentManager, position, gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+		}.getType()));
 	}
 
 	public static void openSimpleDialog(String type, String info) {
 		SimpleDialogFragment.display(fragmentManager, type, info);
-		SimpleDialogFragment.setOnSubmitListener(() -> {});
+		SimpleDialogFragment.setOnSubmitListener(() -> {
+		});
 	}
 
 	public static void runOnUI(Runnable runnable) {
@@ -132,19 +136,22 @@ public class MainActivity extends AppCompatActivity {
 			ruleInitEditor.putString("rules", gson.toJson(list));
 			ruleInitEditor.apply();
 		}
-		/*SharedPreferences.Editor edit = sharedPreferences.edit();
-		list.add(new RuleInfo(true, 0, "0", "1.0", "software", "any", "general type"));
-		list.add(new RuleInfo(true, 1, "1", "1.0", "software", "any", "general type"));
-		list.add(new RuleInfo(true, 2, "2", "1.0", "software", "any", "general type"));
-		list.add(new RuleInfo(true, 3, "3", "1.0", "software", "any", "general type"));
-		list.add(new RuleInfo(true, 4, "4", "1.0", "software", "any", "general type"));
-		list.add(new RuleInfo(true, 5, "5", "1.0", "software", "any", "general type"));
-		list.add(new RuleInfo(true, 6, "6", "1.0", "software", "any", "general type"));
-		list.add(new RuleInfo(true, 7, "7", "1.0", "software", "any", "general type"));
-		list.add(new RuleInfo(true, 8, "8", "1.0", "software", "any", "general type"));
-		edit.putString("rules", gson.toJson(list));
-		edit.apply();*/
-		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {}.getType());
+        /*SharedPreferences.Editor edit = sharedPreferences.edit();
+        list.add(new RuleInfo(true, 0, "0", "1.0", "software", "any", "general type", new PackageWidgetDescription()));
+        list.add(new RuleInfo(true, 1, "1", "1.0", "software", "any", "general type", new PackageWidgetDescription()));
+        list.add(new RuleInfo(true, 2, "2", "1.0", "software", "any", "general type", new PackageWidgetDescription()));
+        edit.putString("rules", gson.toJson(list));
+        edit.apply();*/
+		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+		}.getType());
+
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			public void run() {
+				ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-switch", true));
+				this.cancel();
+			}
+		}, 1000);
 
 		//TODO this should test more
 		//see also https://blog.csdn.net/weixin_42474371/article/details/104405463

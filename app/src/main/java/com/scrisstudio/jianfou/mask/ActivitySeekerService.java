@@ -37,6 +37,13 @@ public class ActivitySeekerService extends AccessibilityService {
 		rulesList = l;
 	}
 
+	public static void setServiceBasicInfo(String rules, Boolean masterSwitch) {
+		Gson gson = new Gson();
+		rulesList = gson.fromJson(rules, new TypeToken<List<RuleInfo>>() {
+		}.getType());
+		isServiceRunning = masterSwitch;
+	}
+
 	//初始化
 	@Override
 	protected void onServiceConnected() {
@@ -48,9 +55,8 @@ public class ActivitySeekerService extends AccessibilityService {
 			this.mWindowManager = new FloatingWindowManager(this);
 		}
 
-		Gson gson = new Gson();
-		rulesList = gson.fromJson(MainActivity.sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {}.getType());
-		isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
+		rulesList = new ArrayList<>();
+		isServiceRunning = false;
 	}
 
 	//实现辅助功能
