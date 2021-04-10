@@ -13,5 +13,10 @@
             android:icon="@drawable/settings_24dp"
             android:title="@string/settings"
             android:checked="false" />
+        <item
+            android:id="@+id/item_about"
+            android:icon="@drawable/about_24dp"
+            android:title="@string/about"
+            android:checked="false" />
     </group>
 </menu>

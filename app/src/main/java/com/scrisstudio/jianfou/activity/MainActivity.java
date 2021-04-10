@@ -223,6 +223,10 @@ public class MainActivity extends AppCompatActivity {
 				Intent settingsOpener = new Intent(MainActivity.this, SettingsActivity.class);
 				startActivity(settingsOpener);
 				return false;
+			} else if (menuItem.getItemId() == R.id.item_about) {
+				Intent aboutOpener = new Intent(MainActivity.this, AboutActivity.class);
+				startActivity(aboutOpener);
+				return false;
 			} else {
 				return true;
 			}
