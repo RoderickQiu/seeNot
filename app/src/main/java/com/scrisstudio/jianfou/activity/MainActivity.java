@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		windowTrueWidth = dm.widthPixels;
 		windowTrueHeight = dm.heightPixels;
+		binding.ruleList.setMinimumHeight(windowTrueHeight);
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		if (!sharedPreferences.contains("rules")) {

@@ -91,6 +91,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 		toolbar.inflateMenu(R.menu.top_dialog_bar);
 		toolbar.setOnMenuItemClickListener(item -> {
 			submitData(view);
+			dismiss();
 			return true;
 		});
 
