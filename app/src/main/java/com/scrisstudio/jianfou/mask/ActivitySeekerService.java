@@ -1,8 +1,11 @@
 package com.scrisstudio.jianfou.mask;
 
 import android.accessibilityservice.AccessibilityService;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
@@ -26,9 +29,26 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static String foregroundClassName = "", foregroundPackageName = "";
 	private static String windowOrientation = "portrait";
 	private FloatingWindowManager mWindowManager;
-	private boolean isMaskOn = false;
+	private boolean isMaskOn = false, isFirstTimeInvokeService = true;
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
 	private int xBuffer = 0, yBuffer = -0, widthBuffer = 0, heightBuffer = 0;
+
+	private BroadcastReceiver mScreenOReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+
+			if (action.equals("android.intent.action.SCREEN_OFF")) {
+				Log.e(TAG, "Screen Off");
+				try {
+					if (isMaskOn) maskCreator(false, -1);
+				} catch (Exception e) {
+					Log.i(TAG, "Failed to remove mask");
+				}
+			}
+		}
+
+	};
 
 	public static boolean isStart() {
 		return mService != null;
@@ -56,8 +76,15 @@ public class ActivitySeekerService extends AccessibilityService {
 			this.mWindowManager = new FloatingWindowManager(this);
 		}
 
-		rulesList = new ArrayList<>();
-		isServiceRunning = false;
+		if (isFirstTimeInvokeService) {
+			isFirstTimeInvokeService = false;
+			rulesList = new ArrayList<>();
+			isServiceRunning = false;
+
+			/* 注册机器锁屏时的广播 */
+			IntentFilter mScreenOffFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
+			this.registerReceiver(mScreenOReceiver, mScreenOffFilter);
+		}
 	}
 
 	//实现辅助功能
@@ -235,6 +262,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		this.unregisterReceiver(mScreenOReceiver);
 		mService = null;
 	}
 }
