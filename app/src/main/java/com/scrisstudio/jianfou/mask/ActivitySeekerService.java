@@ -27,9 +27,10 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static List<RuleInfo> rulesList;
 	public static boolean isServiceRunning;
 	public static String foregroundClassName = "", foregroundPackageName = "";
+	public static boolean isFirstTimeInvokeService = true;
 	private static String windowOrientation = "portrait";
 	private FloatingWindowManager mWindowManager;
-	private boolean isMaskOn = false, isFirstTimeInvokeService = true;
+	private boolean isMaskOn = false;
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
 	private int xBuffer = 0, yBuffer = -0, widthBuffer = 0, heightBuffer = 0;
 
@@ -157,7 +158,7 @@ public class ActivitySeekerService extends AccessibilityService {
 					foregroundClassName = event.getClassName().toString();
 			Log.e(TAG, foregroundClassName);
 			for (int i = 0; i < rulesList.size(); i++) {
-				if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName)) {
+				if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName) && !foregroundPackageName.equals("")) {
 					if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
 						maskSet(rulesList.get(i).getFilter(), i, false);
 						break;

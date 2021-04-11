@@ -59,4 +59,6 @@
     <string name="cannot_open_assigner">已经打开设置窗口或服务未运行，请检查</string>
     <string name="about">关于</string>
     <string name="scris_std_app">A Scris Studio App.</string>
+    <string name="need_hand_action_start">无障碍服务自动打开失败，需要手动打开。</string>
+    <string name="settings_now_go">前去设置</string>
 </resources>

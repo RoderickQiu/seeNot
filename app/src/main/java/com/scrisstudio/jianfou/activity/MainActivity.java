@@ -40,8 +40,6 @@ import com.sergivonavi.materialbanner.Banner;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
 	public static int windowTrueWidth, windowTrueHeight;
 	public static SharedPreferences sharedPreferences;
 	public static String currentHomePackage;
+	private static boolean isSettingsModifierWorking = false;
 	private static FragmentManager fragmentManager;
 	private ActivityMainBinding binding;
 	private List<RuleInfo> list = new ArrayList<>();
@@ -90,7 +89,9 @@ public class MainActivity extends AppCompatActivity {
 		try {
 			Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.mask.ActivitySeekerService");
 			Settings.Secure.putString(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, "1");
+			isSettingsModifierWorking = true;
 		} catch (Exception e) {
+			isSettingsModifierWorking = false;
 			Toast.makeText(getApplicationContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
 		}
 	}
@@ -153,23 +154,6 @@ public class MainActivity extends AppCompatActivity {
 		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
 		}.getType());
 
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			public void run() {
-				ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-switch", true));
-				this.cancel();
-			}
-		}, 1000);
-
-		//TODO this should test more
-		//see also https://blog.csdn.net/weixin_42474371/article/details/104405463
-		//see also https://www.jianshu.com/p/0acb66694860
-		if (!Settings.System.canWrite(getApplicationContext())) {
-			settingModifierTrigger();
-		} else {
-			settingModifier();
-		}
-
 		Banner banner = binding.banner;
 		banner.setLeftButtonListener(banner1 -> {
 			banner.dismiss();
@@ -188,6 +172,41 @@ public class MainActivity extends AppCompatActivity {
 		if (!sharedPreferences.getBoolean("master-switch", true)) {
 			banner.setMessage(R.string.function_closed);
 			banner.show();
+		}
+
+		Handler handler = new Handler();
+
+		Runnable runnable = () -> {
+			try {
+				ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-switch", true));
+
+				if (!isSettingsModifierWorking) {
+					if (sharedPreferences.getBoolean("master-switch", true)) {
+						if (ActivitySeekerService.isFirstTimeInvokeService) {
+							banner.setMessage(R.string.need_hand_action_start);
+							banner.setRightButton(R.string.settings_now_go, banner2 -> {
+								Intent accessibilityIntent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+								startActivity(accessibilityIntent);
+								ActivitySeekerService.isFirstTimeInvokeService = false;
+								banner.dismiss();
+							});
+							banner.show();
+						}
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		};
+		handler.postDelayed(runnable, 1500);
+
+		//TODO this should test more
+		//see also https://blog.csdn.net/weixin_42474371/article/details/104405463
+		//see also https://www.jianshu.com/p/0acb66694860
+		if (!Settings.System.canWrite(getApplicationContext())) {
+			settingModifierTrigger();
+		} else {
+			settingModifier();
 		}
 
 		RecyclerView recyclerView = binding.ruleList;
