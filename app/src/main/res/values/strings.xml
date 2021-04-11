@@ -61,4 +61,13 @@
     <string name="scris_std_app">A Scris Studio App.</string>
     <string name="need_hand_action_start">无障碍服务自动打开失败，需要手动打开。</string>
     <string name="settings_now_go">前去设置</string>
+    <string name="basic_mask_settings">基础屏蔽设置</string>
+    <string name="emergency_aid_settings">补救措施设置</string>
+    <string name="when_such_text_shown">出现指定文字时强制返回：</string>
+    <string name="please_input">请输入，留空则不设置</string>
+    <string name="emergency_aid_text_info">显示补救触发文字</string>
+    <string name="emergency_aid_text_help">点击“显示布局”然后选中含文字的元素，点击“选中”以设置。</string>
+    <string name="select">选中</string>
+    <string name="press_here_move">按住此处以拖动弹窗</string>
+    <string name="divider">|</string>
 </resources>

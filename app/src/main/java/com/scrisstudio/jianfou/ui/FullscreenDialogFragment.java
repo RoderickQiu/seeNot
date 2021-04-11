@@ -3,6 +3,7 @@ package com.scrisstudio.jianfou.ui;
 import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,6 +106,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 				}
 			} catch (Exception e) {
 				Toast.makeText(jianfou.getAppContext(), R.string.cannot_open_assigner, Toast.LENGTH_LONG).show();
+				Log.e(TAG, e.toString());
 			}
 			dismiss();
 		});

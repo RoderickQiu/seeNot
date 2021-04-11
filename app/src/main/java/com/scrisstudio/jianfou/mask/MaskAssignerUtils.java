@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,7 +22,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
-import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.ui.RuleInfo;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class MaskAssignerUtils {
 		// show activity customization window
 		final WindowManager windowManager = (WindowManager) mService.getSystemService(AccessibilityService.WINDOW_SERVICE);
 		final DisplayMetrics metrics = new DisplayMetrics();
-		jianfou.getAppContext().getDisplay().getRealMetrics(metrics);
+		windowManager.getDefaultDisplay().getRealMetrics(metrics);
 		final SharedPreferences sharedPreferences = MainActivity.sharedPreferences;
 		final Gson gson = new Gson();
 		ActivitySeekerService.isServiceRunning = false;
@@ -57,13 +57,16 @@ public class MaskAssignerUtils {
 		final TextView tvPackageName = viewCustomization.findViewById(R.id.tv_package_name);
 		final TextView tvActivityName = viewCustomization.findViewById(R.id.tv_activity_name);
 		final TextView tvWidgetInfo = viewCustomization.findViewById(R.id.tv_widget_info);
+		final TextView tvAidText = viewCustomization.findViewById(R.id.emergency_aid_text_info);
+		final TextView tvPressToMove = viewCustomization.findViewById(R.id.press_here_move);
 		//final TextView tvPositionInfo = viewCustomization.findViewById(R.id.tv_position_info);
-		Button btShowOutline = viewCustomization.findViewById(R.id.button_show_outline);
+		final Button btShowOutline = viewCustomization.findViewById(R.id.button_show_outline);
 		final Button btAddWidget = viewCustomization.findViewById(R.id.button_add_widget);
+		final Button btSelectAidText = viewCustomization.findViewById(R.id.button_set_emergency_aid);
 		//Button btShowTarget = viewCustomization.findViewById(R.id.button_show_target);
 		//Button btReGetTarget = viewCustomization.findViewById(R.id.button_reget_outline);
 		//final Button btAddPosition = viewCustomization.findViewById(R.id.button_add_position);
-		Button btQuit = viewCustomization.findViewById(R.id.button_quit);
+		final ImageButton btQuit = viewCustomization.findViewById(R.id.button_quit);
 
 		@SuppressLint("InflateParams") final View viewTarget = inflater.inflate(R.layout.layout_accessibility_node_desc, null);
 		final FrameLayout layoutOverlayOutline = viewTarget.findViewById(R.id.frame);
@@ -79,10 +82,11 @@ public class MaskAssignerUtils {
 		customizationParams.gravity = Gravity.START | Gravity.TOP;
 		customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		customizationParams.width = width;
-		customizationParams.height = (int) (height / 4.8);
+		customizationParams.height = (int) (height / 4);
 		customizationParams.x = (metrics.widthPixels - customizationParams.width) / 2;
 		customizationParams.y = metrics.heightPixels - customizationParams.height;
 		customizationParams.alpha = 0.8f;
+		customizationParams.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE;
 
 		outlineParams = new WindowManager.LayoutParams();
 		outlineParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
@@ -103,7 +107,7 @@ public class MaskAssignerUtils {
 		targetParams.y = (metrics.heightPixels - targetParams.height) / 2;
 		targetParams.alpha = 0f;
 
-		viewCustomization.setOnTouchListener(new View.OnTouchListener() {
+		tvPressToMove.setOnTouchListener(new View.OnTouchListener() {
 			int x = 0, y = 0;
 
 			@Override
@@ -167,7 +171,8 @@ public class MaskAssignerUtils {
 		btAddWidget.setOnClickListener(v -> {
 			PackageWidgetDescription temWidget = new PackageWidgetDescription(widgetDescription);
 
-			List<RuleInfo> list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {}.getType());
+			List<RuleInfo> list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+			}.getType());
 			RuleInfo rule = list.get(position);
 			rule.setFilter(temWidget);
 			list.set(position, rule);
@@ -177,8 +182,28 @@ public class MaskAssignerUtils {
 			ruleEditor.apply();
 
 			btAddWidget.setEnabled(false);
+			btSelectAidText.setEnabled(false);
+
 			tvPackageName.setText(widgetDescription.packageName + " (以下控件数据已保存)");
 		});
+
+		btSelectAidText.setOnClickListener(v -> {
+			List<RuleInfo> list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+			}.getType());
+			RuleInfo rule = list.get(position);
+			rule.setAidText((String) tvAidText.getText());
+			list.set(position, rule);
+			ActivitySeekerService.setRulesList(list);
+			SharedPreferences.Editor ruleEditor = sharedPreferences.edit();
+			ruleEditor.putString("rules", gson.toJson(list));
+			ruleEditor.apply();
+
+			btAddWidget.setEnabled(false);
+			btSelectAidText.setEnabled(false);
+
+			tvAidText.setText((String) tvAidText.getText() + " (以下控件数据已保存)");
+		});
+
 		btShowOutline.setOnClickListener(v -> {
 			Button button = (Button) v;
 			if (outlineParams.alpha == 0) {
@@ -241,6 +266,7 @@ public class MaskAssignerUtils {
 							tvPackageName.setText(widgetDescription.packageName);
 							tvActivityName.setText(widgetDescription.activityName);
 							tvWidgetInfo.setText("click:" + (e.isClickable() ? "true" : "false") + " " + "bonus:" + temRect.toShortString() + " " + "id:" + (cId == null ? "null" : cId.toString().substring(cId.toString().indexOf("id/") + 3)) + " " + "desc:" + (cDesc == null ? "null" : cDesc.toString()) + " " + "text:" + (cText == null ? "null" : cText.toString()));
+							tvAidText.setText(e.getText());
 							v1.setBackgroundResource(R.drawable.node_focus);
 						} else {
 							v1.setBackgroundResource(R.drawable.node);
