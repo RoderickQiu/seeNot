@@ -66,7 +66,7 @@
     <string name="when_such_text_shown">出现指定文字时强制返回：</string>
     <string name="please_input">请输入，留空则不设置</string>
     <string name="emergency_aid_text_info">显示补救触发文字</string>
-    <string name="emergency_aid_text_help">点击“显示布局”然后选中含文字的元素，点击“选中”以设置。</string>
+    <string name="emergency_aid_text_help">这个功能是让你在已经进入某个不应进入的页面后，强制退出以进行补救，因此应进入那个页面进行设置。点击“显示布局”然后选中含文字的元素，点击“选中”以设置。若软件阻止你获取一些字，则请尝试以其它文字为线索。</string>
     <string name="select">选中</string>
     <string name="press_here_move">按住此处以拖动弹窗</string>
     <string name="divider">|</string>

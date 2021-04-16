@@ -263,6 +263,7 @@ public class MaskAssignerUtils {
 							CharSequence cText = e.getText();
 							widgetDescription.text = cText == null ? "" : cText.toString();
 							btAddWidget.setEnabled(true);
+							btSelectAidText.setEnabled(true);
 							tvPackageName.setText(widgetDescription.packageName);
 							tvActivityName.setText(widgetDescription.activityName);
 							tvWidgetInfo.setText("click:" + (e.isClickable() ? "true" : "false") + " " + "bonus:" + temRect.toShortString() + " " + "id:" + (cId == null ? "null" : cId.toString().substring(cId.toString().indexOf("id/") + 3)) + " " + "desc:" + (cDesc == null ? "null" : cDesc.toString()) + " " + "text:" + (cText == null ? "null" : cText.toString()));
@@ -285,6 +286,7 @@ public class MaskAssignerUtils {
 				outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
 				windowManager.updateViewLayout(viewTarget, outlineParams);
 				btAddWidget.setEnabled(false);
+				btSelectAidText.setEnabled(false);
 				button.setText("显示布局");
 			}
 		});
