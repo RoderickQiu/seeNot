@@ -32,6 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginStart="3dp"
+                android:minWidth="150dp"
                 android:orientation="vertical"
                 android:padding="20dp">
 
@@ -62,7 +63,7 @@
                             android:paddingStart="4dp"
                             android:paddingEnd="0dp"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:visibility="invisible" />
+                            android:visibility="gone" />
 
                     </TableRow>
 
@@ -144,6 +145,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/expand_more"
                         android:src="@drawable/expand_more_36dp"
                         android:tint="?attr/colorPrimary" />
 
@@ -154,6 +156,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/edit"
                         android:src="@drawable/mode_edit_24dp"
                         android:tint="?attr/colorPrimary" />
 
@@ -164,6 +167,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/delete"
                         android:src="@drawable/delete_24dp"
                         android:tint="?attr/colorPrimary" />
 

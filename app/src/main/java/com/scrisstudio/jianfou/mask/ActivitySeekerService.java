@@ -12,10 +12,12 @@ import android.graphics.Rect;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.activity.MainActivity;
+import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.ui.RuleInfo;
 
 import java.util.ArrayList;
@@ -25,16 +27,14 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static final String TAG = "Jianfou-AccessibilityService";
 	public static ActivitySeekerService mService;
 	public static List<RuleInfo> rulesList;
-	public static boolean isServiceRunning;
+	public static boolean isServiceRunning = false;
 	public static String foregroundClassName = "", foregroundPackageName = "";
 	public static boolean isFirstTimeInvokeService = true;
 	private static String windowOrientation = "portrait";
 	private FloatingWindowManager mWindowManager;
 	private boolean isMaskOn = false;
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
-	private int xBuffer = 0, yBuffer = -0, widthBuffer = 0, heightBuffer = 0;
-
-	private BroadcastReceiver mScreenOReceiver = new BroadcastReceiver() {
+	private final BroadcastReceiver mScreenOReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
@@ -135,6 +135,8 @@ public class ActivitySeekerService extends AccessibilityService {
 			ComponentName cName = new ComponentName(foregroundPackageName, foregroundClassName);
 			//Best solution til now
 			if (!foregroundPackageName.equals(MainActivity.currentHomePackage)) {
+				wordFinder(getRootInActiveWindow(), true);
+
 				for (int i = 0; i < rulesList.size(); i++) {
 					if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName)) {
 						if (tryGetActivity(cName) != null) {
@@ -144,6 +146,7 @@ public class ActivitySeekerService extends AccessibilityService {
 									break;
 								} else {
 									if (isMaskOn) maskCreator(false, -1);
+									currentRuleId = -1;
 								}
 							}
 						}
@@ -154,13 +157,15 @@ public class ActivitySeekerService extends AccessibilityService {
 			ComponentName cName = new ComponentName(foregroundPackageName, event.getClassName().toString());
 
 			if (tryGetActivity(cName) != null)
-				if (isCapableClass(event.getClassName().toString()) && !foregroundPackageName.equals(MainActivity.currentHomePackage))
+				if (isCapableClass(event.getClassName().toString()) && !foregroundPackageName.equals(MainActivity.currentHomePackage)) {
 					foregroundClassName = event.getClassName().toString();
+				}
 			Log.e(TAG, foregroundClassName);
 			for (int i = 0; i < rulesList.size(); i++) {
 				if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName) && !foregroundPackageName.equals("")) {
 					if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
 						maskSet(rulesList.get(i).getFilter(), i, false);
+						currentRuleId = i;
 						break;
 					}
 				}
@@ -205,6 +210,34 @@ public class ActivitySeekerService extends AccessibilityService {
 		return null;
 	}
 
+	public void wordFinder(AccessibilityNodeInfo info, boolean isOnlyVisible) {
+		if (isServiceRunning) {
+			if (currentRuleId != -1 && info != null) {
+				if (info.getChildCount() != 0) {
+					for (int i = 0; i < info.getChildCount(); i++) {
+						if (info.getChild(i) != null) {
+							wordFinder(info.getChild(i), isOnlyVisible);
+						}
+					}
+				} else if (!isOnlyVisible || info.isVisibleToUser()) {
+					if (info.getText() != null) {
+						if (info.getText().equals(rulesList.get(currentRuleId).getAidText())) {
+							performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+							Log.e(TAG, "Perform Back: " + info.getText());
+							Toast.makeText(jianfou.getAppContext(), "文字触发补救：强制返回", Toast.LENGTH_LONG).show();
+						}
+					} else if (info.getContentDescription() != null) {
+						Log.e(TAG, "Perform Back: " + info.getContentDescription());
+						if (info.getContentDescription().equals(rulesList.get(currentRuleId).getAidText())) {
+							performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+							Toast.makeText(jianfou.getAppContext(), "文字触发补救：强制返回", Toast.LENGTH_LONG).show();
+						}
+					}
+				}
+			}
+		}
+	}
+
 	private ActivityInfo tryGetActivity(ComponentName componentName) {
 		try {
 			Log.w(TAG, "Caught: " + componentName);
@@ -220,10 +253,15 @@ public class ActivitySeekerService extends AccessibilityService {
 		if (isServiceRunning) {
 			Rect rect = nodeSearcher(p.indices);
 			if (rect != null) {
-				x = rect.centerX() - rect.width() / 2 - xBuffer;// buffer is for edge gesture
-				y = rect.centerY() - rect.height() / 2 - getStatusBarHeight(getBaseContext()) - yBuffer;//fix status bar's effect
-				width = rect.width() + widthBuffer + xBuffer;//buffer (2x) also for edge gesture
-				height = rect.height() + heightBuffer + yBuffer;
+				x = rect.centerX() - rect.width() / 2;// buffer is for edge gesture
+				try {
+					y = rect.centerY() - rect.height() / 2 - getStatusBarHeight(getBaseContext());//fix status bar's effect
+				} catch (Exception e) {
+					Log.e(TAG, "Base context catching failed.");
+					y = rect.centerY() - rect.height() / 2;
+				}
+				width = rect.width();//buffer (2x) also for edge gesture
+				height = rect.height();
 			}
 
 			Log.e(TAG, x + " " + y + " " + width + " " + height + " ");

@@ -70,4 +70,5 @@
     <string name="select">选中</string>
     <string name="press_here_move">按住此处以拖动弹窗</string>
     <string name="divider">|</string>
+    <string name="expand_more">更多内容</string>
 </resources>

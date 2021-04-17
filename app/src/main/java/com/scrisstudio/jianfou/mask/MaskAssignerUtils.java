@@ -267,7 +267,7 @@ public class MaskAssignerUtils {
 							tvPackageName.setText(widgetDescription.packageName);
 							tvActivityName.setText(widgetDescription.activityName);
 							tvWidgetInfo.setText("click:" + (e.isClickable() ? "true" : "false") + " " + "bonus:" + temRect.toShortString() + " " + "id:" + (cId == null ? "null" : cId.toString().substring(cId.toString().indexOf("id/") + 3)) + " " + "desc:" + (cDesc == null ? "null" : cDesc.toString()) + " " + "text:" + (cText == null ? "null" : cText.toString()));
-							tvAidText.setText(e.getText());
+							tvAidText.setText((e.getText() != null) ? e.getText() : e.getContentDescription());
 							v1.setBackgroundResource(R.drawable.node_focus);
 						} else {
 							v1.setBackgroundResource(R.drawable.node);
