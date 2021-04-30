@@ -83,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
 			intent.setData(Uri.parse("package:" + getPackageName()));
 			startActivityForResult(intent, 200);
 		});
+
+		//also for alert window permission
+		//startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), 0);
 	}
 
 	private void settingModifier() {

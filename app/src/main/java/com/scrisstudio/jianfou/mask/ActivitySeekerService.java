@@ -29,7 +29,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static List<RuleInfo> rulesList;
 	public static boolean isServiceRunning = false;
 	public static String foregroundClassName = "", foregroundPackageName = "";
-	public static boolean isFirstTimeInvokeService = true;
+	public static boolean isFirstTimeInvokeService = true, isServiceAbleToWork = false;
 	private static String windowOrientation = "portrait";
 	private FloatingWindowManager mWindowManager;
 	private boolean isMaskOn = false;
@@ -64,13 +64,14 @@ public class ActivitySeekerService extends AccessibilityService {
 		rulesList = gson.fromJson(rules, new TypeToken<List<RuleInfo>>() {
 		}.getType());
 		isServiceRunning = masterSwitch;
+		isServiceAbleToWork = true;
 	}
 
 	//初始化
 	@Override
 	protected void onServiceConnected() {
 		super.onServiceConnected();
-		Log.e(TAG, "Started");
+		Log.e(TAG, "Service starting...");
 		mService = this;
 
 		if (this.mWindowManager == null) {
@@ -125,7 +126,7 @@ public class ActivitySeekerService extends AccessibilityService {
 					}
 				}
 			} catch (Exception e) {
-				Log.i(TAG, "Failed to get orientation");
+				Log.i(TAG, "Failed to get orientation, err message: " + e.toString() + (isServiceAbleToWork ? "" : ", info not given"));
 			}
 			try {
 				foregroundPackageName = getRootInActiveWindow().getPackageName().toString();
@@ -227,7 +228,6 @@ public class ActivitySeekerService extends AccessibilityService {
 							Toast.makeText(jianfou.getAppContext(), "文字触发补救：强制返回", Toast.LENGTH_LONG).show();
 						}
 					} else if (info.getContentDescription() != null) {
-						Log.e(TAG, "Perform Back: " + info.getContentDescription());
 						if (info.getContentDescription().equals(rulesList.get(currentRuleId).getAidText())) {
 							performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
 							Toast.makeText(jianfou.getAppContext(), "文字触发补救：强制返回", Toast.LENGTH_LONG).show();
