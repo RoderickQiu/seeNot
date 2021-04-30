@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -32,9 +33,8 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static final String TAG = "Jianfou-AccessibilityService";
 	public static ActivitySeekerService mService;
 	public static List<RuleInfo> rulesList;
-	public static boolean isServiceRunning = true;
+	public static boolean isServiceRunning = true, isFirstTimeInvokeService = true, isHandlerRunning = false;
 	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
-	public static boolean isFirstTimeInvokeService = true;
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
 	private FloatingWindowManager mWindowManager;
@@ -193,14 +193,20 @@ public class ActivitySeekerService extends AccessibilityService {
 					foregroundClassName = event.getClassName().toString();
 				}
 			Log.e(TAG, foregroundClassName);
-			for (int i = 0; i < rulesList.size(); i++) {
-				if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName) && !foregroundPackageName.equals("")) {
-					if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
-						maskSet(rulesList.get(i).getFilter(), i, true);
-						currentRuleId = i;
-						break;
+			if (!isHandlerRunning) {
+				isHandlerRunning = true;
+				new Handler().postDelayed(() -> {
+					for (int i = 0; i < rulesList.size(); i++) {
+						if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName) && !foregroundPackageName.equals("")) {
+							if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
+								maskSet(rulesList.get(i).getFilter(), i, true);
+								currentRuleId = i;
+								break;
+							}
+						}
 					}
-				}
+					isHandlerRunning = false;
+				}, 250);
 			}
 		}
 	}
