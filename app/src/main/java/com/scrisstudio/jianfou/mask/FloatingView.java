@@ -2,6 +2,7 @@ package com.scrisstudio.jianfou.mask;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -34,7 +35,10 @@ public class FloatingView extends LinearLayout {
 			theme.resolveAttribute(R.attr.colorSecondary, colorSecondary, true);
 			view.findViewById(R.id.floating).setBackgroundColor(getResources().getColor(colorOnSecondary.resourceId, theme));
 			((TextView) view.findViewById(R.id.floating_text)).setTextColor(getResources().getColor(colorSecondary.resourceId, theme));
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			view.findViewById(R.id.floating).setBackgroundColor(Color.parseColor("#F7F7F7"));
+			((TextView) view.findViewById(R.id.floating_text)).setTextColor(Color.parseColor("#DF850D"));
+		}
 	}
 
 	/* access modifiers changed from: protected */

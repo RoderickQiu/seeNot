@@ -6,17 +6,22 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Rect;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 
+import androidx.preference.PreferenceManager;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.scrisstudio.jianfou.activity.MainActivity;
+import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.ui.RuleInfo;
 
@@ -27,10 +32,11 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static final String TAG = "Jianfou-AccessibilityService";
 	public static ActivitySeekerService mService;
 	public static List<RuleInfo> rulesList;
-	public static boolean isServiceRunning = false;
-	public static String foregroundClassName = "", foregroundPackageName = "";
-	public static boolean isFirstTimeInvokeService = true, isServiceAbleToWork = false;
+	public static boolean isServiceRunning = true;
+	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
+	public static boolean isFirstTimeInvokeService = true;
 	private static String windowOrientation = "portrait";
+	private static int windowTrueWidth, windowTrueHeight;
 	private FloatingWindowManager mWindowManager;
 	private boolean isMaskOn = false;
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
@@ -59,19 +65,38 @@ public class ActivitySeekerService extends AccessibilityService {
 		rulesList = l;
 	}
 
-	public static void setServiceBasicInfo(String rules, Boolean masterSwitch) {
-		Gson gson = new Gson();
-		rulesList = gson.fromJson(rules, new TypeToken<List<RuleInfo>>() {
-		}.getType());
+	public static void setServiceBasicInfo(Boolean masterSwitch) {
+		//Gson gson = new Gson();
+		//rulesList = gson.fromJson(rules, new TypeToken<List<RuleInfo>>() {}.getType());
 		isServiceRunning = masterSwitch;
-		isServiceAbleToWork = true;
+	}
+
+	@Override
+	public void onCreate() {
+		Log.e(TAG, "Service starting...");
+
+		windowTrueWidth = jianfou.getAppContext().getResources().getDisplayMetrics().widthPixels;
+		windowTrueHeight = jianfou.getAppContext().getResources().getDisplayMetrics().heightPixels;
+
+		Intent homePkgIntent = new Intent(Intent.ACTION_MAIN);
+		homePkgIntent.addCategory(Intent.CATEGORY_HOME);
+		ResolveInfo resolveInfo = getPackageManager().resolveActivity(homePkgIntent, PackageManager.MATCH_DEFAULT_ONLY);
+		currentHomePackage = resolveInfo.activityInfo.packageName;
+
+		try {
+			Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.mask.ActivitySeekerService");
+			Settings.Secure.putString(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, "1");
+		} catch (Exception e) {
+			//isSettingsModifierWorking = false;
+			Toast.makeText(getApplicationContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
+			Log.e(TAG, "Service invoking failed, err message: " + e.toString());
+		}
 	}
 
 	//初始化
 	@Override
 	protected void onServiceConnected() {
 		super.onServiceConnected();
-		Log.e(TAG, "Service starting...");
 		mService = this;
 
 		if (this.mWindowManager == null) {
@@ -80,8 +105,14 @@ public class ActivitySeekerService extends AccessibilityService {
 
 		if (isFirstTimeInvokeService) {
 			isFirstTimeInvokeService = false;
-			rulesList = new ArrayList<>();
-			isServiceRunning = false;
+
+			Log.e(TAG, "Service invoking...");
+
+			Gson gson = new Gson();
+			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(jianfou.getAppContext());
+			isServiceRunning = sharedPreferences.getBoolean("master-switch", true);
+			rulesList = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+			}.getType());
 
 			/* 注册机器锁屏时的广播 */
 			IntentFilter mScreenOffFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
@@ -96,7 +127,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			try {
 				Rect rect = new Rect();
 				event.getSource().getBoundsInScreen(rect);
-				if (rect.width() == MainActivity.windowTrueWidth) {
+				if (rect.width() == windowTrueWidth) {
 					if (windowOrientation.equals("landscape")) {
 						windowOrientation = "portrait";
 						Log.e(TAG, "Change to Portrait");
@@ -110,7 +141,7 @@ public class ActivitySeekerService extends AccessibilityService {
 								}
 							}
 					}
-				} else if (rect.width() == MainActivity.windowTrueHeight) {
+				} else if (rect.width() == windowTrueHeight) {
 					if (windowOrientation.equals("portrait")) {
 						windowOrientation = "landscape";
 						Log.e(TAG, "Change to Landscape");
@@ -126,7 +157,7 @@ public class ActivitySeekerService extends AccessibilityService {
 					}
 				}
 			} catch (Exception e) {
-				Log.i(TAG, "Failed to get orientation, err message: " + e.toString() + (isServiceAbleToWork ? "" : ", info not given"));
+				Log.i(TAG, "Failed to get orientation, err message: " + e.toString());
 			}
 			try {
 				foregroundPackageName = getRootInActiveWindow().getPackageName().toString();
@@ -135,7 +166,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			}
 			ComponentName cName = new ComponentName(foregroundPackageName, foregroundClassName);
 			//Best solution til now
-			if (!foregroundPackageName.equals(MainActivity.currentHomePackage)) {
+			if (!foregroundPackageName.equals(currentHomePackage)) {
 				wordFinder(getRootInActiveWindow(), true);
 
 				for (int i = 0; i < rulesList.size(); i++) {
@@ -158,22 +189,19 @@ public class ActivitySeekerService extends AccessibilityService {
 			ComponentName cName = new ComponentName(foregroundPackageName, event.getClassName().toString());
 
 			if (tryGetActivity(cName) != null)
-				if (isCapableClass(event.getClassName().toString()) && !foregroundPackageName.equals(MainActivity.currentHomePackage)) {
+				if (isCapableClass(event.getClassName().toString()) && !foregroundPackageName.equals(currentHomePackage)) {
 					foregroundClassName = event.getClassName().toString();
 				}
 			Log.e(TAG, foregroundClassName);
 			for (int i = 0; i < rulesList.size(); i++) {
 				if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName) && !foregroundPackageName.equals("")) {
 					if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
-						maskSet(rulesList.get(i).getFilter(), i, false);
+						maskSet(rulesList.get(i).getFilter(), i, true);
 						currentRuleId = i;
 						break;
 					}
 				}
 			}
-			//}
-			//if (foregroundPackageName.equals(MainActivity.currentHomePackage))
-			//	if (isMaskOn) maskCreator(false);
 		}
 	}
 
@@ -225,12 +253,12 @@ public class ActivitySeekerService extends AccessibilityService {
 						if (info.getText().equals(rulesList.get(currentRuleId).getAidText())) {
 							performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
 							Log.e(TAG, "Perform Back: " + info.getText());
-							Toast.makeText(jianfou.getAppContext(), "文字触发补救：强制返回", Toast.LENGTH_LONG).show();
+							Toast.makeText(jianfou.getAppContext(), "文字触发补救：强制返回", Toast.LENGTH_SHORT).show();
 						}
 					} else if (info.getContentDescription() != null) {
 						if (info.getContentDescription().equals(rulesList.get(currentRuleId).getAidText())) {
 							performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
-							Toast.makeText(jianfou.getAppContext(), "文字触发补救：强制返回", Toast.LENGTH_LONG).show();
+							Toast.makeText(jianfou.getAppContext(), "文字触发补救：强制返回", Toast.LENGTH_SHORT).show();
 						}
 					}
 				}

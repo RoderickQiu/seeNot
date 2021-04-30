@@ -2,8 +2,6 @@ package com.scrisstudio.jianfou.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -51,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
 	public static int windowTrueWidth, windowTrueHeight;
 	public static SharedPreferences sharedPreferences;
 	public static String currentHomePackage;
-	private static boolean isSettingsModifierWorking = false;
 	private static FragmentManager fragmentManager;
 	private ActivityMainBinding binding;
 	private List<RuleInfo> list = new ArrayList<>();
@@ -88,17 +85,6 @@ public class MainActivity extends AppCompatActivity {
 		//startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), 0);
 	}
 
-	private void settingModifier() {
-		try {
-			Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.mask.ActivitySeekerService");
-			Settings.Secure.putString(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, "1");
-			isSettingsModifierWorking = true;
-		} catch (Exception e) {
-			isSettingsModifierWorking = false;
-			Toast.makeText(getApplicationContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
-		}
-	}
-
 	@Override
 	public void onBackPressed() {
 		// super.onBackPressed();
@@ -113,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == 200) {
 			if (Settings.System.canWrite(getApplicationContext())) {
-				settingModifier();
+				Intent serviceIntent = new Intent(this, ActivitySeekerService.class);
+				startService(serviceIntent);
 			}
 		}
 	}
@@ -122,11 +109,6 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.e(TAG, "Start testing...");
-
-		Intent intent = new Intent(Intent.ACTION_MAIN);
-		intent.addCategory(Intent.CATEGORY_HOME);
-		ResolveInfo resolveInfo = getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-		currentHomePackage = resolveInfo.activityInfo.packageName;
 
 		binding = ActivityMainBinding.inflate(getLayoutInflater());
 		View view = binding.getRoot();
@@ -142,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
 		windowTrueHeight = dm.heightPixels;
 		binding.ruleList.setMinimumHeight(windowTrueHeight);
 
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(jianfou.getAppContext());
 		if (!sharedPreferences.contains("rules")) {
 			SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
 			ruleInitEditor.putString("rules", gson.toJson(list));
@@ -175,33 +157,9 @@ public class MainActivity extends AppCompatActivity {
 		if (!sharedPreferences.getBoolean("master-switch", true)) {
 			banner.setMessage(R.string.function_closed);
 			banner.show();
+
+			ActivitySeekerService.setServiceBasicInfo(false);
 		}
-
-		Handler handler = new Handler();
-
-		Runnable runnable = () -> {
-			try {
-				ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-switch", true));
-
-				if (!isSettingsModifierWorking) {
-					if (sharedPreferences.getBoolean("master-switch", true)) {
-						if (ActivitySeekerService.isFirstTimeInvokeService) {
-							banner.setMessage(R.string.need_hand_action_start);
-							banner.setRightButton(R.string.settings_now_go, banner2 -> {
-								Intent accessibilityIntent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-								startActivity(accessibilityIntent);
-								ActivitySeekerService.isFirstTimeInvokeService = false;
-								banner.dismiss();
-							});
-							banner.show();
-						}
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		};
-		handler.postDelayed(runnable, 1500);
 
 		//TODO this should test more
 		//see also https://blog.csdn.net/weixin_42474371/article/details/104405463
@@ -209,7 +167,8 @@ public class MainActivity extends AppCompatActivity {
 		if (!Settings.System.canWrite(getApplicationContext())) {
 			settingModifierTrigger();
 		} else {
-			settingModifier();
+			Intent serviceIntent = new Intent(this, ActivitySeekerService.class);
+			startService(serviceIntent);
 		}
 
 		RecyclerView recyclerView = binding.ruleList;
