@@ -129,12 +129,12 @@ public class MainActivity extends AppCompatActivity {
 			ruleInitEditor.putString("rules", gson.toJson(list));
 			ruleInitEditor.apply();
 		}
-        /*SharedPreferences.Editor edit = sharedPreferences.edit();
-        list.add(new RuleInfo(true, 0, "0", "1.0", "software", "any", "general type", new PackageWidgetDescription()));
-        list.add(new RuleInfo(true, 1, "1", "1.0", "software", "any", "general type", new PackageWidgetDescription()));
-        list.add(new RuleInfo(true, 2, "2", "1.0", "software", "any", "general type", new PackageWidgetDescription()));
-        edit.putString("rules", gson.toJson(list));
-        edit.apply();*/
+		/*SharedPreferences.Editor edit = sharedPreferences.edit();
+		list.add(new RuleInfo(true, 0, "0", "1.0", "software", "any", "general type", new PackageWidgetDescription(), null, null));
+		list.add(new RuleInfo(true, 1, "1", "1.0", "software", "any", "general type", new PackageWidgetDescription(), null, null));
+		list.add(new RuleInfo(true, 2, "2", "1.0", "software", "any", "general type", new PackageWidgetDescription(), null, null));
+		edit.putString("rules", gson.toJson(list));
+		edit.apply();*/
 		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
 		}.getType());
 

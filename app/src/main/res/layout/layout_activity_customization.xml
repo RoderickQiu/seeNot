@@ -201,6 +201,18 @@
                     android:text="@string/add_widget"
                     android:textSize="12sp" />
 
+                <Button
+                    android:id="@+id/button_delete_widget"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:layout_marginVertical="2dp"
+                    android:layout_weight="1"
+                    android:enabled="false"
+                    android:padding="0dp"
+                    android:text="@string/delete_such_setting"
+                    android:textSize="12sp" />
+
                 <!--<Button
                     android:id="@+id/button_show_target"
                     android:layout_width="wrap_content"
@@ -299,6 +311,18 @@
                     android:text="@string/select"
                     android:textSize="12sp" />
 
+                <Button
+                    android:id="@+id/button_delete_emergency_aid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:layout_marginVertical="2dp"
+                    android:layout_weight="1"
+                    android:enabled="false"
+                    android:padding="0dp"
+                    android:text="@string/delete_such_setting"
+                    android:textSize="12sp" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -387,6 +411,18 @@
                     android:enabled="false"
                     android:padding="4dp"
                     android:text="@string/select_skip"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/button_delete_skip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:layout_marginVertical="2dp"
+                    android:layout_weight="1"
+                    android:enabled="false"
+                    android:padding="0dp"
+                    android:text="@string/delete_such_setting"
                     android:textSize="12sp" />
 
             </LinearLayout>

@@ -82,4 +82,5 @@
     <string name="select_skip">选中跳出触发文字</string>
     <string name="select_reenter">选中恢复触发文字</string>
     <string name="skip_reenter_text_info">显示恢复触发文字</string>
+    <string name="delete_such_setting">清除设置</string>
 </resources>

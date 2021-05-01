@@ -27,6 +27,7 @@ import com.scrisstudio.jianfou.ui.RuleInfo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static com.scrisstudio.jianfou.mask.ActivitySeekerService.TAG;
@@ -62,16 +63,27 @@ public class MaskAssignerUtils {
 		final TextView tvSkipText = viewCustomization.findViewById(R.id.skip_text_info);
 		final TextView tvPressToMove = viewCustomization.findViewById(R.id.press_here_move);
 		//final TextView tvPositionInfo = viewCustomization.findViewById(R.id.tv_position_info);
+		final ImageButton btQuit = viewCustomization.findViewById(R.id.button_quit);
 		final Button btShowOutline = viewCustomization.findViewById(R.id.button_show_outline);
 		final Button btShowOutline2 = viewCustomization.findViewById(R.id.button_show_outline_2);
 		final Button btShowOutline3 = viewCustomization.findViewById(R.id.button_show_outline_3);
 		final Button btAddWidget = viewCustomization.findViewById(R.id.button_add_widget);
 		final Button btSelectAidText = viewCustomization.findViewById(R.id.button_set_emergency_aid);
 		final Button btSelectSkipText = viewCustomization.findViewById(R.id.button_set_skip);
+		final Button btDeleteWidget = viewCustomization.findViewById(R.id.button_delete_widget);
+		final Button btDeleteSkipText = viewCustomization.findViewById(R.id.button_delete_skip);
+		final Button btDeleteAidText = viewCustomization.findViewById(R.id.button_delete_emergency_aid);
 		//Button btShowTarget = viewCustomization.findViewById(R.id.button_show_target);
 		//Button btReGetTarget = viewCustomization.findViewById(R.id.button_reget_outline);
 		//final Button btAddPosition = viewCustomization.findViewById(R.id.button_add_position);
-		final ImageButton btQuit = viewCustomization.findViewById(R.id.button_quit);
+
+		AtomicReference<List<RuleInfo>> tempList = new AtomicReference<>(gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+		}.getType()));
+		RuleInfo tempRule = tempList.get().get(position);
+		if (!tempRule.getFilter().equals(new PackageWidgetDescription()))
+			btDeleteWidget.setEnabled(true);
+		if (tempRule.getAidText() != null) btDeleteAidText.setEnabled(true);
+		if (tempRule.getSkipText() != null) btDeleteSkipText.setEnabled(true);
 
 		@SuppressLint("InflateParams") final View viewTarget = inflater.inflate(R.layout.layout_accessibility_node_desc, null);
 		final FrameLayout layoutOverlayOutline = viewTarget.findViewById(R.id.frame);
@@ -172,6 +184,42 @@ public class MaskAssignerUtils {
 				}
 				return true;
 			}
+		});
+
+		Consumer<String> btDeleteOperator = (mode) -> {
+			List<RuleInfo> list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+			}.getType());
+			RuleInfo rule = list.get(position);
+			switch (mode) {
+				case "widget":
+					rule.setFilter(new PackageWidgetDescription());
+					tvPackageName.setText(null);
+				case "aid":
+					rule.setAidText(null);
+					tvAidText.setText(null);
+					break;
+				case "skip":
+					rule.setSkipText(null);
+					tvSkipText.setText(null);
+					break;
+			}
+			list.set(position, rule);
+			ActivitySeekerService.setRulesList(list);
+			SharedPreferences.Editor ruleEditor = sharedPreferences.edit();
+			ruleEditor.putString("rules", gson.toJson(list));
+			ruleEditor.apply();
+		};
+		btDeleteWidget.setOnClickListener(v -> {
+			btDeleteOperator.accept("widget");
+			btDeleteWidget.setEnabled(false);
+		});
+		btDeleteAidText.setOnClickListener(v -> {
+			btDeleteOperator.accept("aid");
+			btDeleteAidText.setEnabled(false);
+		});
+		btDeleteSkipText.setOnClickListener(v -> {
+			btDeleteOperator.accept("skip");
+			btDeleteSkipText.setEnabled(false);
 		});
 
 		Consumer<String> btOperator = (mode) -> {
@@ -277,12 +325,15 @@ public class MaskAssignerUtils {
 									tvPackageName.setText(widgetDescription.packageName);
 									tvActivityName.setText(widgetDescription.activityName);
 									tvWidgetInfo.setText("bonus:" + temRect.toShortString() + " " + "id:" + (cId == null ? "null" : cId.toString().substring(cId.toString().indexOf("id/") + 3)) + " " + "desc:" + (cDesc == null ? "null" : cDesc.toString()) + " " + "text:" + (cText == null ? "null" : cText.toString()));
+									btDeleteWidget.setEnabled(true);
 									break;
 								case 2:
 									tvAidText.setText((e.getText() != null) ? e.getText() : e.getContentDescription());
+									btDeleteAidText.setEnabled(true);
 									break;
 								case 3:
 									tvSkipText.setText((e.getText() != null) ? e.getText() : e.getContentDescription());
+									btDeleteSkipText.setEnabled(true);
 									break;
 							}
 							v1.setBackgroundResource(R.drawable.node_focus);
