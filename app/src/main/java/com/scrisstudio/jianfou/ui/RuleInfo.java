@@ -10,9 +10,10 @@ public class RuleInfo {
 	private String ruleForVersion;
 	private String ruleType;
 	private String aidText;
+	private String skipText;
 	private PackageWidgetDescription filter;
 
-	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion, String ruleType, PackageWidgetDescription filter, String aidText) {
+	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion, String ruleType, PackageWidgetDescription filter, String aidText, String skipText) {
 		this.status = status;
 		this.id = id;
 		this.ruleTitle = ruleTitle;
@@ -22,6 +23,7 @@ public class RuleInfo {
 		this.ruleType = ruleType;
 		this.filter = filter;
 		this.aidText = aidText;
+		this.skipText = skipText;
 	}
 
 	public boolean getStatus() {
@@ -90,5 +92,13 @@ public class RuleInfo {
 
 	public void setAidText(String aidText) {
 		this.aidText = aidText;
+	}
+
+	public String getSkipText() {
+		return skipText;
+	}
+
+	public void setSkipText(String skipText) {
+		this.skipText = skipText;
 	}
 }

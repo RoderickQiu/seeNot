@@ -27,6 +27,7 @@ import com.scrisstudio.jianfou.ui.RuleInfo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.scrisstudio.jianfou.mask.ActivitySeekerService.TAG;
 import static com.scrisstudio.jianfou.mask.ActivitySeekerService.mService;
@@ -58,11 +59,15 @@ public class MaskAssignerUtils {
 		final TextView tvActivityName = viewCustomization.findViewById(R.id.tv_activity_name);
 		final TextView tvWidgetInfo = viewCustomization.findViewById(R.id.tv_widget_info);
 		final TextView tvAidText = viewCustomization.findViewById(R.id.emergency_aid_text_info);
+		final TextView tvSkipText = viewCustomization.findViewById(R.id.skip_text_info);
 		final TextView tvPressToMove = viewCustomization.findViewById(R.id.press_here_move);
 		//final TextView tvPositionInfo = viewCustomization.findViewById(R.id.tv_position_info);
 		final Button btShowOutline = viewCustomization.findViewById(R.id.button_show_outline);
+		final Button btShowOutline2 = viewCustomization.findViewById(R.id.button_show_outline_2);
+		final Button btShowOutline3 = viewCustomization.findViewById(R.id.button_show_outline_3);
 		final Button btAddWidget = viewCustomization.findViewById(R.id.button_add_widget);
 		final Button btSelectAidText = viewCustomization.findViewById(R.id.button_set_emergency_aid);
+		final Button btSelectSkipText = viewCustomization.findViewById(R.id.button_set_skip);
 		//Button btShowTarget = viewCustomization.findViewById(R.id.button_show_target);
 		//Button btReGetTarget = viewCustomization.findViewById(R.id.button_reget_outline);
 		//final Button btAddPosition = viewCustomization.findViewById(R.id.button_add_position);
@@ -168,13 +173,25 @@ public class MaskAssignerUtils {
 				return true;
 			}
 		});
-		btAddWidget.setOnClickListener(v -> {
+
+		Consumer<String> btOperator = (mode) -> {
 			PackageWidgetDescription temWidget = new PackageWidgetDescription(widgetDescription);
-
 			List<RuleInfo> list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
 			}.getType());
 			RuleInfo rule = list.get(position);
-			rule.setFilter(temWidget);
+			switch (mode) {
+				case "widget":
+					rule.setFilter(temWidget);
+					tvPackageName.setText(widgetDescription.packageName + " (控件数据已保存)");
+				case "aid":
+					rule.setAidText((String) tvAidText.getText());
+					tvAidText.setText(tvAidText.getText() + " (控件数据已保存)");
+					break;
+				case "skip":
+					rule.setSkipText((String) tvSkipText.getText());
+					tvSkipText.setText(tvSkipText.getText() + " (控件数据已保存)");
+					break;
+			}
 			list.set(position, rule);
 			ActivitySeekerService.setRulesList(list);
 			SharedPreferences.Editor ruleEditor = sharedPreferences.edit();
@@ -183,29 +200,19 @@ public class MaskAssignerUtils {
 
 			btAddWidget.setEnabled(false);
 			btSelectAidText.setEnabled(false);
-
-			tvPackageName.setText(widgetDescription.packageName + " (以下控件数据已保存)");
+			btSelectSkipText.setEnabled(false);
+		};
+		btAddWidget.setOnClickListener(v -> {
+			btOperator.accept("widget");
 		});
-
 		btSelectAidText.setOnClickListener(v -> {
-			List<RuleInfo> list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
-			}.getType());
-			RuleInfo rule = list.get(position);
-			rule.setAidText((String) tvAidText.getText());
-			list.set(position, rule);
-			ActivitySeekerService.setRulesList(list);
-			SharedPreferences.Editor ruleEditor = sharedPreferences.edit();
-			ruleEditor.putString("rules", gson.toJson(list));
-			ruleEditor.apply();
-
-			btAddWidget.setEnabled(false);
-			btSelectAidText.setEnabled(false);
-
-			tvAidText.setText((String) tvAidText.getText() + " (以下控件数据已保存)");
+			btOperator.accept("aid");
+		});
+		btSelectSkipText.setOnClickListener(v -> {
+			btOperator.accept("skip");
 		});
 
-		btShowOutline.setOnClickListener(v -> {
-			Button button = (Button) v;
+		Consumer<Integer> showOutlineOperator = (num) -> {
 			if (outlineParams.alpha == 0) {
 				AccessibilityNodeInfo root = mService.getRootInActiveWindow();
 				if (root == null) return;
@@ -264,10 +271,20 @@ public class MaskAssignerUtils {
 							widgetDescription.text = cText == null ? "" : cText.toString();
 							btAddWidget.setEnabled(true);
 							btSelectAidText.setEnabled(true);
-							tvPackageName.setText(widgetDescription.packageName);
-							tvActivityName.setText(widgetDescription.activityName);
-							tvWidgetInfo.setText("click:" + (e.isClickable() ? "true" : "false") + " " + "bonus:" + temRect.toShortString() + " " + "id:" + (cId == null ? "null" : cId.toString().substring(cId.toString().indexOf("id/") + 3)) + " " + "desc:" + (cDesc == null ? "null" : cDesc.toString()) + " " + "text:" + (cText == null ? "null" : cText.toString()));
-							tvAidText.setText((e.getText() != null) ? e.getText() : e.getContentDescription());
+							btSelectSkipText.setEnabled(true);
+							switch (num) {
+								case 1:
+									tvPackageName.setText(widgetDescription.packageName);
+									tvActivityName.setText(widgetDescription.activityName);
+									tvWidgetInfo.setText("bonus:" + temRect.toShortString() + " " + "id:" + (cId == null ? "null" : cId.toString().substring(cId.toString().indexOf("id/") + 3)) + " " + "desc:" + (cDesc == null ? "null" : cDesc.toString()) + " " + "text:" + (cText == null ? "null" : cText.toString()));
+									break;
+								case 2:
+									tvAidText.setText((e.getText() != null) ? e.getText() : e.getContentDescription());
+									break;
+								case 3:
+									tvSkipText.setText((e.getText() != null) ? e.getText() : e.getContentDescription());
+									break;
+							}
 							v1.setBackgroundResource(R.drawable.node_focus);
 						} else {
 							v1.setBackgroundResource(R.drawable.node);
@@ -278,30 +295,46 @@ public class MaskAssignerUtils {
 				outlineParams.alpha = 0.5f;
 				outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 				windowManager.updateViewLayout(viewTarget, outlineParams);
-				tvPackageName.setText(widgetDescription.packageName);
-				tvActivityName.setText(widgetDescription.activityName + "（如不正确或为空，则是由于当前软件限制，请尝试重新获取）");
-				button.setText("隐藏布局");
+
+				if (num == 1) {
+					tvPackageName.setText(widgetDescription.packageName);
+					tvActivityName.setText(widgetDescription.activityName + "（如不正确或为空，则是由于当前软件限制，请尝试重新获取）");
+				}
+
+				btShowOutline.setText("隐藏布局");
+				btShowOutline2.setText("隐藏布局");
+				btShowOutline3.setText("隐藏布局");
 			} else {
 				outlineParams.alpha = 0f;
 				outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
 				windowManager.updateViewLayout(viewTarget, outlineParams);
+
 				btAddWidget.setEnabled(false);
 				btSelectAidText.setEnabled(false);
-				button.setText("显示布局");
+				btSelectSkipText.setEnabled(false);
+
+				btShowOutline.setText("显示布局");
+				btShowOutline2.setText("显示布局");
+				btShowOutline3.setText("显示布局");
 			}
+		};
+		btShowOutline.setOnClickListener(v -> {
+			showOutlineOperator.accept(1);
 		});
-		/*btReGetTarget.setOnClickListener(v -> {
-			positionDescription.packageName = ActivitySeekerService.foregroundPackageName;
-			positionDescription.activityName = ActivitySeekerService.foregroundClassName;
-			tvPackageName.setText(positionDescription.packageName);
-			tvActivityName.setText(positionDescription.activityName);
-		});*/
+		btShowOutline2.setOnClickListener(v -> {
+			showOutlineOperator.accept(2);
+		});
+		btShowOutline3.setOnClickListener(v -> {
+			showOutlineOperator.accept(3);
+		});
+
 		btQuit.setOnClickListener(v -> {
 			windowManager.removeViewImmediate(viewTarget);
 			windowManager.removeViewImmediate(viewCustomization);
 			windowManager.removeViewImmediate(imageTarget);
 			ActivitySeekerService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
 		});
+
 		windowManager.addView(viewTarget, outlineParams);
 		windowManager.addView(viewCustomization, customizationParams);
 		windowManager.addView(imageTarget, targetParams);

@@ -48,12 +48,12 @@
     <string name="show_outline">显示布局</string>
     <string name="show_position_info">显示坐标信息</string>
     <string name="position_info">坐标：</string>
-    <string name="show_widget_info">显示控件信息</string>
+    <string name="show_widget_info">显示控件元素信息</string>
     <string name="widget">控件：</string>
-    <string name="show_activity_name">显示当前页面的活动名</string>
-    <string name="activity_name">活动：</string>
-    <string name="package_name">包名：</string>
-    <string name="show_package_name">显示当前应用的包名</string>
+    <string name="show_activity_name">显示当前页面所在 Activity 的名称</string>
+    <string name="activity_name">页面：</string>
+    <string name="package_name">软件：</string>
+    <string name="show_package_name">显示当前应用的软件 Package 名称</string>
     <string name="re_get">重新获取</string>
     <string name="add_widget">添加控件</string>
     <string name="cannot_open_assigner">已经打开设置窗口或服务未运行，请检查</string>
@@ -62,11 +62,11 @@
     <string name="need_hand_action_start">无障碍服务自动打开失败，需要手动打开。</string>
     <string name="settings_now_go">前去设置</string>
     <string name="basic_mask_settings">基础屏蔽设置</string>
-    <string name="emergency_aid_settings">补救措施设置</string>
+    <string name="emergency_aid_settings">高级：补救措施</string>
     <string name="when_such_text_shown">出现指定文字时强制返回：</string>
     <string name="please_input">请输入，留空则不设置</string>
     <string name="emergency_aid_text_info">显示补救触发文字</string>
-    <string name="emergency_aid_text_help">这个功能是让你在已经进入某个不应进入的页面后，强制退出以进行补救，因此应进入那个页面进行设置。点击“显示布局”然后选中含文字的元素，点击“选中”以设置。若软件阻止你获取一些字，则请尝试以其它文字为线索。</string>
+    <string name="emergency_aid_text_help">在特殊情况下进入不应进入的页面后，强制退出以进行补救；因此应进入那个页面进行设置。点击“显示布局”然后选中含文字的元素，点击“选中”以设置。若软件阻止你获取一些字，则请尝试以其它文字为线索。</string>
     <string name="select">选中</string>
     <string name="press_here_move">按住此处以拖动弹窗</string>
     <string name="divider">|</string>
@@ -74,4 +74,12 @@
     <string name="channel_name">服务保活</string>
     <string name="channel_description">如果不允许这个通知一直显示，无障碍服务可能会被系统自动结束。</string>
     <string name="channel_notification_text">见否服务正在运行中</string>
+    <string name="break_settings">高级：跳出屏蔽</string>
+    <string name="when_such_text_shown_break">出现指定文字时删除遮罩框：</string>
+    <string name="skip_text_help">有些软件中，几个页面会被绑定为一个页面（如微信的消息列表和聊天界面），可能导致在一个界面有效的遮罩到另外一个界面就遮挡了正常布局。点击“显示布局”然后选中含文字的元素，点击“选中”以设置。若软件阻止你获取一些字，则请尝试以其它文字为线索。</string>
+    <string name="skip_text_info">显示跳出触发文字</string>
+    <string name="when_such_text_shown_reenter">出现指定文字时恢复遮罩框：</string>
+    <string name="select_skip">选中跳出触发文字</string>
+    <string name="select_reenter">选中恢复触发文字</string>
+    <string name="skip_reenter_text_info">显示恢复触发文字</string>
 </resources>

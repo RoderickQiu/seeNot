@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
 	public static Resources.Theme theme;
 	public static int windowTrueWidth, windowTrueHeight;
 	public static SharedPreferences sharedPreferences;
-	public static String currentHomePackage;
 	private static FragmentManager fragmentManager;
 	private ActivityMainBinding binding;
 	private List<RuleInfo> list = new ArrayList<>();
