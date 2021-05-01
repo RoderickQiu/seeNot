@@ -1,6 +1,9 @@
 package com.scrisstudio.jianfou.mask;
 
 import android.accessibilityservice.AccessibilityService;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -18,11 +21,13 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 
+import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
+import com.scrisstudio.jianfou.activity.MainActivity;
 import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.ui.RuleInfo;
 
@@ -31,9 +36,12 @@ import java.util.List;
 
 public class ActivitySeekerService extends AccessibilityService {
 	public static final String TAG = "Jianfou-AccessibilityService";
+	private static final String CHANNEL_ID = "ServiceKeeper";
+	private static final int NOTIFICATION_ID = 9221;
 	public static ActivitySeekerService mService;
 	public static List<RuleInfo> rulesList;
-	public static boolean isServiceRunning = true, isFirstTimeInvokeService = true, isHandlerRunning = false;
+	public static boolean isServiceRunning = true, isFirstTimeInvokeService = true,
+			isHandlerRunning = false, isReceiverRegistered = false, isForegroundServiceRunning = false;
 	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
@@ -65,9 +73,10 @@ public class ActivitySeekerService extends AccessibilityService {
 		rulesList = l;
 	}
 
-	public static void setServiceBasicInfo(Boolean masterSwitch) {
-		//Gson gson = new Gson();
-		//rulesList = gson.fromJson(rules, new TypeToken<List<RuleInfo>>() {}.getType());
+	public static void setServiceBasicInfo(String rules, Boolean masterSwitch) {
+		Gson gson = new Gson();
+		rulesList = gson.fromJson(rules, new TypeToken<List<RuleInfo>>() {
+		}.getType());
 		isServiceRunning = masterSwitch;
 	}
 
@@ -93,6 +102,28 @@ public class ActivitySeekerService extends AccessibilityService {
 		}
 	}
 
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		return START_STICKY;
+	}
+
+	public void setForegroundService() {
+		String channelName = getString(R.string.channel_name);
+		int importance = NotificationManager.IMPORTANCE_LOW;
+		NotificationChannel channel = new NotificationChannel(CHANNEL_ID, channelName, importance);
+		channel.setDescription(getString(R.string.channel_description));
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
+		builder.setSmallIcon(R.drawable.jianfou_transparent_bg)
+				.setContentTitle(getString(R.string.channel_notification_text))
+				.setOngoing(true);
+		Intent resultIntent = new Intent(this, MainActivity.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		builder.setContentIntent(pendingIntent);
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.createNotificationChannel(channel);
+		startForeground(NOTIFICATION_ID, builder.build());
+		isForegroundServiceRunning = true;
+	}
+
 	//初始化
 	@Override
 	protected void onServiceConnected() {
@@ -115,8 +146,17 @@ public class ActivitySeekerService extends AccessibilityService {
 			}.getType());
 
 			/* 注册机器锁屏时的广播 */
-			IntentFilter mScreenOffFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
-			this.registerReceiver(mScreenOReceiver, mScreenOffFilter);
+			try {
+				IntentFilter mScreenOffFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
+				this.registerReceiver(mScreenOReceiver, mScreenOffFilter);
+				isReceiverRegistered = true;
+			} catch (Exception ignored) {
+			}
+
+			try {
+				setForegroundService();
+			} catch (Exception ignored) {
+			}
 		}
 	}
 
@@ -335,7 +375,14 @@ public class ActivitySeekerService extends AccessibilityService {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		this.unregisterReceiver(mScreenOReceiver);
+		if (isReceiverRegistered) {
+			this.unregisterReceiver(mScreenOReceiver);
+			isReceiverRegistered = false;
+		}
+		if (isForegroundServiceRunning) {
+			stopForeground(true);
+			isForegroundServiceRunning = false;
+		}
 		mService = null;
 	}
 }

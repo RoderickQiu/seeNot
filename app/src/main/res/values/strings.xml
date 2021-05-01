@@ -71,4 +71,7 @@
     <string name="press_here_move">按住此处以拖动弹窗</string>
     <string name="divider">|</string>
     <string name="expand_more">更多内容</string>
+    <string name="channel_name">服务保活</string>
+    <string name="channel_description">如果不允许这个通知一直显示，无障碍服务可能会被系统自动结束。</string>
+    <string name="channel_notification_text">见否服务正在运行中</string>
 </resources>

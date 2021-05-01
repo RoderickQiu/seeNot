@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 			banner.setMessage(R.string.function_closed);
 			banner.show();
 
-			ActivitySeekerService.setServiceBasicInfo(false);
+			ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), false);
 		}
 
 		//TODO this should test more
