@@ -56,6 +56,32 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:elevation="1dp"
+                android:text="@string/rule_type" />
+
+            <RadioGroup
+                android:id="@+id/radio_type_select"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkedButton="@+id/radio_normal_mask">
+
+                <RadioButton
+                    android:id="@+id/radio_normal_mask"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/normal_mask" />
+
+                <RadioButton
+                    android:id="@+id/radio_simple_return"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/simple_return" />
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:elevation="1dp"
                 android:text="@string/rule_version" />
 
             <com.google.android.material.textfield.TextInputLayout

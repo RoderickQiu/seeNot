@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 	public static Resources.Theme theme;
 	public static int windowTrueWidth, windowTrueHeight;
 	public static SharedPreferences sharedPreferences;
-	private static FragmentManager fragmentManager;
+	public static FragmentManager fragmentManager;
 	private ActivityMainBinding binding;
 	private List<RuleInfo> list = new ArrayList<>();
 
@@ -130,9 +130,9 @@ public class MainActivity extends AppCompatActivity {
 			ruleInitEditor.apply();
 		}
 		/*SharedPreferences.Editor edit = sharedPreferences.edit();
-		list.add(new RuleInfo(true, 0, "0", "1.0", "software", "any", "general type", new PackageWidgetDescription(), null, null));
-		list.add(new RuleInfo(true, 1, "1", "1.0", "software", "any", "general type", new PackageWidgetDescription(), null, null));
-		list.add(new RuleInfo(true, 2, "2", "1.0", "software", "any", "general type", new PackageWidgetDescription(), null, null));
+		list.add(new RuleInfo(true, 0, "0", "1.0", "software", "any", 0, new PackageWidgetDescription(), null, null));
+		list.add(new RuleInfo(true, 1, "1", "1.0", "software", "any", 0, new PackageWidgetDescription(), null, null));
+		list.add(new RuleInfo(true, 2, "2", "1.0", "software", "any", 1, new PackageWidgetDescription(), null, null));
 		edit.putString("rules", gson.toJson(list));
 		edit.apply();*/
 		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
@@ -182,6 +182,8 @@ public class MainActivity extends AppCompatActivity {
 			SharedPreferences.Editor submitEditer = sharedPreferences.edit();
 			submitEditer.putString("rules", gson.toJson(l));
 			submitEditer.apply();
+
+			ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true));
 
 			adapter.dataChange(l);
 		});

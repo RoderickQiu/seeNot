@@ -40,6 +40,17 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 		gson = new Gson();
 	}
 
+	public static String getRuleTypeRealName(int type) {
+		switch (type) {
+			case 0:
+				return "常规遮罩";
+			case 1:
+				return "简单返回";
+			default:
+				return "未知类型";
+		}
+	}
+
 	@NonNull
 	@Override
 	public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -74,7 +85,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 			holder.ruleFor.setText(rule.getFor());
 			holder.ruleForVersion.setText(" (" + rule.getForVersion() + ")");
 			holder.ruleSwitch.setChecked(rule.getStatus());
-			holder.ruleType.setText(rule.getType());
+			holder.ruleType.setText(getRuleTypeRealName(rule.getType()));
 
 			holder.ruleSwitch.setOnCheckedChangeListener((v, isChecked) -> {
 				SharedPreferences.Editor edit = sharedPreferences.edit();
@@ -107,7 +118,8 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 								holder.deleteButton.setVisibility(View.VISIBLE);
 								holder.deleteRecheckButton.setVisibility(View.GONE);
 							});
-						} catch (Exception ignored) {}
+						} catch (Exception ignored) {
+						}
 					}
 				}, 3000);
 			});

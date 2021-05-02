@@ -83,4 +83,8 @@
     <string name="select_reenter">选中恢复触发文字</string>
     <string name="skip_reenter_text_info">显示恢复触发文字</string>
     <string name="delete_such_setting">清除设置</string>
+    <string name="simple_return">简单返回</string>
+    <string name="normal_mask">常规遮罩</string>
+    <string name="app_confirm_dialog_title">请注意</string>
+    <string name="regret">取消</string>
 </resources>

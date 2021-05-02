@@ -46,7 +46,6 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
-	private static AccessibilityNodeInfo rootNodeInfo;
 	private FloatingWindowManager mWindowManager;
 	private boolean isMaskOn = false;
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
@@ -99,7 +98,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			Settings.Secure.putString(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, "1");
 		} catch (Exception e) {
 			//isSettingsModifierWorking = false;
-			Toast.makeText(getApplicationContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
+			Toast.makeText(jianfou.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
 			Log.e(TAG, "Service invoking failed, err message: " + e.toString());
 		}
 	}
@@ -168,7 +167,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		if (event.getEventType() == AccessibilityEvent.TYPE_WINDOWS_CHANGED) {
 			wordFinder(getRootInActiveWindow(), true);
 		} else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
-			rootNodeInfo = getRootInActiveWindow();
+			AccessibilityNodeInfo rootNodeInfo = getRootInActiveWindow();
 			try {
 				Rect rect = new Rect();
 				event.getSource().getBoundsInScreen(rect);
@@ -180,7 +179,7 @@ public class ActivitySeekerService extends AccessibilityService {
 							for (int i = 0; i < rulesList.size(); i++) {
 								if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName)) {
 									if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
-										maskSet(rulesList.get(i).getFilter(), i, true);
+										maskSet(rulesList.get(i).getFilter(), i);
 										break;
 									}
 								}
@@ -193,7 +192,7 @@ public class ActivitySeekerService extends AccessibilityService {
 							for (int i = 0; i < rulesList.size(); i++) {
 								if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName)) {
 									if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
-										maskSet(rulesList.get(i).getFilter(), i, true);
+										maskSet(rulesList.get(i).getFilter(), i);
 										break;
 									}
 								}
@@ -243,7 +242,7 @@ public class ActivitySeekerService extends AccessibilityService {
 				if (currentRuleId != -1) {
 					if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
 						if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
-							maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId, true);
+							maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
 							Log.e(TAG, "Recover");
 						}
 					}
@@ -253,7 +252,7 @@ public class ActivitySeekerService extends AccessibilityService {
 						for (int i = 0; i < rulesList.size(); i++) {
 							if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName) && !foregroundPackageName.equals("")) {
 								if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
-									maskSet(rulesList.get(i).getFilter(), i, true);
+									maskSet(rulesList.get(i).getFilter(), i);
 									currentRuleId = i;
 									break;
 								}
@@ -346,7 +345,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		}
 	}
 
-	private void maskSet(PackageWidgetDescription p, int indice, boolean shouldMove) {
+	private void maskSet(PackageWidgetDescription p, int indice) {
 		//Rect rect = nodeSearcher();
 		if (isServiceRunning) {
 			Rect rect = nodeSearcher(p.indices);
@@ -365,7 +364,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			Log.e(TAG, x + " " + y + " " + width + " " + height + " ");
 
 			if (!isMaskOn) maskCreator(true, indice, false);
-			else if (shouldMove) maskPositionMover();
+			else maskPositionMover();
 		}
 	}
 

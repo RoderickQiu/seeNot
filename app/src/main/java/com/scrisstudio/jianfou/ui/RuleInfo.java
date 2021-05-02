@@ -8,12 +8,12 @@ public class RuleInfo {
 	private String ruleVersion;
 	private String ruleFor;
 	private String ruleForVersion;
-	private String ruleType;
+	private int ruleType;
 	private String aidText;
 	private String skipText;
 	private PackageWidgetDescription filter;
 
-	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion, String ruleType, PackageWidgetDescription filter, String aidText, String skipText) {
+	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion, int ruleType, PackageWidgetDescription filter, String aidText, String skipText) {
 		this.status = status;
 		this.id = id;
 		this.ruleTitle = ruleTitle;
@@ -70,11 +70,11 @@ public class RuleInfo {
 		this.ruleVersion = ruleVersion;
 	}
 
-	public String getType() {
+	public int getType() {
 		return ruleType;
 	}
 
-	public void setType(String ruleType) {
+	public void setType(int ruleType) {
 		this.ruleType = ruleType;
 	}
 

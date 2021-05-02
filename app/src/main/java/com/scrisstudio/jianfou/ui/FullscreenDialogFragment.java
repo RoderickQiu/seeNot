@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,9 +19,11 @@ import androidx.fragment.app.FragmentManager;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.scrisstudio.jianfou.R;
+import com.scrisstudio.jianfou.activity.MainActivity;
 import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.mask.ActivitySeekerService;
 import com.scrisstudio.jianfou.mask.MaskAssignerUtils;
+import com.scrisstudio.jianfou.mask.PackageWidgetDescription;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +37,10 @@ public class FullscreenDialogFragment extends DialogFragment {
 	private static SharedPreferences sharedPreferences;
 	private static List<RuleInfo> list = new ArrayList<>();
 	private static OnSubmitListener callBack;
+	private static int ruleType = 0;
+	private static boolean hasJustRevertedRuleType = false;
 	private final Gson gson = new Gson();
+	private View dialogView;
 	private Toolbar toolbar;
 
 	public static void display(FragmentManager fragmentManager, int pos, List<RuleInfo> l) {
@@ -45,6 +52,37 @@ public class FullscreenDialogFragment extends DialogFragment {
 
 	public static void setOnSubmitListener(OnSubmitListener callback) {
 		callBack = callback;
+	}
+
+	public void openRuleSetConfirmDialog(String type, String info, int formerChoice, int choice) {
+		ConfirmDialogFragment.display(MainActivity.fragmentManager, type, info);
+		ConfirmDialogFragment.setOnSubmitListener((callback -> {
+			if (callback) {
+				ruleType = choice;
+
+				//delete the former settings
+				RuleInfo rule = list.get(position);
+				rule.setSkipText(null);
+				rule.setAidText(null);
+				rule.setFilter(new PackageWidgetDescription());
+				list.set(position, rule);
+			} else {
+				//revert the choice
+				hasJustRevertedRuleType = true;
+				try {
+					if (formerChoice == 0) {
+						if (choice == 1) {
+							((RadioButton) dialogView.findViewById(R.id.radio_normal_mask)).toggle();
+						}
+					} else if (formerChoice == 1) {
+						if (choice == 0) {
+							((RadioButton) dialogView.findViewById(R.id.radio_simple_return)).toggle();
+						}
+					}
+				} catch (Exception ignored) {
+				}
+			}
+		}));
 	}
 
 	@Override
@@ -77,6 +115,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 		RuleInfo rule = list.get(position);
 		rule.setTitle(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_name)).getEditText()).getText()));
 		rule.setVersion(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_version)).getEditText()).getText()));
+		rule.setType(ruleType);
 		rule.setFor(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_for)).getEditText()).getText()));
 		rule.setForVersion(String.valueOf(Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_for_version)).getEditText()).getText()));
 		list.set(position, rule);
@@ -96,6 +135,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 			return true;
 		});
 
+		dialogView = view;
 		view.findViewById(R.id.rule_extra_settings_tip).setOnClickListener(v -> {
 			try {
 				if (ActivitySeekerService.isServiceRunning) {
@@ -109,6 +149,19 @@ public class FullscreenDialogFragment extends DialogFragment {
 				Log.e(TAG, e.toString());
 			}
 			dismiss();
+		});
+
+		ruleType = list.get(position).getType();
+		if (ruleType == 0) ((RadioButton) view.findViewById(R.id.radio_normal_mask)).toggle();
+		else if (ruleType == 1)
+			((RadioButton) view.findViewById(R.id.radio_simple_return)).toggle();
+		((RadioGroup) view.findViewById(R.id.radio_type_select)).setOnCheckedChangeListener((group, checkedId) -> {
+			if (hasJustRevertedRuleType) hasJustRevertedRuleType = false;
+			else if (checkedId == view.findViewById(R.id.radio_normal_mask).getId()) {
+				openRuleSetConfirmDialog("radio-rule-type", "这将会删除原有的规则逻辑，请谨慎。", ruleType, 0);
+			} else if (checkedId == view.findViewById(R.id.radio_simple_return).getId()) {
+				openRuleSetConfirmDialog("radio-rule-type", "这将会删除原有的规则逻辑，请谨慎。", ruleType, 1);
+			}
 		});
 
 		Objects.requireNonNull(((TextInputLayout) view.findViewById(R.id.rule_name)).getEditText()).setText(list.get(position).getTitle());
