@@ -101,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
 				Intent serviceIntent = new Intent(this, ActivitySeekerService.class);
 				startService(serviceIntent);
 			}
+		} else if (requestCode == 201) {
+			//reload page when back from settings
+			Log.e(TAG, "Fuck");
+			Intent intent = getIntent();
+			finish();
+			startActivity(intent);
 		}
 	}
 
@@ -203,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
 			if (menuItem.getItemId() == R.id.item_settings) {
 				Intent settingsOpener = new Intent(MainActivity.this, SettingsActivity.class);
-				startActivity(settingsOpener);
+				startActivityForResult(settingsOpener, 201);
 				return false;
 			} else if (menuItem.getItemId() == R.id.item_about) {
 				Intent aboutOpener = new Intent(MainActivity.this, AboutActivity.class);

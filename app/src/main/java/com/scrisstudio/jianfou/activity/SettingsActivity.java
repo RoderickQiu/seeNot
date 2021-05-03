@@ -1,6 +1,5 @@
 package com.scrisstudio.jianfou.activity;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -27,8 +26,7 @@ public class SettingsActivity extends AppCompatActivity {
 	@Override
 	public void onBackPressed() {
 		//super.onBackPressed();
-		Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
-		startActivity(intent);
+		finish();
 	}
 
 	@Override
@@ -65,8 +63,7 @@ public class SettingsActivity extends AppCompatActivity {
 		});
 
 		binding.settingsAppBar.setNavigationOnClickListener(v -> {
-			Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
-			startActivity(intent);
+			finish();
 		});
 	}
 }

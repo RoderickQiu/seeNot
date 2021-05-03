@@ -23,7 +23,6 @@
                 style="@style/Theme.Jianfou.About.Toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:menu="@menu/top_app_bar"
                 app:navigationIcon="@drawable/backspace_24dp"
                 app:title="@string/about" />
 
@@ -50,6 +49,7 @@
                     android:layout_width="96dp"
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
+                    android:contentDescription="@string/scris_std_app"
                     android:padding="3dp"
                     android:scaleType="fitXY"
                     android:src="@drawable/scris_studio" />
@@ -77,10 +77,12 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/scris_studio_app"
                 style="@style/TextAppearance.MaterialComponents.Subtitle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
                 android:text="@string/scris_std_app"
                 android:textColor="@color/scris" />
 
