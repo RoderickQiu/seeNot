@@ -1,6 +1,7 @@
 package com.scrisstudio.jianfou.mask;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -8,7 +9,7 @@ import android.widget.LinearLayout;
 
 import com.scrisstudio.jianfou.R;
 
-public class FloatingWindowManager {
+public class FloatingViewManager {
 	private static final WindowManager.LayoutParams layoutParams;
 
 	static {
@@ -21,7 +22,9 @@ public class FloatingWindowManager {
 		params.type = 2032;
 		params.format = 1;
 		params.flags = 40;
-		params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
+		}
 		layoutParams = params;
 	}
 
@@ -29,7 +32,7 @@ public class FloatingWindowManager {
 	private final WindowManager mWindowManager;
 	private View mFloatingView;
 
-	public FloatingWindowManager(Context context) {
+	public FloatingViewManager(Context context) {
 		this.mContext = context;
 		this.mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 	}

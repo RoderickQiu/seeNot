@@ -1,5 +1,4 @@
-package com.scrisstudio.jianfou.ui;
-import com.scrisstudio.jianfou.mask.PackageWidgetDescription;
+package com.scrisstudio.jianfou.mask;
 
 public class RuleInfo {
 	private final int id;
@@ -11,9 +10,9 @@ public class RuleInfo {
 	private int ruleType;
 	private String aidText;
 	private String skipText;
-	private PackageWidgetDescription filter;
+	private WidgetInfo filter;
 
-	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion, int ruleType, PackageWidgetDescription filter, String aidText, String skipText) {
+	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion, int ruleType, WidgetInfo filter, String aidText, String skipText) {
 		this.status = status;
 		this.id = id;
 		this.ruleTitle = ruleTitle;
@@ -78,11 +77,11 @@ public class RuleInfo {
 		this.ruleType = ruleType;
 	}
 
-	public PackageWidgetDescription getFilter() {
+	public WidgetInfo getFilter() {
 		return filter;
 	}
 
-	public void setFilter(PackageWidgetDescription filter) {
+	public void setFilter(WidgetInfo filter) {
 		this.filter = filter;
 	}
 

@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
 import com.scrisstudio.jianfou.jianfou;
+import com.scrisstudio.jianfou.mask.RuleInfo;
 
 import java.util.List;
 import java.util.Timer;
@@ -56,9 +57,9 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 	public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 		View view;
 		if (viewType == VIEW_TYPE_CARD) {
-			view = LayoutInflater.from(context).inflate(R.layout.rule_card, parent, false);
+			view = LayoutInflater.from(context).inflate(R.layout.layout_rule_card, parent, false);
 		} else {
-			view = LayoutInflater.from(context).inflate(R.layout.empty_recyclerview, parent, false);
+			view = LayoutInflater.from(context).inflate(R.layout.layout_empty_recyclerview, parent, false);
 		}
 		return new MyViewHolder(view);
 	}

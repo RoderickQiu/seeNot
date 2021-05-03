@@ -5,13 +5,13 @@ import android.graphics.Rect;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class PackageWidgetDescription {
+public class WidgetInfo {
 	public String packageName, activityName, className, idName, description, text;
 	public Rect position;
 	public ArrayList<Integer> indices;
 	public boolean clickable, onlyClick;
 
-	public PackageWidgetDescription() {
+	public WidgetInfo() {
 		this.packageName = "";
 		this.activityName = "";
 		this.className = "";
@@ -24,7 +24,7 @@ public class PackageWidgetDescription {
 		this.onlyClick = false;
 	}
 
-	public PackageWidgetDescription(String packageName, String activityName, String className, String idName, String description, String text, Rect position, ArrayList<Integer> indices, boolean clickable, boolean onlyClick) {
+	public WidgetInfo(String packageName, String activityName, String className, String idName, String description, String text, Rect position, ArrayList<Integer> indices, boolean clickable, boolean onlyClick) {
 		this.packageName = packageName;
 		this.activityName = activityName;
 		this.className = className;
@@ -37,7 +37,7 @@ public class PackageWidgetDescription {
 		this.onlyClick = onlyClick;
 	}
 
-	public PackageWidgetDescription(PackageWidgetDescription widgetDescription) {
+	public WidgetInfo(WidgetInfo widgetDescription) {
 		this.packageName = widgetDescription.packageName;
 		this.activityName = widgetDescription.activityName;
 		this.className = widgetDescription.className;
@@ -54,8 +54,8 @@ public class PackageWidgetDescription {
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
-		if (!(obj instanceof PackageWidgetDescription)) return false;
-		PackageWidgetDescription widget = (PackageWidgetDescription) obj;
+		if (!(obj instanceof WidgetInfo)) return false;
+		WidgetInfo widget = (WidgetInfo) obj;
 		return position.equals(widget.position);
 	}
 

@@ -28,10 +28,10 @@ import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.databinding.ActivityMainBinding;
 import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.mask.ActivitySeekerService;
-import com.scrisstudio.jianfou.ui.CardDecoration;
+import com.scrisstudio.jianfou.mask.RuleInfo;
 import com.scrisstudio.jianfou.ui.FullscreenDialogFragment;
-import com.scrisstudio.jianfou.ui.RuleInfo;
 import com.scrisstudio.jianfou.ui.RuleInfoAdapter;
+import com.scrisstudio.jianfou.ui.RuleInfoCardDecoration;
 import com.scrisstudio.jianfou.ui.SimpleDialogFragment;
 import com.sergivonavi.materialbanner.Banner;
 
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 		recyclerView.setLayoutManager(layoutManager);
 		RuleInfoAdapter adapter = new RuleInfoAdapter(getBaseContext(), list, sharedPreferences);
 		recyclerView.setAdapter(adapter);
-		recyclerView.addItemDecoration(new CardDecoration());
+		recyclerView.addItemDecoration(new RuleInfoCardDecoration());
 
 		FullscreenDialogFragment.setOnSubmitListener((pos, l) -> {
 			SharedPreferences.Editor submitEditer = sharedPreferences.edit();

@@ -1,6 +1,6 @@
 package com.scrisstudio.jianfou.mask;
 
-public class PackagePositionDescription {
+public class PositionInfo {
 	public String packageName;
 	public String activityName;
 	public int x;
@@ -9,7 +9,7 @@ public class PackagePositionDescription {
 	public int period;
 	public int number;
 
-	public PackagePositionDescription() {
+	public PositionInfo() {
 		this.packageName = "";
 		this.activityName = "";
 		this.x = 0;
@@ -19,7 +19,7 @@ public class PackagePositionDescription {
 		this.number = 0;
 	}
 
-	public PackagePositionDescription(String packageName, String activityName, int x, int y, int delay, int period, int number) {
+	public PositionInfo(String packageName, String activityName, int x, int y, int delay, int period, int number) {
 		this.packageName = packageName;
 		this.activityName = activityName;
 		this.x = x;
@@ -29,7 +29,7 @@ public class PackagePositionDescription {
 		this.number = number;
 	}
 
-	public PackagePositionDescription(PackagePositionDescription positionDescription) {
+	public PositionInfo(PositionInfo positionDescription) {
 		this.packageName = positionDescription.packageName;
 		this.activityName = positionDescription.activityName;
 		this.x = positionDescription.x;

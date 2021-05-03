@@ -9,7 +9,7 @@ import com.scrisstudio.jianfou.activity.MainActivity;
 
 import java.util.Objects;
 
-public class CardDecoration extends RecyclerView.ItemDecoration {
+public class RuleInfoCardDecoration extends RecyclerView.ItemDecoration {
 
 	@Override
 	public void getItemOffsets(Rect outRect, @NonNull View view, RecyclerView parent, @NonNull RecyclerView.State state) {

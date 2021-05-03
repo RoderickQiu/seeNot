@@ -29,8 +29,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:elevation="0dp"
-                    app:menu="@menu/top_app_bar"
-                    app:navigationIcon="@drawable/ic_menu_24dp"
+                    app:menu="@menu/menu_app_bar"
+                    app:navigationIcon="@drawable/menu_24dp"
                     app:title="@string/app_name" />
 
             </com.google.android.material.appbar.AppBarLayout>
@@ -84,8 +84,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            app:headerLayout="@layout/header_navigation_drawer"
-            app:menu="@menu/navigation_drawer" />
+            app:headerLayout="@layout/layout_navigation_menu"
+            app:menu="@menu/menu_navigation" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
 

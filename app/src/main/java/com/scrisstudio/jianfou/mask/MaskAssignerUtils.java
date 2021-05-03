@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
-import com.scrisstudio.jianfou.ui.RuleInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +35,7 @@ import static com.scrisstudio.jianfou.mask.ActivitySeekerService.mService;
 public class MaskAssignerUtils {
 
 	@SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
-	public static void showActivityCustomizationDialog(int position) {
+	public static void showActivityCustomizationDialog(int position, int type) {
 		// show activity customization window
 		final WindowManager windowManager = (WindowManager) mService.getSystemService(AccessibilityService.WINDOW_SERVICE);
 		final DisplayMetrics metrics = new DisplayMetrics();
@@ -50,12 +49,12 @@ public class MaskAssignerUtils {
 		final int width = b ? metrics.widthPixels : metrics.heightPixels;
 		final int height = b ? metrics.heightPixels : metrics.widthPixels;
 
-		final PackageWidgetDescription widgetDescription = new PackageWidgetDescription();
-		final PackagePositionDescription positionDescription = new PackagePositionDescription("", "", 0, 0, 500, 500, 6);
+		final WidgetInfo widgetDescription = new WidgetInfo();
+		final PositionInfo positionDescription = new PositionInfo("", "", 0, 0, 500, 500, 6);
 
 		final LayoutInflater inflater = LayoutInflater.from(mService);
 		// activity customization view
-		final View viewCustomization = inflater.inflate(R.layout.layout_activity_customization, null);
+		final View viewCustomization = inflater.inflate(R.layout.layout_mask_assigner, null);
 		final TextView tvPackageName = viewCustomization.findViewById(R.id.tv_package_name);
 		final TextView tvActivityName = viewCustomization.findViewById(R.id.tv_activity_name);
 		final TextView tvWidgetInfo = viewCustomization.findViewById(R.id.tv_widget_info);
@@ -77,10 +76,17 @@ public class MaskAssignerUtils {
 		//Button btReGetTarget = viewCustomization.findViewById(R.id.button_reget_outline);
 		//final Button btAddPosition = viewCustomization.findViewById(R.id.button_add_position);
 
+		//if type is only skip, hide other things
+		if (type == 1) {
+			viewCustomization.findViewById(R.id.normal_mask_settings).setVisibility(View.GONE);
+			viewCustomization.findViewById(R.id.skip_settings).setVisibility(View.GONE);
+			((TextView) viewCustomization.findViewById(R.id.emergency_aid_settings_title)).setText(R.string.simple_return);
+		}
+
 		AtomicReference<List<RuleInfo>> tempList = new AtomicReference<>(gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
 		}.getType()));
 		RuleInfo tempRule = tempList.get().get(position);
-		if (!tempRule.getFilter().equals(new PackageWidgetDescription()))
+		if (!tempRule.getFilter().equals(new WidgetInfo()))
 			btDeleteWidget.setEnabled(true);
 		if (tempRule.getAidText() != null) btDeleteAidText.setEnabled(true);
 		if (tempRule.getSkipText() != null) btDeleteSkipText.setEnabled(true);
@@ -89,7 +95,7 @@ public class MaskAssignerUtils {
 		final FrameLayout layoutOverlayOutline = viewTarget.findViewById(R.id.frame);
 
 		final ImageView imageTarget = new ImageView(mService);
-		imageTarget.setImageResource(R.drawable.ic_target);
+		imageTarget.setImageResource(R.drawable.target);
 
 		// define view positions
 		final WindowManager.LayoutParams customizationParams, outlineParams, targetParams;
@@ -192,7 +198,7 @@ public class MaskAssignerUtils {
 			RuleInfo rule = list.get(position);
 			switch (mode) {
 				case "widget":
-					rule.setFilter(new PackageWidgetDescription());
+					rule.setFilter(new WidgetInfo());
 					tvPackageName.setText(null);
 				case "aid":
 					rule.setAidText(null);
@@ -223,7 +229,7 @@ public class MaskAssignerUtils {
 		});
 
 		Consumer<String> btOperator = (mode) -> {
-			PackageWidgetDescription temWidget = new PackageWidgetDescription(widgetDescription);
+			WidgetInfo temWidget = new WidgetInfo(widgetDescription);
 			List<RuleInfo> list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
 			}.getType());
 			RuleInfo rule = list.get(position);

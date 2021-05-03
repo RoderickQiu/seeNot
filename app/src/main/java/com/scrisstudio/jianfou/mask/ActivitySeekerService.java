@@ -29,7 +29,6 @@ import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
 import com.scrisstudio.jianfou.jianfou;
-import com.scrisstudio.jianfou.ui.RuleInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +45,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
-	private FloatingWindowManager mWindowManager;
+	private FloatingViewManager mWindowManager;
 	private boolean isMaskOn = false;
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
 	private final BroadcastReceiver mScreenOReceiver = new BroadcastReceiver() {
@@ -113,7 +112,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		NotificationChannel channel = new NotificationChannel(CHANNEL_ID, channelName, importance);
 		channel.setDescription(getString(R.string.channel_description));
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
-		builder.setSmallIcon(R.drawable.jianfou_transparent_bg)
+		builder.setSmallIcon(R.drawable.jianfou_no_bg)
 				.setContentTitle(getString(R.string.channel_notification_text))
 				.setOngoing(true);
 		Intent resultIntent = new Intent(this, MainActivity.class);
@@ -132,7 +131,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		mService = this;
 
 		if (this.mWindowManager == null) {
-			this.mWindowManager = new FloatingWindowManager(this);
+			this.mWindowManager = new FloatingViewManager(this);
 		}
 
 		if (isFirstTimeInvokeService) {
@@ -345,7 +344,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		}
 	}
 
-	private void maskSet(PackageWidgetDescription p, int indice) {
+	private void maskSet(WidgetInfo p, int indice) {
 		//Rect rect = nodeSearcher();
 		if (isServiceRunning) {
 			Rect rect = nodeSearcher(p.indices);

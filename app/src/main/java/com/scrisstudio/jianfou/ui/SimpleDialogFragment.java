@@ -49,7 +49,7 @@ public class SimpleDialogFragment extends DialogFragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View view = null;
-		view = inflater.inflate(R.layout.simple_dialog, container, false);
+		view = inflater.inflate(R.layout.dialog_simple, container, false);
 		if (view != null) {
 			okButton = view.findViewById(R.id.ok_button);
 			textView = view.findViewById(R.id.info_box);

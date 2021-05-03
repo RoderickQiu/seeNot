@@ -23,7 +23,8 @@ import com.scrisstudio.jianfou.activity.MainActivity;
 import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.mask.ActivitySeekerService;
 import com.scrisstudio.jianfou.mask.MaskAssignerUtils;
-import com.scrisstudio.jianfou.mask.PackageWidgetDescription;
+import com.scrisstudio.jianfou.mask.RuleInfo;
+import com.scrisstudio.jianfou.mask.WidgetInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 				RuleInfo rule = list.get(position);
 				rule.setSkipText(null);
 				rule.setAidText(null);
-				rule.setFilter(new PackageWidgetDescription());
+				rule.setFilter(new WidgetInfo());
 				list.set(position, rule);
 			} else {
 				//revert the choice
@@ -106,7 +107,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
-		View view = inflater.inflate(R.layout.card_edit_dialog, container, false);
+		View view = inflater.inflate(R.layout.dialog_card_edit, container, false);
 		toolbar = view.findViewById(R.id.toolbar);
 		return view;
 	}
@@ -128,7 +129,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 		super.onViewCreated(view, savedInstanceState);
 		toolbar.setNavigationOnClickListener(v -> dismiss());
 		toolbar.setTitle(R.string.edit_dialog_title);
-		toolbar.inflateMenu(R.menu.top_dialog_bar);
+		toolbar.inflateMenu(R.menu.menu_dialog_bar);
 		toolbar.setOnMenuItemClickListener(item -> {
 			submitData(view);
 			dismiss();
@@ -140,7 +141,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 			try {
 				if (ActivitySeekerService.isServiceRunning) {
 					submitData(view);
-					MaskAssignerUtils.showActivityCustomizationDialog(position);
+					MaskAssignerUtils.showActivityCustomizationDialog(position, ruleType);
 				} else {
 					Toast.makeText(jianfou.getAppContext(), R.string.cannot_open_assigner, Toast.LENGTH_LONG).show();
 				}
