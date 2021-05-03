@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -41,10 +42,11 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static List<RuleInfo> rulesList;
 	public static boolean isServiceRunning = true, isFirstTimeInvokeService = true,
 			isHandlerRunning = false, isReceiverRegistered = false, isForegroundServiceRunning = false,
-			hasJustSkipped = false;
+			hasJustSkipped = false, isWordFinderRunning = false;
 	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
+	private long lastContentChangedTime = 0;
 	private FloatingViewManager mWindowManager;
 	private boolean isMaskOn = false;
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
@@ -164,69 +166,71 @@ public class ActivitySeekerService extends AccessibilityService {
 	@Override
 	public void onAccessibilityEvent(AccessibilityEvent event) {
 		if (event.getEventType() == AccessibilityEvent.TYPE_WINDOWS_CHANGED) {
-			wordFinder(getRootInActiveWindow(), true);
+			if (currentRuleId == -1) wordFinder(getRootInActiveWindow(), true);
+			else if (rulesList.get(currentRuleId).getType() == 0)
+				wordFinder(getRootInActiveWindow(), true);
 		} else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
-			AccessibilityNodeInfo rootNodeInfo = getRootInActiveWindow();
 			try {
-				Rect rect = new Rect();
-				event.getSource().getBoundsInScreen(rect);
-				if (isMaskOn)
-					if (rect.width() == windowTrueWidth) {
-						if (windowOrientation.equals("landscape")) {
-							windowOrientation = "portrait";
-							Log.e(TAG, "Change to Portrait");
-							for (int i = 0; i < rulesList.size(); i++) {
-								if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName)) {
-									if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
-										maskSet(rulesList.get(i).getFilter(), i);
-										break;
-									}
-								}
-							}
-						}
-					} else if (rect.width() == windowTrueHeight) {
-						if (windowOrientation.equals("portrait")) {
-							windowOrientation = "landscape";
-							Log.e(TAG, "Change to Landscape");
-							for (int i = 0; i < rulesList.size(); i++) {
-								if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName)) {
-									if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
-										maskSet(rulesList.get(i).getFilter(), i);
-										break;
-									}
-								}
-							}
-						}
-					}
-			} catch (Exception e) {
-				Log.i(TAG, "Failed to get orientation, err message: " + e.toString());
-			}
-			try {
-				foregroundPackageName = rootNodeInfo.getPackageName().toString();
+				foregroundPackageName = getRootInActiveWindow().getPackageName().toString();
 			} catch (Exception e) {
 				foregroundPackageName = event.getPackageName().toString();
 			}
 			ComponentName cName = new ComponentName(foregroundPackageName, foregroundClassName);
-			//Best solution til now
-			if (!foregroundPackageName.equals(currentHomePackage) && isMaskOn) {
-				for (int i = 0; i < rulesList.size(); i++) {
-					if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName)) {
-						if (tryGetActivity(cName) != null) {
-							if (isCapableClass(foregroundClassName)) {
-								if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
-									//maskSet();
-									break;
-								} else {
-									maskCreator(false, -1, false);
-									currentRuleId = -1;
-								}
+			if (currentRuleId != -1) {
+				if (foregroundPackageName.equals(currentHomePackage)) {
+					if (isMaskOn) maskCreator(false, -1, false);
+					currentRuleId = -1;
+				} else if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
+					if (tryGetActivity(cName) != null) {
+						if (isCapableClass(foregroundClassName)) {
+							if (!foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
+								if (isMaskOn) maskCreator(false, -1, false);
+								currentRuleId = -1;
 							}
 						}
 					}
 				}
-			} else if (isMaskOn) {
-				maskCreator(false, -1, false);
-				currentRuleId = -1;
+			}
+
+			//prevent a lot of events flood in to cause crash
+			long time = SystemClock.uptimeMillis();
+			if (time - lastContentChangedTime > 500) {
+				lastContentChangedTime = time;
+				try {
+					Rect rect = new Rect();
+					event.getSource().getBoundsInScreen(rect);
+					if (currentRuleId != -1) {
+						if (isMaskOn) {
+							if (rect.width() == windowTrueWidth) {
+								if (windowOrientation.equals("landscape")) {
+									windowOrientation = "portrait";
+									Log.e(TAG, "Change to Portrait");
+									if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
+										if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
+											maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
+										}
+									}
+								}
+							} else if (rect.width() == windowTrueHeight) {
+								if (windowOrientation.equals("portrait")) {
+									windowOrientation = "landscape";
+									Log.e(TAG, "Change to Landscape");
+									if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
+										if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
+											maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
+											Log.e(TAG, "Recover");
+										}
+									}
+								}
+							}
+						} else if (rulesList.get(currentRuleId).getType() == 1) {
+							wordFinder(getRootInActiveWindow(), true);
+						}
+					}
+				} catch (Exception e) {
+					Log.i(TAG, "Failed to get orientation, err message: " + e.toString());
+				}
+
 			}
 		} else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
 			ComponentName cName = new ComponentName(foregroundPackageName, event.getClassName().toString());
@@ -239,21 +243,28 @@ public class ActivitySeekerService extends AccessibilityService {
 
 			if (!isHandlerRunning && !isMaskOn) {
 				if (currentRuleId != -1) {
-					if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
-						if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
-							maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
-							Log.e(TAG, "Recover");
+					if (rulesList.get(currentRuleId).getType() == 0)
+						if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
+							if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
+								maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
+								Log.e(TAG, "Recover");
+							}
 						}
-					}
 				} else {
 					isHandlerRunning = true;
 					new Handler().postDelayed(() -> {
 						for (int i = 0; i < rulesList.size(); i++) {
-							if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName) && !foregroundPackageName.equals("")) {
-								if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
-									maskSet(rulesList.get(i).getFilter(), i);
-									currentRuleId = i;
-									break;
+							if (rulesList.get(i).getStatus()) {
+								if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName) && !foregroundPackageName.equals("")) {
+									if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
+										currentRuleId = i;
+										Log.e(TAG, "currentRuleId: " + currentRuleId);
+										if (rulesList.get(i).getType() == 0)
+											maskSet(rulesList.get(i).getFilter(), i);
+										else if (rulesList.get(i).getType() == 1)
+											wordFinder(getRootInActiveWindow(), true);
+										break;
+									}
 								}
 							}
 						}
@@ -319,9 +330,9 @@ public class ActivitySeekerService extends AccessibilityService {
 					}
 				} else if (!isOnlyVisible || info.isVisibleToUser()) {
 					if (info.getText() != null) {
-						if (info.getText().equals(rulesList.get(currentRuleId).getAidText()))
+						if (info.getText().toString().equals(rulesList.get(currentRuleId).getAidText()))
 							aidTextTriggerExecutor();
-						else if (info.getText().equals(rulesList.get(currentRuleId).getSkipText()))
+						else if (info.getText().toString().equals(rulesList.get(currentRuleId).getSkipText()))
 							skipTextExecutor();
 					} else if (info.getContentDescription() != null) {
 						if (info.getContentDescription().equals(rulesList.get(currentRuleId).getAidText()))
@@ -336,10 +347,8 @@ public class ActivitySeekerService extends AccessibilityService {
 
 	private ActivityInfo tryGetActivity(ComponentName componentName) {
 		try {
-			Log.w(TAG, "Caught: " + componentName);
 			return getPackageManager().getActivityInfo(componentName, 0);
 		} catch (PackageManager.NameNotFoundException e) {
-			Log.w(TAG, "Problem catching: " + componentName);
 			return null;
 		}
 	}

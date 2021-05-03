@@ -17,11 +17,13 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
+import com.scrisstudio.jianfou.jianfou;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,11 +33,12 @@ import java.util.function.Consumer;
 
 import static com.scrisstudio.jianfou.mask.ActivitySeekerService.TAG;
 import static com.scrisstudio.jianfou.mask.ActivitySeekerService.mService;
+import static com.scrisstudio.jianfou.mask.ActivitySeekerService.rulesList;
 
 public class MaskAssignerUtils {
 
 	@SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
-	public static void showActivityCustomizationDialog(int position, int type) {
+	public static void showActivityCustomizationDialog(int position) {
 		// show activity customization window
 		final WindowManager windowManager = (WindowManager) mService.getSystemService(AccessibilityService.WINDOW_SERVICE);
 		final DisplayMetrics metrics = new DisplayMetrics();
@@ -77,7 +80,7 @@ public class MaskAssignerUtils {
 		//final Button btAddPosition = viewCustomization.findViewById(R.id.button_add_position);
 
 		//if type is only skip, hide other things
-		if (type == 1) {
+		if (rulesList.get(position).getType() == 1) {
 			viewCustomization.findViewById(R.id.normal_mask_settings).setVisibility(View.GONE);
 			viewCustomization.findViewById(R.id.skip_settings).setVisibility(View.GONE);
 			((TextView) viewCustomization.findViewById(R.id.emergency_aid_settings_title)).setText(R.string.simple_return);
@@ -202,6 +205,7 @@ public class MaskAssignerUtils {
 					tvPackageName.setText(null);
 				case "aid":
 					rule.setAidText(null);
+					if (rule.getType() == 1) rule.setFilter(new WidgetInfo());
 					tvAidText.setText(null);
 					break;
 				case "skip":
@@ -229,6 +233,7 @@ public class MaskAssignerUtils {
 		});
 
 		Consumer<String> btOperator = (mode) -> {
+
 			WidgetInfo temWidget = new WidgetInfo(widgetDescription);
 			List<RuleInfo> list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
 			}.getType());
@@ -238,8 +243,11 @@ public class MaskAssignerUtils {
 					rule.setFilter(temWidget);
 					tvPackageName.setText(widgetDescription.packageName + " (控件数据已保存)");
 				case "aid":
-					rule.setAidText((String) tvAidText.getText());
+					rule.setAidText(tvAidText.getText().toString());
 					tvAidText.setText(tvAidText.getText() + " (控件数据已保存)");
+					if (rule.getType() == 1) {
+						rule.setFilter(temWidget);
+					}
 					break;
 				case "skip":
 					rule.setSkipText((String) tvSkipText.getText());
@@ -268,99 +276,102 @@ public class MaskAssignerUtils {
 
 		Consumer<Integer> showOutlineOperator = (num) -> {
 			if (outlineParams.alpha == 0) {
-				AccessibilityNodeInfo root = mService.getRootInActiveWindow();
-				if (root == null) return;
-				widgetDescription.packageName = ActivitySeekerService.foregroundPackageName;
-				widgetDescription.activityName = ActivitySeekerService.foregroundClassName;
-				layoutOverlayOutline.removeAllViews();
-				ArrayList<AccessibilityNodeInfo> roots = new ArrayList<>();
-				roots.add(root);
-				ArrayList<AccessibilityNodeInfo> nodeList = new ArrayList<>();
-				findAllNode(roots, nodeList, "");
-				nodeList.sort((a, b1) -> {
-					Rect rectA = new Rect();
-					Rect rectB = new Rect();
-					a.getBoundsInScreen(rectA);
-					b1.getBoundsInScreen(rectB);
-					return rectB.width() * rectB.height() - rectA.width() * rectA.height();
-				});
-				for (final AccessibilityNodeInfo e : nodeList) {
-					final Rect temRect = new Rect();
-					e.getBoundsInScreen(temRect);
-					FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(temRect.width(), temRect.height());
-					params.leftMargin = temRect.left;
-					params.topMargin = temRect.top;
-					final ImageView img = new ImageView(mService);
-					img.setBackgroundResource(R.drawable.node);
-					img.setFocusableInTouchMode(true);
-					img.setOnClickListener(View::requestFocus);
-					img.setOnFocusChangeListener((v1, hasFocus) -> {
-						if (hasFocus) {
-							AccessibilityNodeInfo tempNode = e;
-							ArrayList<Integer> indicesList = new ArrayList<Integer>();
-							while (true) {
-								for (int i = 0; i < tempNode.getParent().getChildCount(); i++) {
-									if (tempNode.getParent().getChild(i).equals(tempNode)) {
-										indicesList.add(i);
+				if (!ActivitySeekerService.foregroundPackageName.equals(ActivitySeekerService.currentHomePackage) && !ActivitySeekerService.foregroundPackageName.equals("com.scrisstudio.jianfou")) {
+					AccessibilityNodeInfo root = mService.getRootInActiveWindow();
+					if (root == null) return;
+					widgetDescription.packageName = ActivitySeekerService.foregroundPackageName;
+					widgetDescription.activityName = ActivitySeekerService.foregroundClassName;
+					layoutOverlayOutline.removeAllViews();
+					ArrayList<AccessibilityNodeInfo> roots = new ArrayList<>();
+					roots.add(root);
+					ArrayList<AccessibilityNodeInfo> nodeList = new ArrayList<>();
+					findAllNode(roots, nodeList, "");
+					nodeList.sort((a, b1) -> {
+						Rect rectA = new Rect();
+						Rect rectB = new Rect();
+						a.getBoundsInScreen(rectA);
+						b1.getBoundsInScreen(rectB);
+						return rectB.width() * rectB.height() - rectA.width() * rectA.height();
+					});
+					for (final AccessibilityNodeInfo e : nodeList) {
+						final Rect temRect = new Rect();
+						e.getBoundsInScreen(temRect);
+						FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(temRect.width(), temRect.height());
+						params.leftMargin = temRect.left;
+						params.topMargin = temRect.top;
+						final ImageView img = new ImageView(mService);
+						img.setBackgroundResource(R.drawable.node);
+						img.setFocusableInTouchMode(true);
+						img.setOnClickListener(View::requestFocus);
+						img.setOnFocusChangeListener((v1, hasFocus) -> {
+							if (hasFocus) {
+								AccessibilityNodeInfo tempNode = e;
+								ArrayList<Integer> indicesList = new ArrayList<Integer>();
+								while (true) {
+									for (int i = 0; i < tempNode.getParent().getChildCount(); i++) {
+										if (tempNode.getParent().getChild(i).equals(tempNode)) {
+											indicesList.add(i);
+											break;
+										}
+									}
+									tempNode = tempNode.getParent();
+
+									if (tempNode.equals(root)) {
+										Collections.reverse(indicesList);
 										break;
 									}
 								}
-								tempNode = tempNode.getParent();
 
-								if (tempNode.equals(root)) {
-									Collections.reverse(indicesList);
-									break;
+								widgetDescription.position = temRect;
+								widgetDescription.indices = indicesList;
+								widgetDescription.clickable = e.isClickable();
+								widgetDescription.className = e.getClassName().toString();
+								CharSequence cId = e.getViewIdResourceName();
+								widgetDescription.idName = cId == null ? "" : cId.toString();
+								CharSequence cDesc = e.getContentDescription();
+								widgetDescription.description = cDesc == null ? "" : cDesc.toString();
+								CharSequence cText = e.getText();
+								widgetDescription.text = cText == null ? "" : cText.toString();
+								btAddWidget.setEnabled(true);
+								btSelectAidText.setEnabled(true);
+								btSelectSkipText.setEnabled(true);
+								switch (num) {
+									case 1:
+										tvPackageName.setText(widgetDescription.packageName);
+										tvActivityName.setText(widgetDescription.activityName);
+										tvWidgetInfo.setText("bonus:" + temRect.toShortString() + " " + "id:" + (cId == null ? "null" : cId.toString().substring(cId.toString().indexOf("id/") + 3)) + " " + "desc:" + (cDesc == null ? "null" : cDesc.toString()) + " " + "text:" + (cText == null ? "null" : cText.toString()));
+										btDeleteWidget.setEnabled(true);
+										break;
+									case 2:
+										tvAidText.setText((e.getText() != null) ? e.getText() : e.getContentDescription());
+										btDeleteAidText.setEnabled(true);
+										break;
+									case 3:
+										tvSkipText.setText((e.getText() != null) ? e.getText() : e.getContentDescription());
+										btDeleteSkipText.setEnabled(true);
+										break;
 								}
+								v1.setBackgroundResource(R.drawable.node_focus);
+							} else {
+								v1.setBackgroundResource(R.drawable.node);
 							}
+						});
+						layoutOverlayOutline.addView(img, params);
+					}
+					outlineParams.alpha = 0.5f;
+					outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+					windowManager.updateViewLayout(viewTarget, outlineParams);
 
-							widgetDescription.position = temRect;
-							widgetDescription.indices = indicesList;
-							widgetDescription.clickable = e.isClickable();
-							widgetDescription.className = e.getClassName().toString();
-							CharSequence cId = e.getViewIdResourceName();
-							widgetDescription.idName = cId == null ? "" : cId.toString();
-							CharSequence cDesc = e.getContentDescription();
-							widgetDescription.description = cDesc == null ? "" : cDesc.toString();
-							CharSequence cText = e.getText();
-							widgetDescription.text = cText == null ? "" : cText.toString();
-							btAddWidget.setEnabled(true);
-							btSelectAidText.setEnabled(true);
-							btSelectSkipText.setEnabled(true);
-							switch (num) {
-								case 1:
-									tvPackageName.setText(widgetDescription.packageName);
-									tvActivityName.setText(widgetDescription.activityName);
-									tvWidgetInfo.setText("bonus:" + temRect.toShortString() + " " + "id:" + (cId == null ? "null" : cId.toString().substring(cId.toString().indexOf("id/") + 3)) + " " + "desc:" + (cDesc == null ? "null" : cDesc.toString()) + " " + "text:" + (cText == null ? "null" : cText.toString()));
-									btDeleteWidget.setEnabled(true);
-									break;
-								case 2:
-									tvAidText.setText((e.getText() != null) ? e.getText() : e.getContentDescription());
-									btDeleteAidText.setEnabled(true);
-									break;
-								case 3:
-									tvSkipText.setText((e.getText() != null) ? e.getText() : e.getContentDescription());
-									btDeleteSkipText.setEnabled(true);
-									break;
-							}
-							v1.setBackgroundResource(R.drawable.node_focus);
-						} else {
-							v1.setBackgroundResource(R.drawable.node);
-						}
-					});
-					layoutOverlayOutline.addView(img, params);
-				}
-				outlineParams.alpha = 0.5f;
-				outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-				windowManager.updateViewLayout(viewTarget, outlineParams);
+					if (num == 1) {
+						tvPackageName.setText(widgetDescription.packageName);
+						tvActivityName.setText(widgetDescription.activityName + "（如不正确或为空，则是由于当前软件限制，请尝试重新获取）");
+					}
 
-				if (num == 1) {
-					tvPackageName.setText(widgetDescription.packageName);
-					tvActivityName.setText(widgetDescription.activityName + "（如不正确或为空，则是由于当前软件限制，请尝试重新获取）");
-				}
-
-				btShowOutline.setText("隐藏布局");
-				btShowOutline2.setText("隐藏布局");
-				btShowOutline3.setText("隐藏布局");
+					btShowOutline.setText("隐藏布局");
+					btShowOutline2.setText("隐藏布局");
+					btShowOutline3.setText("隐藏布局");
+				} else
+					Toast.makeText(jianfou.getAppContext(), "不允许在此处设置规则", Toast.LENGTH_SHORT).show();
 			} else {
 				outlineParams.alpha = 0f;
 				outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;

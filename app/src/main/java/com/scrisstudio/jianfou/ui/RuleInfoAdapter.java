@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
 import com.scrisstudio.jianfou.jianfou;
+import com.scrisstudio.jianfou.mask.ActivitySeekerService;
 import com.scrisstudio.jianfou.mask.RuleInfo;
 
 import java.util.List;
@@ -96,6 +97,8 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 				mList.set(position, newRule);
 				edit.putString("rules", gson.toJson(mList));
 				edit.apply();
+
+				ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true));
 			});
 
 			holder.moreButton.setOnClickListener(v -> {

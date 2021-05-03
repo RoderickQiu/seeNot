@@ -141,7 +141,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 			try {
 				if (ActivitySeekerService.isServiceRunning) {
 					submitData(view);
-					MaskAssignerUtils.showActivityCustomizationDialog(position, ruleType);
+					MaskAssignerUtils.showActivityCustomizationDialog(position);
 				} else {
 					Toast.makeText(jianfou.getAppContext(), R.string.cannot_open_assigner, Toast.LENGTH_LONG).show();
 				}
