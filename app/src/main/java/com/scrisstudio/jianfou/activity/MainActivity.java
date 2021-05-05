@@ -30,6 +30,7 @@ import com.scrisstudio.jianfou.databinding.ActivityMainBinding;
 import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.mask.ActivitySeekerService;
 import com.scrisstudio.jianfou.mask.RuleInfo;
+import com.scrisstudio.jianfou.mask.WidgetInfo;
 import com.scrisstudio.jianfou.ui.FullscreenDialogFragment;
 import com.scrisstudio.jianfou.ui.RuleInfoAdapter;
 import com.scrisstudio.jianfou.ui.RuleInfoCardDecoration;
@@ -193,13 +194,14 @@ public class MainActivity extends AppCompatActivity {
 		recyclerView.addItemDecoration(new RuleInfoCardDecoration());
 
 		FullscreenDialogFragment.setOnSubmitListener((pos, l) -> {
+			list = l;
 			SharedPreferences.Editor submitEditer = sharedPreferences.edit();
-			submitEditer.putString("rules", gson.toJson(l));
+			submitEditer.putString("rules", gson.toJson(list));
 			submitEditer.apply();
 
 			ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true));
 
-			adapter.dataChange(l);
+			adapter.dataChange(list);
 		});
 
 		binding.topAppBar.setOnMenuItemClickListener(menuItem -> {
@@ -232,7 +234,16 @@ public class MainActivity extends AppCompatActivity {
 			final CharSequence[] choices = {resources.getString(R.string.add_rule_way_type_manual), resources.getString(R.string.add_rule_way_paste), resources.getString(R.string.add_rule_way_community)};
 
 			AlertDialog alertDialog = new MaterialAlertDialogBuilder(this).setTitle(R.string.add_rule).setItems(choices, (dialog, which) -> {
-				Toast.makeText(jianfou.getAppContext(), "还没有完成。", Toast.LENGTH_LONG).show();
+				if (which == 0) {// manual add rule
+					SharedPreferences.Editor edit = sharedPreferences.edit();
+					list.add(new RuleInfo(true, sharedPreferences.getInt("rule-id-max", 0), "新建规则", "1.0", "软件名称", "any", 0, new WidgetInfo(), null, null));
+					edit.putString("rules", gson.toJson(list));
+					edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
+					edit.apply();
+					adapter.dataChange(list);
+					ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true));
+				} else
+					Toast.makeText(jianfou.getAppContext(), "还没有完成。", Toast.LENGTH_LONG).show();
 			}).create();
 			alertDialog.show();
 

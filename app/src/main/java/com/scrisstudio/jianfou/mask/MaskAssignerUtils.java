@@ -242,6 +242,7 @@ public class MaskAssignerUtils {
 				case "widget":
 					rule.setFilter(temWidget);
 					tvPackageName.setText(widgetDescription.packageName + " (控件数据已保存)");
+					break;
 				case "aid":
 					rule.setAidText(tvAidText.getText().toString());
 					tvAidText.setText(tvAidText.getText() + " (控件数据已保存)");
