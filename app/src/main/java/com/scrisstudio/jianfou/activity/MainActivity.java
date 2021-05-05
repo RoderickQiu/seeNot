@@ -1,5 +1,6 @@
 package com.scrisstudio.jianfou.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -70,6 +71,13 @@ public class MainActivity extends AppCompatActivity {
 
 	public static void runOnUI(Runnable runnable) {
 		UIHandler.post(runnable);
+	}
+
+	@Override
+	protected void attachBaseContext(Context base) {
+		super.attachBaseContext(base);
+
+		xcrash.XCrash.init(this);
 	}
 
 	private void settingModifierTrigger() {
