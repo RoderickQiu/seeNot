@@ -42,7 +42,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static List<RuleInfo> rulesList;
 	public static boolean isServiceRunning = true, isFirstTimeInvokeService = true,
 			isHandlerRunning = false, isReceiverRegistered = false, isForegroundServiceRunning = false,
-			isReEnterHandlerRunning = false;
+			isSoftInputPanelOn = false, hasSoftInputPanelJustFound = false;
 	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
@@ -116,6 +116,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
 		builder.setSmallIcon(R.drawable.jianfou_no_bg)
 				.setContentTitle(getString(R.string.channel_notification_text))
+				.setContentText("为防止服务被杀，必须显示一个通知")
 				.setOngoing(true);
 		Intent resultIntent = new Intent(this, MainActivity.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -166,6 +167,28 @@ public class ActivitySeekerService extends AccessibilityService {
 	@Override
 	public void onAccessibilityEvent(AccessibilityEvent event) {
 		if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
+			if (currentRuleId != -1 && !isHandlerRunning) {
+				hasSoftInputPanelJustFound = false;
+				for (int i = 0; i < getWindows().size(); i++) {
+					try {
+						if (getWindows().get(i).getRoot().getPackageName().toString().contains("inputmethod")) {
+							hasSoftInputPanelJustFound = true;
+							if (!isSoftInputPanelOn) {
+								isSoftInputPanelOn = true;
+								Log.w(TAG, "Input method is enabled.");
+								skipTextExecutor();
+							}
+						}
+					} catch (Exception ignored) {
+					}
+				}
+				if (!hasSoftInputPanelJustFound && isSoftInputPanelOn) {
+					isSoftInputPanelOn = false;
+					Log.w(TAG, "Input method closed.");
+					maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
+				}
+			}
+
 			try {
 				foregroundPackageName = getRootInActiveWindow().getPackageName().toString();
 			} catch (Exception e) {
@@ -315,6 +338,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		}
 	}
 
+	/*
 	private void skipTextReEnterExecutor() {
 		if (!isMaskOn) {
 			isReEnterHandlerRunning = true;
@@ -326,7 +350,7 @@ public class ActivitySeekerService extends AccessibilityService {
 				}, 100);
 			}
 		}
-	}
+	}*/
 
 	public boolean wordFinder(AccessibilityNodeInfo info, boolean isOnlyVisible, boolean isRoot) {
 		if (isServiceRunning) {
@@ -342,9 +366,9 @@ public class ActivitySeekerService extends AccessibilityService {
 							}
 						}
 					}
-					if (!hasExecutionSucceeded && !isMaskOn) {
+					/*if (!hasExecutionSucceeded && !isMaskOn) {
 						skipTextReEnterExecutor();
-					}
+					}*/
 				} else {
 					if (info.getChildCount() != 0) {
 						for (int i = 0; i < info.getChildCount(); i++) {
