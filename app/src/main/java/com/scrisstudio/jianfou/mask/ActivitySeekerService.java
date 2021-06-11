@@ -42,13 +42,14 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static List<RuleInfo> rulesList;
 	public static boolean isServiceRunning = true, isFirstTimeInvokeService = true,
 			isHandlerRunning = false, isReceiverRegistered = false, isForegroundServiceRunning = false,
-			isSoftInputPanelOn = false, hasSoftInputPanelJustFound = false, isSkipping = false;
+			isSoftInputPanelOn = false, hasSoftInputPanelJustFound = false, isSkipping = false,
+			isMaskOn = false, isSplitScreenAcceptable = false;
+	public static int foregroundWindowId = 0, foregroundWindowLayer = 1;
 	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
 	private long lastContentChangedTime = 0;
 	private FloatingViewManager mWindowManager;
-	private boolean isMaskOn = false;
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
 	private final BroadcastReceiver mScreenOReceiver = new BroadcastReceiver() {
 		@Override
@@ -56,7 +57,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			String action = intent.getAction();
 
 			if (action.equals("android.intent.action.SCREEN_OFF")) {
-				Log.e(TAG, "Screen Off");
+				le("Screen Off");
 				try {
 					if (isMaskOn) maskCreator(false, -1);
 				} catch (Exception e) {
@@ -75,16 +76,17 @@ public class ActivitySeekerService extends AccessibilityService {
 		rulesList = l;
 	}
 
-	public static void setServiceBasicInfo(String rules, Boolean masterSwitch) {
+	public static void setServiceBasicInfo(String rules, Boolean masterSwitch, Boolean split) {
 		Gson gson = new Gson();
 		rulesList = gson.fromJson(rules, new TypeToken<List<RuleInfo>>() {
 		}.getType());
 		isServiceRunning = masterSwitch;
+		isSplitScreenAcceptable = !split;
 	}
 
 	@Override
 	public void onCreate() {
-		Log.e(TAG, "Service starting...");
+		le("Service starting...");
 
 		windowTrueWidth = jianfou.getAppContext().getResources().getDisplayMetrics().widthPixels;
 		windowTrueHeight = jianfou.getAppContext().getResources().getDisplayMetrics().heightPixels;
@@ -100,7 +102,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		} catch (Exception e) {
 			//isSettingsModifierWorking = false;
 			Toast.makeText(jianfou.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
-			Log.e(TAG, "Service invoking failed, err message: " + e.toString());
+			le("Service invoking failed, err message: " + e.toString());
 		}
 	}
 
@@ -140,7 +142,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		if (isFirstTimeInvokeService) {
 			isFirstTimeInvokeService = false;
 
-			Log.e(TAG, "Service invoking...");
+			le("Service invoking...");
 
 			Gson gson = new Gson();
 			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(jianfou.getAppContext());
@@ -171,11 +173,12 @@ public class ActivitySeekerService extends AccessibilityService {
 				hasSoftInputPanelJustFound = false;
 				for (int i = 0; i < getWindows().size(); i++) {
 					try {
-						if (getWindows().get(i).getRoot().getPackageName().toString().contains("inputmethod")) {
+						//查找输入法是否打开，打开则删除遮罩：TYPE_INPUT_METHOD=2
+						if (getWindows().get(i).getType() == 2) {
 							hasSoftInputPanelJustFound = true;
 							if (!isSoftInputPanelOn) {
 								isSoftInputPanelOn = true;
-								Log.w(TAG, "Input method is enabled.");
+								l("Input method is enabled.");
 								skipTextExecutor();
 							}
 						}
@@ -184,7 +187,7 @@ public class ActivitySeekerService extends AccessibilityService {
 				}
 				if (!hasSoftInputPanelJustFound && isSoftInputPanelOn) {
 					isSoftInputPanelOn = false;
-					Log.w(TAG, "Input method closed.");
+					l("Input method closed.");
 					maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
 				}
 			}
@@ -229,7 +232,7 @@ public class ActivitySeekerService extends AccessibilityService {
 												if (rect.width() == windowTrueWidth) {
 													if (windowOrientation.equals("landscape")) {
 														windowOrientation = "portrait";
-														Log.e(TAG, "Change to Portrait");
+														le("Change to Portrait");
 														if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
 															if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
 																maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
@@ -239,11 +242,11 @@ public class ActivitySeekerService extends AccessibilityService {
 												} else if (rect.width() == windowTrueHeight) {
 													if (windowOrientation.equals("portrait")) {
 														windowOrientation = "landscape";
-														Log.e(TAG, "Change to Landscape");
+														le("Change to Landscape");
 														if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
 															if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
 																maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
-																Log.e(TAG, "Recover");
+																le("Recover");
 															}
 														}
 													}
@@ -260,6 +263,7 @@ public class ActivitySeekerService extends AccessibilityService {
 				}
 			}
 
+			//移到此处以解决快速切换的问题
 			if (!isHandlerRunning && !isMaskOn && !isSoftInputPanelOn && !isSkipping) {
 				isHandlerRunning = true;
 				for (int i = 0; i < rulesList.size(); i++) {
@@ -267,7 +271,7 @@ public class ActivitySeekerService extends AccessibilityService {
 						if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName) && !foregroundPackageName.equals("")) {
 							if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
 								currentRuleId = i;
-								Log.e(TAG, "currentRuleId: " + currentRuleId);
+								le("currentRuleId: " + currentRuleId);
 								if (rulesList.get(i).getType() == 0)
 									maskSet(rulesList.get(i).getFilter(), i);
 								else if (rulesList.get(i).getType() == 1)
@@ -281,14 +285,28 @@ public class ActivitySeekerService extends AccessibilityService {
 					isHandlerRunning = false;
 				}, 250);
 			}
+
+			if (!isSplitScreenAcceptable)
+				for (int i = 0; i < getWindows().size(); i++) {
+					//通过查找window的layer属性发现是否处于分屏、小窗
+					if (getWindows().get(i).getId() == foregroundWindowId) {
+						foregroundWindowLayer = getWindows().get(i).getLayer();
+						//只选择常规窗口，不选择输入法等特殊窗口
+						if (foregroundWindowLayer != 0 && getWindows().get(i).getType() == 1) {
+							performGlobalAction(GLOBAL_ACTION_BACK);
+							Toast.makeText(jianfou.getAppContext(), "分屏屏蔽打开：禁止分屏和小窗", Toast.LENGTH_SHORT).show();
+						}//com.android.systemui.pip.phone.PipMenuActivity
+					}
+				}
 		} else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
 			ComponentName cName = new ComponentName(foregroundPackageName, event.getClassName().toString());
 
-			if (tryGetActivity(cName) != null)
-				if (isCapableClass(event.getClassName().toString()) && !foregroundPackageName.equals(currentHomePackage)) {
-					foregroundClassName = event.getClassName().toString();
-				}
-			Log.e(TAG, foregroundClassName);
+			//if (tryGetActivity(cName) != null)
+			if (isCapableClass(event.getClassName().toString()) && !event.getPackageName().equals(currentHomePackage)) {
+				foregroundClassName = event.getClassName().toString();
+				foregroundWindowId = event.getWindowId();
+				le(event.getClassName().toString() + event.getWindowId());
+			}
 		}
 	}
 
@@ -309,9 +327,19 @@ public class ActivitySeekerService extends AccessibilityService {
 		else return true;
 	}
 
+	AccessibilityNodeInfo getRightWindowNode() {
+		//使兼容多窗模式
+		for (int i = 0; i < getWindows().size(); i++) {
+			if (getWindows().get(i).getId() == foregroundWindowId) {
+				return getWindows().get(i).getRoot();
+			}
+		}
+		return getRootInActiveWindow();
+	}
+
 	private Rect nodeSearcher(ArrayList<Integer> indices) {
 		try {
-			AccessibilityNodeInfo node = getRootInActiveWindow();
+			AccessibilityNodeInfo node = getRightWindowNode();
 			for (int i = 0; i < indices.size(); i++) {
 				node = node.getChild(indices.get(i));
 			}
@@ -320,7 +348,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			node.getBoundsInScreen(rect);
 			return rect;
 		} catch (Exception e) {
-			Log.e(TAG, "Node search really went wrong: " + e);
+			le("Node search really went wrong: " + e);
 			if (isMaskOn) {
 				maskCreator(false, -1);
 			}
@@ -338,24 +366,10 @@ public class ActivitySeekerService extends AccessibilityService {
 			//when skipping, cannot create masks
 			isSkipping = true;
 
-			Log.e(TAG, "skip");
+			le("skip");
 			maskCreator(false, currentRuleId);
 		}
 	}
-
-	/*
-	private void skipTextReEnterExecutor() {
-		if (!isMaskOn) {
-			isReEnterHandlerRunning = true;
-			if (!isReEnterHandlerRunning) {
-				Log.e(TAG, "reenter");
-				maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
-				new Handler().postDelayed(() -> {
-					isReEnterHandlerRunning = false;
-				}, 100);
-			}
-		}
-	}*/
 
 	public boolean wordFinder(AccessibilityNodeInfo info, boolean isOnlyVisible, boolean isRoot) {
 		if (isServiceRunning) {
@@ -411,23 +425,23 @@ public class ActivitySeekerService extends AccessibilityService {
 				try {
 					y = rect.centerY() - rect.height() / 2 - getStatusBarHeight(getBaseContext());//fix status bar's effect
 				} catch (Exception e) {
-					Log.e(TAG, "Base context catching failed.");
+					le("Base context catching failed.");
 					y = rect.centerY() - rect.height() / 2;
 				}
 				width = rect.width();//buffer (2x) also for edge gesture
 				height = rect.height();
 
-				Log.e(TAG, x + " " + y + " " + width + " " + height + " ");
+				le(x + " " + y + " " + width + " " + height + " ");
 
 				if (x == -1 || y == -1 || width == -1 || height == -1) {
-					Log.e(TAG, "Item rect wrong.");
+					le("Item rect wrong.");
 					//maskCreator(false, -1);
 				} else {
 					if (!isMaskOn) maskCreator(true, indice);
 					else maskPositionMover();
 				}
 			} else {
-				Log.e(TAG, "Item rect wrong.");
+				le("Item rect wrong.");
 				//maskCreator(false, -1);
 			}
 		}
@@ -435,7 +449,7 @@ public class ActivitySeekerService extends AccessibilityService {
 
 	private void maskPositionMover() {
 		if (isServiceRunning) {
-			Log.w(TAG, "Mask target moved.");
+			l("Mask target moved.");
 
 			this.mWindowManager.updateView(x, y, width, height);
 		}
@@ -443,12 +457,12 @@ public class ActivitySeekerService extends AccessibilityService {
 
 	private void maskCreator(boolean shouldCreate, int indice) {
 		if (shouldCreate) {
-			Log.w(TAG, "Find mask target.");
+			l("Find mask target.");
 			isMaskOn = true;
 			currentRuleId = indice;
 			this.mWindowManager.addView(x, y, width, height);
 		} else {
-			Log.w(TAG, "Mask target was destroyed.");
+			l("Mask target was destroyed.");
 			if (indice == -1) currentRuleId = -1;
 			this.mWindowManager.removeView();
 			isMaskOn = false;
@@ -472,6 +486,16 @@ public class ActivitySeekerService extends AccessibilityService {
 			isForegroundServiceRunning = false;
 		}
 		mService = null;
+	}
+
+	//log
+	private void l(Object input) {
+		Log.w(TAG, input.toString() + " " + System.currentTimeMillis());
+	}
+
+	//log-error
+	private void le(Object input) {
+		Log.e(TAG, input.toString() + " " + System.currentTimeMillis());
 	}
 }
 

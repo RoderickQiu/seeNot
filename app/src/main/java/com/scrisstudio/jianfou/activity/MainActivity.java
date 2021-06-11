@@ -171,9 +171,9 @@ public class MainActivity extends AppCompatActivity {
 		if (!sharedPreferences.getBoolean("master-switch", true)) {
 			banner.setMessage(R.string.function_closed);
 			banner.show();
-
-			ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), false);
 		}
+
+		ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), false, sharedPreferences.getBoolean("split", true));
 
 		//TODO this should test more
 		//see also https://blog.csdn.net/weixin_42474371/article/details/104405463
@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
 			submitEditer.putString("rules", gson.toJson(list));
 			submitEditer.apply();
 
-			ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true));
+			ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
 
 			adapter.dataChange(list);
 		});
@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
 					edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
 					edit.apply();
 					adapter.dataChange(list);
-					ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true));
+					ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
 				} else
 					Toast.makeText(jianfou.getAppContext(), "还没有完成。", Toast.LENGTH_LONG).show();
 			}).create();

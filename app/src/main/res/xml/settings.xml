@@ -11,6 +11,12 @@
             app:title="@string/settings_master_switch"
             app:defaultValue="true"/>
 
+        <SwitchPreferenceCompat
+            app:key="split"
+            app:summary="@string/settings_split_screen_summary"
+            app:title="@string/settings_split_screen"
+            app:defaultValue="true"/>
+
     </PreferenceCategory>
 
 </PreferenceScreen>
