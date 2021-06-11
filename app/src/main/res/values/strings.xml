@@ -88,5 +88,5 @@
     <string name="app_confirm_dialog_title">请注意</string>
     <string name="regret">取消</string>
     <string name="settings_split_screen">分屏屏蔽</string>
-    <string name="settings_split_screen_summary">设置是否要禁止系统进入分屏状态和画中画模式，因为这将使得你有可能逃过见否屏蔽。</string>
+    <string name="settings_split_screen_summary">设置是否要禁止系统进入分屏状态或打开小窗，因为这将使得你有可能逃过见否屏蔽。</string>
 </resources>

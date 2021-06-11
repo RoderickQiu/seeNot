@@ -169,7 +169,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	@Override
 	public void onAccessibilityEvent(AccessibilityEvent event) {
 		if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
-			if (currentRuleId != -1 && !isHandlerRunning) {
+			if (currentRuleId != -1 && !isHandlerRunning && isServiceRunning) {
 				hasSoftInputPanelJustFound = false;
 				for (int i = 0; i < getWindows().size(); i++) {
 					try {
@@ -264,7 +264,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			}
 
 			//移到此处以解决快速切换的问题
-			if (!isHandlerRunning && !isMaskOn && !isSoftInputPanelOn && !isSkipping) {
+			if (!isHandlerRunning && !isMaskOn && !isSoftInputPanelOn && !isSkipping && isServiceRunning) {
 				isHandlerRunning = true;
 				for (int i = 0; i < rulesList.size(); i++) {
 					if (rulesList.get(i).getStatus()) {
@@ -286,16 +286,16 @@ public class ActivitySeekerService extends AccessibilityService {
 				}, 250);
 			}
 
-			if (!isSplitScreenAcceptable)
+			if (!isSplitScreenAcceptable && isServiceRunning)
 				for (int i = 0; i < getWindows().size(); i++) {
 					//通过查找window的layer属性发现是否处于分屏、小窗
-					if (getWindows().get(i).getId() == foregroundWindowId) {
+					if (getWindows().get(i).getId() == foregroundWindowId && getWindows().get(i).isActive()) {
 						foregroundWindowLayer = getWindows().get(i).getLayer();
 						//只选择常规窗口，不选择输入法等特殊窗口
 						if (foregroundWindowLayer != 0 && getWindows().get(i).getType() == 1) {
 							performGlobalAction(GLOBAL_ACTION_BACK);
 							Toast.makeText(jianfou.getAppContext(), "分屏屏蔽打开：禁止分屏和小窗", Toast.LENGTH_SHORT).show();
-						}//com.android.systemui.pip.phone.PipMenuActivity
+						}
 					}
 				}
 		} else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
@@ -490,12 +490,16 @@ public class ActivitySeekerService extends AccessibilityService {
 
 	//log
 	private void l(Object input) {
-		Log.w(TAG, input.toString() + " " + System.currentTimeMillis());
+		if (input != null)
+			Log.w(TAG, input.toString() + " " + System.currentTimeMillis());
+		else Log.w(TAG, "NULL" + " " + System.currentTimeMillis());
 	}
 
 	//log-error
 	private void le(Object input) {
-		Log.e(TAG, input.toString() + " " + System.currentTimeMillis());
+		if (input != null)
+			Log.e(TAG, input.toString() + " " + System.currentTimeMillis());
+		else Log.w(TAG, "NULL" + " " + System.currentTimeMillis());
 	}
 }
 
