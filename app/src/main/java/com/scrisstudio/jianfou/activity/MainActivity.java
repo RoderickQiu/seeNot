@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
 			}
 		} else if (requestCode == 201) {
 			//reload page when back from settings
-			Log.e(TAG, "Fuck");
 			Intent intent = getIntent();
 			finish();
 			startActivity(intent);
@@ -122,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.e(TAG, "Start testing...");
+		Log.w(TAG, "Start testing...");
 
 		binding = ActivityMainBinding.inflate(getLayoutInflater());
 		View view = binding.getRoot();

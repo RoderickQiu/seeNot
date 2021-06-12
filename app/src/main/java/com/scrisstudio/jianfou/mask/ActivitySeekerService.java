@@ -33,6 +33,8 @@ import com.scrisstudio.jianfou.jianfou;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ActivitySeekerService extends AccessibilityService {
 	public static final String TAG = "Jianfou-AccessibilityService";
@@ -61,7 +63,7 @@ public class ActivitySeekerService extends AccessibilityService {
 				try {
 					if (isMaskOn) maskCreator(false, -1);
 				} catch (Exception e) {
-					Log.i(TAG, "Failed to remove mask");
+					le("Failed to remove mask");
 				}
 			}
 		}
@@ -86,7 +88,7 @@ public class ActivitySeekerService extends AccessibilityService {
 
 	@Override
 	public void onCreate() {
-		le("Service starting...");
+		l("Service starting...");
 
 		windowTrueWidth = jianfou.getAppContext().getResources().getDisplayMetrics().widthPixels;
 		windowTrueHeight = jianfou.getAppContext().getResources().getDisplayMetrics().heightPixels;
@@ -104,6 +106,20 @@ public class ActivitySeekerService extends AccessibilityService {
 			Toast.makeText(jianfou.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
 			le("Service invoking failed, err message: " + e.toString());
 		}
+
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					if (!isStart()) {
+						Toast.makeText(jianfou.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
+						le("Service invoking didn't respond, a manual start might be needed.");
+					}
+				} catch (Exception ignored) {
+				}
+			}
+		}, 3000);
 	}
 
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -142,7 +158,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		if (isFirstTimeInvokeService) {
 			isFirstTimeInvokeService = false;
 
-			le("Service invoking...");
+			l("Service invoking...");
 
 			Gson gson = new Gson();
 			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(jianfou.getAppContext());
@@ -155,12 +171,15 @@ public class ActivitySeekerService extends AccessibilityService {
 				IntentFilter mScreenOffFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
 				this.registerReceiver(mScreenOReceiver, mScreenOffFilter);
 				isReceiverRegistered = true;
-			} catch (Exception ignored) {
+			} catch (Exception e) {
+				le("Monitoring locker failed, err message: " + e.toString());
 			}
 
 			try {
 				setForegroundService();
-			} catch (Exception ignored) {
+			} catch (Exception e) {
+				Toast.makeText(jianfou.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
+				le("Starting foreground service failed, err message: " + e.toString());
 			}
 		}
 	}
@@ -232,7 +251,7 @@ public class ActivitySeekerService extends AccessibilityService {
 												if (rect.width() == windowTrueWidth) {
 													if (windowOrientation.equals("landscape")) {
 														windowOrientation = "portrait";
-														le("Change to Portrait");
+														l("Change to Portrait");
 														if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
 															if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
 																maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
@@ -242,11 +261,11 @@ public class ActivitySeekerService extends AccessibilityService {
 												} else if (rect.width() == windowTrueHeight) {
 													if (windowOrientation.equals("portrait")) {
 														windowOrientation = "landscape";
-														le("Change to Landscape");
+														l("Change to Landscape");
 														if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
 															if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
 																maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
-																le("Recover");
+																l("Recover");
 															}
 														}
 													}
@@ -254,7 +273,7 @@ public class ActivitySeekerService extends AccessibilityService {
 											}
 										}
 									} catch (Exception e) {
-										Log.i(TAG, "Failed to get orientation, err message: " + e.toString());
+										le("Failed to get orientation, err message: " + e.toString());
 									}
 								}
 							}
@@ -271,7 +290,7 @@ public class ActivitySeekerService extends AccessibilityService {
 						if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName) && !foregroundPackageName.equals("")) {
 							if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
 								currentRuleId = i;
-								le("currentRuleId: " + currentRuleId);
+								l("currentRuleId: " + currentRuleId);
 								if (rulesList.get(i).getType() == 0)
 									maskSet(rulesList.get(i).getFilter(), i);
 								else if (rulesList.get(i).getType() == 1)
@@ -305,7 +324,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			if (isCapableClass(event.getClassName().toString()) && !event.getPackageName().equals(currentHomePackage)) {
 				foregroundClassName = event.getClassName().toString();
 				foregroundWindowId = event.getWindowId();
-				le(event.getClassName().toString() + event.getWindowId());
+				l(event.getClassName().toString() + event.getWindowId());
 			}
 		}
 	}
@@ -366,7 +385,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			//when skipping, cannot create masks
 			isSkipping = true;
 
-			le("skip");
+			l("Skipping now.");
 			maskCreator(false, currentRuleId);
 		}
 	}
@@ -499,7 +518,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	private void le(Object input) {
 		if (input != null)
 			Log.e(TAG, input.toString() + " " + System.currentTimeMillis());
-		else Log.w(TAG, "NULL" + " " + System.currentTimeMillis());
+		else Log.e(TAG, "NULL" + " " + System.currentTimeMillis());
 	}
 }
 
