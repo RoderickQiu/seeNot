@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -40,6 +41,8 @@ import com.sergivonavi.materialbanner.BannerInterface;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.scrisstudio.jianfou.activity.PermissionGrantActivity.isAccessibilitySettingsOn;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -254,7 +257,8 @@ public class MainActivity extends AppCompatActivity {
 			startActivity(grantOpener);
 			banner2.dismiss();
 		});
-		if (!PermissionGrantActivity.areAllPermissionsOK()) {
+		//如果不是所有权限都已打开
+		if (!(isAccessibilitySettingsOn(jianfou.getAppContext()) && Settings.canDrawOverlays(jianfou.getAppContext()) && ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()))) {
 			bannerForPermissions.setMessage(R.string.service_not_running);
 			bannerForPermissions.show();
 		}

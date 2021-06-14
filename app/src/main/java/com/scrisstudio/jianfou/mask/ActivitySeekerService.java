@@ -1,6 +1,7 @@
 package com.scrisstudio.jianfou.mask;
 
 import android.accessibilityservice.AccessibilityService;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -130,8 +131,10 @@ public class ActivitySeekerService extends AccessibilityService {
 
 	private void createNotificationChannel() {
 		CharSequence name = getString(R.string.default_notification_channel);
-		int importance = NotificationManager.IMPORTANCE_HIGH;
+		int importance = NotificationManager.IMPORTANCE_LOW;
 		normalNotificationChannel = new NotificationChannel(CHANNEL_NORMAL_NOTIFICATION_ID, name, importance);
+		normalNotificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+		normalNotificationChannel.setBypassDnd(true);
 		normalNotificationManager = (NotificationManager) getSystemService(NotificationManager.class);
 		normalNotificationManager.createNotificationChannel(normalNotificationChannel);
 	}

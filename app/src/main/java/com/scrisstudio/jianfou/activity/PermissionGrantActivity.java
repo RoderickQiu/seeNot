@@ -1,9 +1,11 @@
 package com.scrisstudio.jianfou.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
@@ -19,10 +21,6 @@ import static com.scrisstudio.jianfou.mask.ActivitySeekerService.l;
 
 public class PermissionGrantActivity extends AppCompatActivity {
 	ActivityPermissionGrantBinding binding;
-
-	public static boolean areAllPermissionsOK() {
-		return (isAccessibilitySettingsOn(jianfou.getAppContext()) && Settings.canDrawOverlays(jianfou.getAppContext()));
-	}
 
 	public static boolean isAccessibilitySettingsOn(Context mContext) {
 		int accessibilityEnabled = 0;
@@ -125,5 +123,31 @@ public class PermissionGrantActivity extends AppCompatActivity {
 				e.printStackTrace();
 			}
 		});
+
+		//省电
+		if (!((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName())) {
+			binding.permissionBatteryUngranted.setVisibility(View.VISIBLE);
+		} else {
+			binding.permissionBatteryGranted.setVisibility(View.VISIBLE);
+		}
+		binding.permissionBattery.setOnClickListener(v -> {
+			if (!((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName())) {
+				@SuppressLint("BatteryLife") Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+				intent.setData(Uri.parse("package:" + getPackageName()));
+				startActivityForResult(intent, 111);
+			} else
+				Toast.makeText(jianfou.getAppContext(), "已经获取权限，无需设置", Toast.LENGTH_SHORT).show();
+		});
+
+		//自启和后台运行
+		binding.permissionBackground.setOnClickListener(v -> {
+			//打开浏览器链接
+			Intent intent = new Intent();
+			intent.setAction("android.intent.action.VIEW");
+			Uri content_url = Uri.parse("https://keep-alive.pages.dev/");
+			intent.setData(content_url);
+			startActivity(intent);
+		});
+
 	}
 }

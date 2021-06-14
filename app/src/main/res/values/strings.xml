@@ -98,4 +98,10 @@
     <string name="now_open_service">进入页面，请往下拉，找到“见否基础服务”并打开。</string>
     <string name="default_notification_channel">常规通知</string>
     <string name="service_start_failed_title">见否服务未开启</string>
+    <string name="permission_battery_msg">用于防止系统杀死服务，续航其实并不会被显著影响。</string>
+    <string name="permission_battery">系统省电白名单</string>
+    <string name="how_to_grant">了解获取方式</string>
+    <string name="dunno_granted">无法判断，请自行确保</string>
+    <string name="permission_background_msg">使得可以正常开机自启和在后台运行。</string>
+    <string name="permission_background">后台运行和自启动</string>
 </resources>
