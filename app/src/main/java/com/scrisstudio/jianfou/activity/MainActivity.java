@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -36,6 +35,7 @@ import com.scrisstudio.jianfou.ui.RuleInfoAdapter;
 import com.scrisstudio.jianfou.ui.RuleInfoCardDecoration;
 import com.scrisstudio.jianfou.ui.SimpleDialogFragment;
 import com.sergivonavi.materialbanner.Banner;
+import com.sergivonavi.materialbanner.BannerInterface;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -79,18 +79,6 @@ public class MainActivity extends AppCompatActivity {
 		super.attachBaseContext(base);
 
 		xcrash.XCrash.init(this);
-	}
-
-	private void settingModifierTrigger() {
-		SimpleDialogFragment.display(fragmentManager, "service-trigger", resources.getString(R.string.settings_modifier_enable_guide));
-		SimpleDialogFragment.setOnSubmitListener(() -> {
-			Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-			intent.setData(Uri.parse("package:" + getPackageName()));
-			startActivityForResult(intent, 200);
-		});
-
-		//also for alert window permission
-		//startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), 0);
 	}
 
 	@Override
@@ -174,15 +162,8 @@ public class MainActivity extends AppCompatActivity {
 
 		ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), false, sharedPreferences.getBoolean("split", true));
 
-		//TODO this should test more
-		//see also https://blog.csdn.net/weixin_42474371/article/details/104405463
-		//see also https://www.jianshu.com/p/0acb66694860
-		if (!Settings.System.canWrite(getApplicationContext())) {
-			settingModifierTrigger();
-		} else {
-			Intent serviceIntent = new Intent(this, ActivitySeekerService.class);
-			startService(serviceIntent);
-		}
+		Intent serviceIntent = new Intent(this, ActivitySeekerService.class);
+		startService(serviceIntent);
 
 		RecyclerView recyclerView = binding.ruleList;
 		LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -224,6 +205,10 @@ public class MainActivity extends AppCompatActivity {
 				Intent aboutOpener = new Intent(MainActivity.this, AboutActivity.class);
 				startActivity(aboutOpener);
 				return false;
+			} else if (menuItem.getItemId() == R.id.item_permissions) {
+				Intent grantOpener = new Intent(MainActivity.this, PermissionGrantActivity.class);
+				startActivity(grantOpener);
+				return false;
 			} else {
 				return true;
 			}
@@ -261,6 +246,18 @@ public class MainActivity extends AppCompatActivity {
 				e.printStackTrace();
 			}
 		});
+
+		Banner bannerForPermissions = binding.banner;
+		bannerForPermissions.setLeftButtonListener(BannerInterface::dismiss);
+		bannerForPermissions.setRightButton("设置", banner2 -> {
+			Intent grantOpener = new Intent(MainActivity.this, PermissionGrantActivity.class);
+			startActivity(grantOpener);
+			banner2.dismiss();
+		});
+		if (!PermissionGrantActivity.areAllPermissionsOK()) {
+			bannerForPermissions.setMessage(R.string.service_not_running);
+			bannerForPermissions.show();
+		}
 
 	}
 }

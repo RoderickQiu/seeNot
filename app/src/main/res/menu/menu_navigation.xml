@@ -14,6 +14,11 @@
             android:title="@string/settings"
             android:checked="false" />
         <item
+            android:id="@+id/item_permissions"
+            android:icon="@drawable/construction_black_24dp"
+            android:title="@string/permissions"
+            android:checked="false" />
+        <item
             android:id="@+id/item_about"
             android:icon="@drawable/about_24dp"
             android:title="@string/about"

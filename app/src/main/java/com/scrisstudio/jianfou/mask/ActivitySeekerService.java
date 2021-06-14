@@ -16,7 +16,6 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -29,17 +28,16 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
+import com.scrisstudio.jianfou.activity.PermissionGrantActivity;
 import com.scrisstudio.jianfou.jianfou;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ActivitySeekerService extends AccessibilityService {
 	public static final String TAG = "Jianfou-AccessibilityService";
-	private static final String CHANNEL_ID = "ServiceKeeper";
-	private static final int NOTIFICATION_ID = 9221;
+	private static final String CHANNEL_SERVICE_KEEPER_ID = "ServiceKeeper", CHANNEL_NORMAL_NOTIFICATION_ID = "NormalNotification";
+	private static final int KEEPER_NOTIFICATION_ID = 9221, NORMAL_NOTIFICATION_ID = 9311;
 	public static ActivitySeekerService mService;
 	public static List<RuleInfo> rulesList;
 	public static boolean isServiceRunning = true, isFirstTimeInvokeService = true,
@@ -50,6 +48,9 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
+	public NotificationChannel normalNotificationChannel;
+	public NotificationManager normalNotificationManager;
+	private Handler mHandler = new Handler();
 	private long lastContentChangedTime = 0;
 	private FloatingViewManager mWindowManager;
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
@@ -86,6 +87,20 @@ public class ActivitySeekerService extends AccessibilityService {
 		isSplitScreenAcceptable = !split;
 	}
 
+	//log
+	public static void l(Object input) {
+		if (input != null)
+			Log.w(TAG, input.toString() + " " + System.currentTimeMillis());
+		else Log.w(TAG, "NULL" + " " + System.currentTimeMillis());
+	}
+
+	//log-error
+	public static void le(Object input) {
+		if (input != null)
+			Log.e(TAG, input.toString() + " " + System.currentTimeMillis());
+		else Log.e(TAG, "NULL" + " " + System.currentTimeMillis());
+	}
+
 	@Override
 	public void onCreate() {
 		l("Service starting...");
@@ -98,28 +113,40 @@ public class ActivitySeekerService extends AccessibilityService {
 		ResolveInfo resolveInfo = getPackageManager().resolveActivity(homePkgIntent, PackageManager.MATCH_DEFAULT_ONLY);
 		currentHomePackage = resolveInfo.activityInfo.packageName;
 
-		try {
-			Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.mask.ActivitySeekerService");
-			Settings.Secure.putString(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, "1");
-		} catch (Exception e) {
-			//isSettingsModifierWorking = false;
-			Toast.makeText(jianfou.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
-			le("Service invoking failed, err message: " + e.toString());
-		}
+		createNotificationChannel();
 
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				try {
-					if (!isStart()) {
-						Toast.makeText(jianfou.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
-						le("Service invoking didn't respond, a manual start might be needed.");
-					}
-				} catch (Exception ignored) {
+		mHandler.postDelayed(() -> {
+			try {
+				if (!isStart()) {
+					Toast.makeText(jianfou.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
+					le("Service invoking didn't respond, a manual start might be needed.");
+
+					sendSimpleNotification("见否服务未开启", "见否服务没有成功开启，请前往系统无障碍设置手动开启");
 				}
+			} catch (Exception ignored) {
 			}
 		}, 3000);
+	}
+
+	private void createNotificationChannel() {
+		CharSequence name = getString(R.string.default_notification_channel);
+		int importance = NotificationManager.IMPORTANCE_HIGH;
+		normalNotificationChannel = new NotificationChannel(CHANNEL_NORMAL_NOTIFICATION_ID, name, importance);
+		normalNotificationManager = (NotificationManager) getSystemService(NotificationManager.class);
+		normalNotificationManager.createNotificationChannel(normalNotificationChannel);
+	}
+
+	public void sendSimpleNotification(String title, String content) {
+		Intent intent = new Intent(this, PermissionGrantActivity.class);
+		PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
+		NotificationCompat.Builder nb = new NotificationCompat.Builder(this, CHANNEL_NORMAL_NOTIFICATION_ID)
+				.setSmallIcon(R.drawable.jianfou_no_bg)
+				.setContentTitle(title)
+				.setContentText(content)
+				.setContentIntent(pi)
+				.setAutoCancel(true)
+				.setShowWhen(true);
+		normalNotificationManager.notify(NORMAL_NOTIFICATION_ID, nb.build());
 	}
 
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -129,9 +156,9 @@ public class ActivitySeekerService extends AccessibilityService {
 	public void setForegroundService() {
 		String channelName = getString(R.string.channel_name);
 		int importance = NotificationManager.IMPORTANCE_LOW;
-		NotificationChannel channel = new NotificationChannel(CHANNEL_ID, channelName, importance);
+		NotificationChannel channel = new NotificationChannel(CHANNEL_SERVICE_KEEPER_ID, channelName, importance);
 		channel.setDescription(getString(R.string.channel_description));
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_SERVICE_KEEPER_ID);
 		builder.setSmallIcon(R.drawable.jianfou_no_bg)
 				.setContentTitle(getString(R.string.channel_notification_text))
 				.setContentText("为防止服务被杀，必须显示一个通知")
@@ -141,7 +168,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		builder.setContentIntent(pendingIntent);
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.createNotificationChannel(channel);
-		startForeground(NOTIFICATION_ID, builder.build());
+		startForeground(KEEPER_NOTIFICATION_ID, builder.build());
 		isForegroundServiceRunning = true;
 	}
 
@@ -505,20 +532,6 @@ public class ActivitySeekerService extends AccessibilityService {
 			isForegroundServiceRunning = false;
 		}
 		mService = null;
-	}
-
-	//log
-	private void l(Object input) {
-		if (input != null)
-			Log.w(TAG, input.toString() + " " + System.currentTimeMillis());
-		else Log.w(TAG, "NULL" + " " + System.currentTimeMillis());
-	}
-
-	//log-error
-	private void le(Object input) {
-		if (input != null)
-			Log.e(TAG, input.toString() + " " + System.currentTimeMillis());
-		else Log.e(TAG, "NULL" + " " + System.currentTimeMillis());
 	}
 }
 
