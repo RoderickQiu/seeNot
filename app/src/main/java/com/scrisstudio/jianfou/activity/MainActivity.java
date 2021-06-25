@@ -1,5 +1,6 @@
 package com.scrisstudio.jianfou.activity;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -258,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
 			banner2.dismiss();
 		});
 		//如果不是所有权限都已打开
-		if (!(isAccessibilitySettingsOn(jianfou.getAppContext()) && Settings.canDrawOverlays(jianfou.getAppContext()) && ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()))) {
+		if (!(isAccessibilitySettingsOn(jianfou.getAppContext()) && Settings.canDrawOverlays(jianfou.getAppContext()) && ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()) && getSystemService(NotificationManager.class).areNotificationsEnabled())) {
 			bannerForPermissions.setMessage(R.string.service_not_running);
 			bannerForPermissions.show();
 		}

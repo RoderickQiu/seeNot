@@ -104,4 +104,6 @@
     <string name="dunno_granted">无法判断，请自行确保</string>
     <string name="permission_background_msg">使得可以正常开机自启和在后台运行。</string>
     <string name="permission_background">后台运行和自启动</string>
+    <string name="permission_notification">通知权限</string>
+    <string name="permission_notification_msg">用于发送必要通知和防止服务被杀死。</string>
 </resources>

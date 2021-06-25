@@ -1,6 +1,7 @@
 package com.scrisstudio.jianfou.activity;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -97,6 +98,19 @@ public class PermissionGrantActivity extends AppCompatActivity {
 			finish();
 		});
 
+		//通知权限
+		if (!getSystemService(NotificationManager.class).areNotificationsEnabled()) {
+			binding.permissionNotificationUngranted.setVisibility(View.VISIBLE);
+		} else {
+			binding.permissionNotificationGranted.setVisibility(View.VISIBLE);
+		}
+		binding.permissionNotification.setOnClickListener(v -> {
+			Intent intent = new Intent();
+			intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+			intent.putExtra("android.provider.extra.APP_PACKAGE", PermissionGrantActivity.this.getPackageName());
+			startActivityForResult(intent, 111);
+		});
+
 		//悬浮窗权限
 		if (!Settings.canDrawOverlays(this)) {
 			binding.permissionOverlayUngranted.setVisibility(View.VISIBLE);
@@ -144,10 +158,30 @@ public class PermissionGrantActivity extends AppCompatActivity {
 			//打开浏览器链接
 			Intent intent = new Intent();
 			intent.setAction("android.intent.action.VIEW");
-			Uri content_url = Uri.parse("https://keep-alive.pages.dev/");
+			Uri content_url = Uri.parse("https://keep-alive.pages.dev/#" + getManufacturer());
 			intent.setData(content_url);
 			startActivity(intent);
 		});
 
+	}
+
+	private String getManufacturer() {
+		String brand = android.os.Build.BRAND.toLowerCase();
+		switch (brand) {
+			case "xiaomi":
+				return "miui";
+			case "huawei":
+			case "honor":
+				return "emui";
+			case "oppo":
+			case "oneplus":
+			case "realme":
+				return "coloros";
+			case "vivo":
+			case "iqoo":
+				return "funtouchos";
+			default:
+				return "other";
+		}
 	}
 }
