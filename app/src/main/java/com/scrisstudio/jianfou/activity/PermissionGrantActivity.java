@@ -94,9 +94,7 @@ public class PermissionGrantActivity extends AppCompatActivity {
 			}
 		});
 
-		binding.settingsAppBar.setNavigationOnClickListener(v -> {
-			finish();
-		});
+		binding.settingsAppBar.setNavigationOnClickListener(v -> finish());
 
 		//通知权限
 		if (!getSystemService(NotificationManager.class).areNotificationsEnabled()) {
