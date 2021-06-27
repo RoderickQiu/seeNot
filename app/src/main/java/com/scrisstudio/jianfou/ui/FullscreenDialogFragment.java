@@ -139,7 +139,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 		dialogView = view;
 		view.findViewById(R.id.rule_extra_settings_tip).setOnClickListener(v -> {
 			try {
-				if (ActivitySeekerService.isServiceRunning) {
+				if (ActivitySeekerService.isStart()) {
 					submitData(view);
 					MaskAssignerUtils.showActivityCustomizationDialog(position);
 				} else {
