@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -44,7 +45,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static boolean isServiceRunning = true, isFirstTimeInvokeService = true,
 			isHandlerRunning = false, isReceiverRegistered = false, isForegroundServiceRunning = false,
 			isSoftInputPanelOn = false, hasSoftInputPanelJustFound = false, isSkipping = false,
-			isMaskOn = false, isSplitScreenAcceptable = false;
+			isMaskOn = false, isSplitScreenAcceptable = false, isDarkModeOn = false;
 	public static int foregroundWindowId = 0, foregroundWindowLayer = 1;
 	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
 	private static String windowOrientation = "portrait";
@@ -74,6 +75,12 @@ public class ActivitySeekerService extends AccessibilityService {
 
 	public static boolean isStart() {
 		return mService != null;
+	}
+
+	public static boolean isNightMode(Context context) {
+		int currentNightMode = context.getResources().getConfiguration().uiMode &
+				Configuration.UI_MODE_NIGHT_MASK;
+		return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
 	}
 
 	public static void setRulesList(List<RuleInfo> l) {
@@ -355,6 +362,14 @@ public class ActivitySeekerService extends AccessibilityService {
 				foregroundClassName = event.getClassName().toString();
 				foregroundWindowId = event.getWindowId();
 				l(event.getClassName().toString() + event.getWindowId());
+			}
+
+			if (isNightMode(jianfou.getAppContext()) && !isDarkModeOn) {
+				isDarkModeOn = true;
+				if (isMaskOn) maskPositionMover();
+			} else if (!isNightMode(jianfou.getAppContext()) && isDarkModeOn) {
+				isDarkModeOn = false;
+				if (isMaskOn) maskPositionMover();
 			}
 		}
 	}

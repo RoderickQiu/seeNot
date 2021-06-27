@@ -1,13 +1,16 @@
 package com.scrisstudio.jianfou.mask;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.scrisstudio.jianfou.R;
+import com.scrisstudio.jianfou.jianfou;
 
 public class FloatingViewManager {
 	private static final WindowManager.LayoutParams layoutParams;
@@ -52,6 +55,8 @@ public class FloatingViewManager {
 			linearParams.width = width;
 			linearParams.height = height;
 			floatingLinear.setLayoutParams(linearParams);
+
+			changeForDarkMode(floatingLinear);
 		}
 	}
 
@@ -68,6 +73,8 @@ public class FloatingViewManager {
 			linearParams.width = width;
 			linearParams.height = height;
 			floatingLinear.setLayoutParams(linearParams);
+
+			changeForDarkMode(floatingLinear);
 		}
 	}
 
@@ -76,6 +83,16 @@ public class FloatingViewManager {
 		if (view != null) {
 			this.mWindowManager.removeView(view);
 			this.mFloatingView = null;
+		}
+	}
+
+	public void changeForDarkMode(LinearLayout floatingLinear) {
+		if (ActivitySeekerService.isNightMode(jianfou.getAppContext())) {
+			floatingLinear.findViewById(R.id.floating).setBackgroundColor(Color.parseColor("#1B1B1B"));
+			((TextView) floatingLinear.findViewById(R.id.floating_text)).setTextColor(Color.parseColor("#E8D21B"));
+		} else {
+			floatingLinear.findViewById(R.id.floating).setBackgroundColor(Color.parseColor("#F7F7F7"));
+			((TextView) floatingLinear.findViewById(R.id.floating_text)).setTextColor(Color.parseColor("#DF850D"));
 		}
 	}
 }
