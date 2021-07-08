@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
 	public static FragmentManager fragmentManager;
 	private ActivityMainBinding binding;
 	private List<RuleInfo> list = new ArrayList<>();
-	private Banner bannerForPermissions;
 
 	public static int dip2px(float dipValue) {
 		float m = jianfou.getAppContext().getResources().getDisplayMetrics().density;
@@ -146,9 +145,7 @@ public class MainActivity extends AppCompatActivity {
 		}.getType());
 
 		Banner banner = binding.banner;
-		banner.setLeftButtonListener(banner1 -> {
-			banner.dismiss();
-		});
+		banner.setLeftButtonListener(banner1 -> banner.dismiss());
 		banner.setRightButtonListener(banner2 -> {
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("master-switch", true);
@@ -252,19 +249,21 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 
-		bannerForPermissions = binding.banner;
-		bannerForPermissions.setLeftButtonListener(BannerInterface::dismiss);
-		bannerForPermissions.setRightButton("设置", banner2 -> {
-			Intent grantOpener = new Intent(MainActivity.this, PermissionGrantActivity.class);
-			startActivity(grantOpener);
-			banner2.dismiss();
-		});
 		permissionBannerOpener();
 	}
 
 	private void permissionBannerOpener() {
 		//如果不是所有权限都已打开
-		if (!(isAccessibilitySettingsOn(jianfou.getAppContext()) && Settings.canDrawOverlays(jianfou.getAppContext()) && ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()) && getSystemService(NotificationManager.class).areNotificationsEnabled())) {
+		if (!(isAccessibilitySettingsOn(jianfou.getAppContext()) && Settings.canDrawOverlays(jianfou.getAppContext()) &&
+				((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()) &&
+				getSystemService(NotificationManager.class).areNotificationsEnabled())) {
+			Banner bannerForPermissions = binding.banner;
+			bannerForPermissions.setLeftButtonListener(BannerInterface::dismiss);
+			bannerForPermissions.setRightButton("设置", banner2 -> {
+				Intent grantOpener = new Intent(MainActivity.this, PermissionGrantActivity.class);
+				startActivity(grantOpener);
+				banner2.dismiss();
+			});
 			bannerForPermissions.setMessage(R.string.service_not_running);
 			bannerForPermissions.show();
 		}
