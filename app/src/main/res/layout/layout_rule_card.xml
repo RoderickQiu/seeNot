@@ -13,6 +13,7 @@
         android:clickable="true"
         android:clipToPadding="false"
         android:focusable="true"
+        android:theme="@style/Theme.Jianfou"
         app:cardBackgroundColor="?attr/colorOnPrimary"
         app:cardElevation="3dp">
 
