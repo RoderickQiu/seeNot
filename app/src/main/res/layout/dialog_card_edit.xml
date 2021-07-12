@@ -70,11 +70,39 @@
                     android:layout_height="match_parent"
                     android:text="@string/normal_mask" />
 
+                <TextView
+                    style="@style/TextAppearance.MaterialComponents.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:text="@string/normal_mask_msg" />
+
                 <RadioButton
                     android:id="@+id/radio_simple_return"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="@string/simple_return" />
+
+                <TextView
+                    style="@style/TextAppearance.MaterialComponents.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:text="@string/simple_return_msg" />
+
+                <RadioButton
+                    android:id="@+id/radio_dynamic_mask"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/dynamic_mask" />
+
+                <TextView
+                    style="@style/TextAppearance.MaterialComponents.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:text="@string/dynamic_mask_msg" />
+
             </RadioGroup>
 
             <TextView

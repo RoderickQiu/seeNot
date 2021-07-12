@@ -27,7 +27,6 @@ import java.util.TimerTask;
 
 public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyViewHolder> {
 
-	private static final String TAG = "Jianfou-RuleInfoAdapter";
 	private static final int VIEW_TYPE_EMPTY = 0;
 	private static final int VIEW_TYPE_CARD = 1;
 	private static List<RuleInfo> mList = null;
@@ -48,6 +47,8 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 				return "常规遮罩";
 			case 1:
 				return "简单返回";
+			case 2:
+				return "动态遮罩";
 			default:
 				return "未知类型";
 		}
@@ -76,7 +77,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 
 	@SuppressLint("SetTextI18n")
 	@Override
-	public void onBindViewHolder(MyViewHolder holder, int position) {
+	public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 		int viewType = getItemViewType(position);
 		if (viewType == VIEW_TYPE_CARD) {
 			RuleInfo rule = mList.get(position);
@@ -101,13 +102,9 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 				ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
 			});
 
-			holder.moreButton.setOnClickListener(v -> {
-				MainActivity.openSimpleDialog("more-info", MainActivity.resources.getString(R.string.rule_version_info) + rule.getVersion());
-			});
+			holder.moreButton.setOnClickListener(v -> MainActivity.openSimpleDialog("more-info", MainActivity.resources.getString(R.string.rule_version_info) + rule.getVersion()));
 
-			holder.editButton.setOnClickListener(v -> {
-				MainActivity.openCardEditDialog(position);
-			});
+			holder.editButton.setOnClickListener(v -> MainActivity.openCardEditDialog(position));
 
 			holder.deleteButton.setOnClickListener(v -> {
 				holder.deleteButton.setVisibility(View.GONE);

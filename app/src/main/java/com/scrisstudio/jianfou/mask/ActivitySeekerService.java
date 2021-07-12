@@ -50,9 +50,9 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
+	private final Handler mHandler = new Handler();
 	public NotificationChannel normalNotificationChannel;
 	public NotificationManager normalNotificationManager;
-	private Handler mHandler = new Handler();
 	private long lastContentChangedTime = 0;
 	private FloatingViewManager mWindowManager;
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
@@ -244,7 +244,7 @@ public class ActivitySeekerService extends AccessibilityService {
 				if (!hasSoftInputPanelJustFound && isSoftInputPanelOn) {
 					isSoftInputPanelOn = false;
 					l("Input method closed.");
-					maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
+					maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().indices), currentRuleId);
 				}
 			}
 
@@ -269,41 +269,42 @@ public class ActivitySeekerService extends AccessibilityService {
 							} else {
 								//prevent a lot of events flood in to cause crash
 								long time = SystemClock.uptimeMillis();
-								if (time - lastContentChangedTime > 100) {
+								if (time - lastContentChangedTime > 200) {
 									lastContentChangedTime = time;
 
 									//can't find skip text, stop being skipping
-									if (!wordFinder(getRootInActiveWindow(), true, true)) {
+									if (!wordFinder(getRootInActiveWindow(), true)) {
 										isSkipping = false;
+										if (rulesList.get(currentRuleId).getType() == 2)
+											maskCreator(false, currentRuleId);
 									}
 
 									try {
 										Rect rect = new Rect();
 										event.getSource().getBoundsInScreen(rect);
-										if (currentRuleId != -1) {
-											if (isMaskOn && !isSkipping) {
-												//find if node cannot be found
-												nodeSearcher(rulesList.get(currentRuleId).getFilter().indices);
+										if (isMaskOn && !isSkipping) {
+											//find if node cannot be found
+											//if (rulesList.get(currentRuleId).getType() == 0)
+											//nodeSearcher(rulesList.get(currentRuleId).getFilter().indices);
 
-												if (rect.width() == windowTrueWidth) {
-													if (windowOrientation.equals("landscape")) {
-														windowOrientation = "portrait";
-														l("Change to Portrait");
-														if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
-															if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
-																maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
-															}
+											if (rect.width() == windowTrueWidth) {
+												if (windowOrientation.equals("landscape")) {
+													windowOrientation = "portrait";
+													l("Change to Portrait");
+													if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
+														if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
+															maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().indices), currentRuleId);
 														}
 													}
-												} else if (rect.width() == windowTrueHeight) {
-													if (windowOrientation.equals("portrait")) {
-														windowOrientation = "landscape";
-														l("Change to Landscape");
-														if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
-															if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
-																maskSet(rulesList.get(currentRuleId).getFilter(), currentRuleId);
-																l("Recover");
-															}
+												}
+											} else if (rect.width() == windowTrueHeight) {
+												if (windowOrientation.equals("portrait")) {
+													windowOrientation = "landscape";
+													l("Change to Landscape");
+													if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
+														if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
+															maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().indices), currentRuleId);
+															l("Recover");
 														}
 													}
 												}
@@ -329,17 +330,15 @@ public class ActivitySeekerService extends AccessibilityService {
 								currentRuleId = i;
 								l("currentRuleId: " + currentRuleId);
 								if (rulesList.get(i).getType() == 0)
-									maskSet(rulesList.get(i).getFilter(), i);
-								else if (rulesList.get(i).getType() == 1)
-									wordFinder(getRootInActiveWindow(), true, true);
+									maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().indices), currentRuleId);
+								else if (rulesList.get(i).getType() == 1 || rulesList.get(i).getType() == 2)
+									wordFinder(getRootInActiveWindow(), true);
 								break;
 							}
 						}
 					}
 				}
-				new Handler().postDelayed(() -> {
-					isHandlerRunning = false;
-				}, 250);
+				new Handler().postDelayed(() -> isHandlerRunning = false, 250);
 			}
 
 			if (!isSplitScreenAcceptable && isServiceRunning)
@@ -355,9 +354,6 @@ public class ActivitySeekerService extends AccessibilityService {
 					}
 				}
 		} else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-			ComponentName cName = new ComponentName(foregroundPackageName, event.getClassName().toString());
-
-			//if (tryGetActivity(cName) != null)
 			if (isCapableClass(event.getClassName().toString()) && !event.getPackageName().equals(currentHomePackage)) {
 				foregroundClassName = event.getClassName().toString();
 				foregroundWindowId = event.getWindowId();
@@ -386,9 +382,8 @@ public class ActivitySeekerService extends AccessibilityService {
 	private boolean isCapableClass(String className) {
 		if (className == null) return false;
 		else if (className.contains("Activity")) return true;
-		else if (className.startsWith("android.widget.") || className.startsWith("android.view.") || className.startsWith("androidx."))
-			return false;
-		else return true;
+		else
+			return !className.startsWith("android.widget.") && !className.startsWith("android.view.") && !className.startsWith("androidx.");
 	}
 
 	AccessibilityNodeInfo getRightWindowNode() {
@@ -435,14 +430,23 @@ public class ActivitySeekerService extends AccessibilityService {
 		}
 	}
 
-	public boolean wordFinder(AccessibilityNodeInfo info, boolean isOnlyVisible, boolean isRoot) {
+	private void dynamicTextExecutor(AccessibilityNodeInfo info) {
+		for (int i = 0; i < rulesList.get(currentRuleId).getDynamicParentLevel(); i++) {
+			info = info.getParent();
+		}
+		Rect rect = new Rect();
+		info.getBoundsInScreen(rect);
+		maskSet(rect, currentRuleId);
+	}
+
+	public boolean wordFinder(AccessibilityNodeInfo info, boolean isOnlyVisible) {
 		if (isServiceRunning) {
 			boolean hasExecutionSucceeded = false;
 			if (currentRuleId != -1 && info != null) {
 				if (info.getChildCount() != 0) {
 					for (int i = 0; i < info.getChildCount(); i++) {
 						if (info.getChild(i) != null) {
-							if (wordFinder(info.getChild(i), isOnlyVisible, false)) {
+							if (wordFinder(info.getChild(i), isOnlyVisible)) {
 								hasExecutionSucceeded = true;
 							}
 						}
@@ -455,6 +459,9 @@ public class ActivitySeekerService extends AccessibilityService {
 						} else if (info.getText().toString().equals(rulesList.get(currentRuleId).getSkipText())) {
 							skipTextExecutor();
 							hasExecutionSucceeded = true;
+						} else if (info.getText().toString().equals(rulesList.get(currentRuleId).getDynamicText())) {
+							dynamicTextExecutor(info);
+							hasExecutionSucceeded = true;
 						}
 					} else if (info.getContentDescription() != null) {
 						if (info.getContentDescription().equals(rulesList.get(currentRuleId).getAidText())) {
@@ -462,6 +469,9 @@ public class ActivitySeekerService extends AccessibilityService {
 							hasExecutionSucceeded = true;
 						} else if (info.getContentDescription().equals(rulesList.get(currentRuleId).getSkipText())) {
 							skipTextExecutor();
+							hasExecutionSucceeded = true;
+						} else if (info.getContentDescription().toString().equals(rulesList.get(currentRuleId).getDynamicText())) {
+							dynamicTextExecutor(info);
 							hasExecutionSucceeded = true;
 						}
 					}
@@ -480,10 +490,9 @@ public class ActivitySeekerService extends AccessibilityService {
 		}
 	}
 
-	private void maskSet(WidgetInfo p, int indice) {
+	private void maskSet(Rect rect, int indice) {
 		//Rect rect = nodeSearcher();
 		if (isServiceRunning && !isSkipping) {
-			Rect rect = nodeSearcher(p.indices);
 			if (rect != null) {
 				x = rect.centerX() - rect.width() / 2;// buffer is for edge gesture
 				try {

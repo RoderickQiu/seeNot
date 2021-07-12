@@ -1,7 +1,6 @@
 package com.scrisstudio.jianfou.ui;
 
 import android.app.Dialog;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,7 +16,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.gson.Gson;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
 import com.scrisstudio.jianfou.jianfou;
@@ -35,12 +33,10 @@ public class FullscreenDialogFragment extends DialogFragment {
 
 	public static final String TAG = "Jianfou-Dialog";
 	private static int position;
-	private static SharedPreferences sharedPreferences;
 	private static List<RuleInfo> list = new ArrayList<>();
 	private static OnSubmitListener callBack;
 	private static int ruleType = 0;
 	private static boolean hasJustRevertedRuleType = false;
-	private final Gson gson = new Gson();
 	private View dialogView;
 	private Toolbar toolbar;
 
@@ -65,20 +61,20 @@ public class FullscreenDialogFragment extends DialogFragment {
 				RuleInfo rule = list.get(position);
 				rule.setSkipText(null);
 				rule.setAidText(null);
+				rule.setDynamicText(null);
+				rule.setDynamicParentLevel(0);
 				rule.setFilter(new WidgetInfo());
 				list.set(position, rule);
 			} else {
 				//revert the choice
 				hasJustRevertedRuleType = true;
 				try {
-					if (formerChoice == 0) {
-						if (choice == 1) {
-							((RadioButton) dialogView.findViewById(R.id.radio_normal_mask)).toggle();
-						}
-					} else if (formerChoice == 1) {
-						if (choice == 0) {
-							((RadioButton) dialogView.findViewById(R.id.radio_simple_return)).toggle();
-						}
+					if (formerChoice == 0 && choice != 0) {
+						((RadioButton) dialogView.findViewById(R.id.radio_normal_mask)).toggle();
+					} else if (formerChoice == 1 && choice != 1) {
+						((RadioButton) dialogView.findViewById(R.id.radio_simple_return)).toggle();
+					} else if (formerChoice == 2 && choice != 2) {
+						((RadioButton) dialogView.findViewById(R.id.radio_dynamic_mask)).toggle();
 					}
 				} catch (Exception ignored) {
 				}
@@ -156,12 +152,16 @@ public class FullscreenDialogFragment extends DialogFragment {
 		if (ruleType == 0) ((RadioButton) view.findViewById(R.id.radio_normal_mask)).toggle();
 		else if (ruleType == 1)
 			((RadioButton) view.findViewById(R.id.radio_simple_return)).toggle();
+		else if (ruleType == 2)
+			((RadioButton) view.findViewById(R.id.radio_dynamic_mask)).toggle();
 		((RadioGroup) view.findViewById(R.id.radio_type_select)).setOnCheckedChangeListener((group, checkedId) -> {
 			if (hasJustRevertedRuleType) hasJustRevertedRuleType = false;
 			else if (checkedId == view.findViewById(R.id.radio_normal_mask).getId()) {
 				openRuleSetConfirmDialog("radio-rule-type", "这将会删除原有的规则逻辑，请谨慎。", ruleType, 0);
 			} else if (checkedId == view.findViewById(R.id.radio_simple_return).getId()) {
 				openRuleSetConfirmDialog("radio-rule-type", "这将会删除原有的规则逻辑，请谨慎。", ruleType, 1);
+			} else if (checkedId == view.findViewById(R.id.radio_dynamic_mask).getId()) {
+				openRuleSetConfirmDialog("radio-rule-type", "这将会删除原有的规则逻辑，请谨慎。", ruleType, 2);
 			}
 		});
 

@@ -106,4 +106,14 @@
     <string name="permission_background">后台运行和自启动</string>
     <string name="permission_notification">通知权限</string>
     <string name="permission_notification_msg">用于发送必要通知和防止服务被杀死。</string>
+    <string name="dynamic_mask">动态遮罩</string>
+    <string name="normal_mask_msg">这类遮罩用于屏蔽某个特定页面元素。</string>
+    <string name="simple_return_msg">有时你不需要一个遮罩框，而是要将某个页面彻底屏蔽。</string>
+    <string name="dynamic_mask_msg">查找文字并动态生成遮罩，适合屏蔽信息流中内容。</string>
+    <string name="dynamic_mode_normal_settings_help">对于动态遮罩屏蔽，此处仅用于获取要屏蔽的元素（和作为线索的文字可以是不同元素，但必须有从属关系，后台会自动计算二者的层级关系）。</string>
+    <string name="dynamic_mask_settings">动态遮罩设置</string>
+    <string name="when_such_text_shown_involve">当出现指定文字时出现遮罩框：</string>
+    <string name="dynamic_mask_text_info">显示动态遮罩触发文字</string>
+    <string name="select_dynamic">选中触发文字</string>
+    <string name="dynamic_text_help">此处用于设置含有动态遮罩的触发文字的元素。需要注意的是，由于部分软件限制，一些文字可能无法添加。</string>
 </resources>

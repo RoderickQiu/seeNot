@@ -10,9 +10,12 @@ public class RuleInfo {
 	private int ruleType;
 	private String aidText;
 	private String skipText;
+	private String dynamicText;
+	private int dynamicParentLevel;
 	private WidgetInfo filter;
 
-	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion, int ruleType, WidgetInfo filter, String aidText, String skipText) {
+	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion,
+	                int ruleType, WidgetInfo filter, String aidText, String skipText, String dynamicText, int dynamicParentLevel) {
 		this.status = status;
 		this.id = id;
 		this.ruleTitle = ruleTitle;
@@ -23,6 +26,8 @@ public class RuleInfo {
 		this.filter = filter;
 		this.aidText = aidText;
 		this.skipText = skipText;
+		this.dynamicText = dynamicText;
+		this.dynamicParentLevel = dynamicParentLevel;
 	}
 
 	public boolean getStatus() {
@@ -99,5 +104,21 @@ public class RuleInfo {
 
 	public void setSkipText(String skipText) {
 		this.skipText = skipText;
+	}
+
+	public String getDynamicText() {
+		return dynamicText;
+	}
+
+	public void setDynamicText(String dynamicText) {
+		this.dynamicText = dynamicText;
+	}
+
+	public int getDynamicParentLevel() {
+		return dynamicParentLevel;
+	}
+
+	public void setDynamicParentLevel(int dynamicParentLevel) {
+		this.dynamicParentLevel = dynamicParentLevel;
 	}
 }

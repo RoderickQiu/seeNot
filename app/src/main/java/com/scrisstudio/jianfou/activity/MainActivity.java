@@ -135,12 +135,6 @@ public class MainActivity extends AppCompatActivity {
 			ruleInitEditor.putString("rules", gson.toJson(list));
 			ruleInitEditor.apply();
 		}
-		/*SharedPreferences.Editor edit = sharedPreferences.edit();
-		list.add(new RuleInfo(true, 0, "0", "1.0", "software", "any", 0, new PackageWidgetDescription(), null, null));
-		list.add(new RuleInfo(true, 1, "1", "1.0", "software", "any", 0, new PackageWidgetDescription(), null, null));
-		list.add(new RuleInfo(true, 2, "2", "1.0", "software", "any", 1, new PackageWidgetDescription(), null, null));
-		edit.putString("rules", gson.toJson(list));
-		edit.apply();*/
 		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
 		}.getType());
 
@@ -166,6 +160,14 @@ public class MainActivity extends AppCompatActivity {
 
 		Intent serviceIntent = new Intent(this, ActivitySeekerService.class);
 		startService(serviceIntent);
+
+		//如果处于Debug状态
+		if (jianfou.isDebugApp()) {
+			if (!ActivitySeekerService.isStart()) {
+				startActivityForResult(new Intent("android.settings.ACCESSIBILITY_SETTINGS"), 111);
+				banner.dismiss();
+			}
+		}
 
 		RecyclerView recyclerView = binding.ruleList;
 		LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -222,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
 			AlertDialog alertDialog = new MaterialAlertDialogBuilder(this).setTitle(R.string.add_rule).setItems(choices, (dialog, which) -> {
 				if (which == 0) {// manual add rule
 					SharedPreferences.Editor edit = sharedPreferences.edit();
-					list.add(new RuleInfo(true, sharedPreferences.getInt("rule-id-max", 0), "新建规则", "1.0", "软件名称", "any", 0, new WidgetInfo(), null, null));
+					list.add(new RuleInfo(true, sharedPreferences.getInt("rule-id-max", 0), "新建规则", "1.0", "软件名称", "any", 0, new WidgetInfo(), null, null, null, 0));
 					edit.putString("rules", gson.toJson(list));
 					edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
 					edit.apply();
