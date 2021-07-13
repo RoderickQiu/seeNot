@@ -55,8 +55,11 @@ public class MainActivity extends AppCompatActivity {
 	public static int windowTrueWidth, windowTrueHeight;
 	public static SharedPreferences sharedPreferences;
 	public static FragmentManager fragmentManager;
+	public Banner banner;
 	private ActivityMainBinding binding;
 	private List<RuleInfo> list = new ArrayList<>();
+	private RecyclerView recyclerView;
+	private RuleInfoAdapter adapter;
 
 	public static int dip2px(float dipValue) {
 		float m = jianfou.getAppContext().getResources().getDisplayMetrics().density;
@@ -104,9 +107,7 @@ public class MainActivity extends AppCompatActivity {
 			}
 		} else if (requestCode == 201) {
 			//reload page when back from settings
-			Intent intent = getIntent();
-			finish();
-			startActivity(intent);
+			reloader();
 		}
 	}
 
@@ -138,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
 		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
 		}.getType());
 
-		Banner banner = binding.banner;
+		banner = binding.banner;
 		banner.setLeftButtonListener(banner1 -> banner.dismiss());
 		banner.setRightButtonListener(banner2 -> {
 			SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -169,11 +170,11 @@ public class MainActivity extends AppCompatActivity {
 			}
 		}
 
-		RecyclerView recyclerView = binding.ruleList;
+		recyclerView = binding.ruleList;
 		LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
 		layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 		recyclerView.setLayoutManager(layoutManager);
-		RuleInfoAdapter adapter = new RuleInfoAdapter(getBaseContext(), list, sharedPreferences);
+		adapter = new RuleInfoAdapter(getBaseContext(), list, sharedPreferences);
 		recyclerView.setAdapter(adapter);
 		recyclerView.addItemDecoration(new RuleInfoCardDecoration());
 
@@ -274,6 +275,22 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		reloader();
+	}
+
+	private void reloader() {
 		permissionBannerOpener();
+
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(jianfou.getAppContext());
+		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+		}.getType());
+		adapter = new RuleInfoAdapter(getBaseContext(), list, sharedPreferences);
+		recyclerView.setAdapter(adapter);
+
+		if (!sharedPreferences.getBoolean("master-switch", true)) {
+			banner.setMessage(R.string.function_closed);
+			banner.show();
+		} else banner.dismiss();
+		ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), false, sharedPreferences.getBoolean("split", true));
 	}
 }

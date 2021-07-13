@@ -2,6 +2,7 @@ package com.scrisstudio.jianfou.mask;
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static com.scrisstudio.jianfou.mask.ActivitySeekerService.TAG;
 import static com.scrisstudio.jianfou.mask.ActivitySeekerService.mService;
@@ -89,11 +91,13 @@ public class MaskAssignerUtils {
 		if (rulesList.get(position).getType() == 1) {
 			viewCustomization.findViewById(R.id.normal_mask_settings).setVisibility(View.GONE);
 			viewCustomization.findViewById(R.id.skip_settings).setVisibility(View.GONE);
+			viewCustomization.findViewById(R.id.dynamic_mask_settings).setVisibility(View.GONE);
 			((TextView) viewCustomization.findViewById(R.id.emergency_aid_settings_title)).setText(R.string.simple_return);
 		} else if (rulesList.get(position).getType() == 2) {
 			viewCustomization.findViewById(R.id.skip_settings).setVisibility(View.GONE);
 		} else {
 			viewCustomization.findViewById(R.id.dynamic_mode_normal_settings_help).setVisibility(View.GONE);
+			viewCustomization.findViewById(R.id.dynamic_mask_settings).setVisibility(View.GONE);
 		}
 
 		AtomicReference<List<RuleInfo>> tempList = new AtomicReference<>(gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
@@ -251,6 +255,25 @@ public class MaskAssignerUtils {
 			btDeleteDynamicText.setEnabled(false);
 		});
 
+		Function<String, String> getApplicationNameFunction = in -> {
+			PackageManager pm = jianfou.getAppContext().getPackageManager();
+			String name = "";
+			try {
+				name = pm.getApplicationLabel(pm.getApplicationInfo(in, PackageManager.GET_META_DATA)).toString();
+			} catch (PackageManager.NameNotFoundException ignored) {
+			}
+			return name;
+		};
+
+		Function<String, String> getApplicationVersionFunction = in -> {
+			PackageManager pm = jianfou.getAppContext().getPackageManager();
+			String version = "";
+			try {
+				version = pm.getPackageInfo(in, PackageManager.GET_META_DATA).versionName;
+			} catch (PackageManager.NameNotFoundException ignored) {
+			}
+			return version;
+		};
 
 		Consumer<String> btOperator = (mode) -> {
 			WidgetInfo temWidget = new WidgetInfo(widgetDescription);
@@ -261,6 +284,10 @@ public class MaskAssignerUtils {
 				case "widget":
 					rule.setFilter(temWidget);
 					tvPackageName.setText(widgetDescription.packageName + " (控件数据已保存)");
+					if (!getApplicationNameFunction.apply(widgetDescription.packageName).equals(""))
+						rule.setFor(getApplicationNameFunction.apply(widgetDescription.packageName));
+					if (!getApplicationVersionFunction.apply(widgetDescription.packageName).equals(""))
+						rule.setForVersion(getApplicationVersionFunction.apply(widgetDescription.packageName));
 					break;
 				case "aid":
 					rule.setAidText(tvAidText.getText().toString());
