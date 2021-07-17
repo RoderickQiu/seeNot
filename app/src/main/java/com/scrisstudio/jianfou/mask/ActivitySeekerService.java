@@ -30,6 +30,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
+import com.scrisstudio.jianfou.activity.PIPShieldActivity;
 import com.scrisstudio.jianfou.activity.PermissionGrantActivity;
 import com.scrisstudio.jianfou.jianfou;
 
@@ -226,21 +227,6 @@ public class ActivitySeekerService extends AccessibilityService {
 	public void onAccessibilityEvent(AccessibilityEvent event) {
 		if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
 			if (currentRuleId != -1 && !isHandlerRunning && isServiceRunning) {
-				hasSoftInputPanelJustFound = false;
-				for (int i = 0; i < getWindows().size(); i++) {
-					try {
-						//查找输入法是否打开，打开则删除遮罩：TYPE_INPUT_METHOD=2
-						if (getWindows().get(i).getType() == 2) {
-							hasSoftInputPanelJustFound = true;
-							if (!isSoftInputPanelOn) {
-								isSoftInputPanelOn = true;
-								l("Input method is enabled.");
-								skipTextExecutor();
-							}
-						}
-					} catch (Exception ignored) {
-					}
-				}
 				if (!hasSoftInputPanelJustFound && isSoftInputPanelOn) {
 					isSoftInputPanelOn = false;
 					l("Input method closed.");
@@ -269,7 +255,7 @@ public class ActivitySeekerService extends AccessibilityService {
 							} else {
 								//prevent a lot of events flood in to cause crash
 								long time = SystemClock.uptimeMillis();
-								if (time - lastContentChangedTime > 200) {
+								if (time - lastContentChangedTime >= 250) {
 									lastContentChangedTime = time;
 
 									//can't find skip text, stop being skipping
@@ -341,18 +327,36 @@ public class ActivitySeekerService extends AccessibilityService {
 				new Handler().postDelayed(() -> isHandlerRunning = false, 250);
 			}
 
-			if (!isSplitScreenAcceptable && isServiceRunning)
+			if (isServiceRunning) {
+				hasSoftInputPanelJustFound = false;
 				for (int i = 0; i < getWindows().size(); i++) {
 					//通过查找window的layer属性发现是否处于分屏、小窗
 					if (getWindows().get(i).getId() == foregroundWindowId && getWindows().get(i).isActive()) {
 						foregroundWindowLayer = getWindows().get(i).getLayer();
-						//只选择常规窗口，不选择输入法等特殊窗口
-						if (foregroundWindowLayer != 0 && getWindows().get(i).getType() == 1) {
+						if (getWindows().get(i).isInPictureInPictureMode()) {//检测画中画并强退之
+							startActivity(new Intent(this, PIPShieldActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+							Toast.makeText(jianfou.getAppContext(), "分屏屏蔽打开：当前禁止打开画中画窗口", Toast.LENGTH_SHORT).show();
+						} else if (foregroundWindowLayer != 0 && getWindows().get(i).getType() == 1) {//只选择常规窗口，不选择输入法等特殊窗口
 							performGlobalAction(GLOBAL_ACTION_BACK);
 							Toast.makeText(jianfou.getAppContext(), "分屏屏蔽打开：禁止分屏和小窗", Toast.LENGTH_SHORT).show();
 						}
 					}
+					if (currentRuleId != -1 && !isHandlerRunning) {
+						try {
+							//查找输入法是否打开，打开则删除遮罩：TYPE_INPUT_METHOD=2
+							if (getWindows().get(i).getType() == 2) {
+								hasSoftInputPanelJustFound = true;
+								if (!isSoftInputPanelOn) {
+									isSoftInputPanelOn = true;
+									l("Input method is enabled.");
+									maskCreator(false, currentRuleId);
+								}
+							}
+						} catch (Exception ignored) {
+						}
+					}
 				}
+			}
 		} else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
 			if (isCapableClass(event.getClassName().toString()) && !event.getPackageName().equals(currentHomePackage)) {
 				foregroundClassName = event.getClassName().toString();
