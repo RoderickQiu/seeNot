@@ -22,7 +22,6 @@ import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.mask.ActivitySeekerService;
 import com.scrisstudio.jianfou.mask.MaskAssignerUtils;
 import com.scrisstudio.jianfou.mask.RuleInfo;
-import com.scrisstudio.jianfou.mask.WidgetInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +62,7 @@ public class FullscreenDialogFragment extends DialogFragment {
 				rule.setAidText(null);
 				rule.setDynamicText(null);
 				rule.setDynamicParentLevel(0);
-				rule.setFilter(new WidgetInfo());
+				rule.setFilter(new ArrayList<>());
 				list.set(position, rule);
 			} else {
 				//revert the choice

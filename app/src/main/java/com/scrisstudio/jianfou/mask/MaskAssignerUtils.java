@@ -36,7 +36,6 @@ import java.util.function.Function;
 
 import static com.scrisstudio.jianfou.mask.ActivitySeekerService.TAG;
 import static com.scrisstudio.jianfou.mask.ActivitySeekerService.mService;
-import static com.scrisstudio.jianfou.mask.ActivitySeekerService.rulesList;
 
 public class MaskAssignerUtils {
 
@@ -52,12 +51,11 @@ public class MaskAssignerUtils {
 		Log.i(TAG, "Assigner running.");
 
 		boolean b = metrics.heightPixels > metrics.widthPixels;
-		AtomicInteger dynamicParentLevel = new AtomicInteger();
+		AtomicInteger dynamicParentLevel = new AtomicInteger(), currentMaskWidget = new AtomicInteger();
 		final int width = b ? metrics.widthPixels : metrics.heightPixels;
 		final int height = b ? metrics.heightPixels : metrics.widthPixels;
 
 		final WidgetInfo widgetDescription = new WidgetInfo();
-		final PositionInfo positionDescription = new PositionInfo("", "", 0, 0, 500, 500, 6);
 
 		final LayoutInflater inflater = LayoutInflater.from(mService);
 		// activity customization view
@@ -69,7 +67,8 @@ public class MaskAssignerUtils {
 		final TextView tvSkipText = viewCustomization.findViewById(R.id.skip_text_info);
 		final TextView tvDynamicText = viewCustomization.findViewById(R.id.dynamic_mask_text_info);
 		final TextView tvPressToMove = viewCustomization.findViewById(R.id.press_here_move);
-		//final TextView tvPositionInfo = viewCustomization.findViewById(R.id.tv_position_info);
+		final TextView tvCurrentMaskWidgetNum = viewCustomization.findViewById(R.id.current_mask_widget);
+		final TextView tvAllMaskWidgetNum = viewCustomization.findViewById(R.id.all_mask_widget);
 		final ImageButton btQuit = viewCustomization.findViewById(R.id.button_quit);
 		final Button btShowOutline = viewCustomization.findViewById(R.id.button_show_outline);
 		final Button btShowOutline2 = viewCustomization.findViewById(R.id.button_show_outline_2);
@@ -79,54 +78,69 @@ public class MaskAssignerUtils {
 		final Button btSelectAidText = viewCustomization.findViewById(R.id.button_set_emergency_aid);
 		final Button btSelectSkipText = viewCustomization.findViewById(R.id.button_set_skip);
 		final Button btSelectDynamicText = viewCustomization.findViewById(R.id.button_set_dynamic);
+		final Button btDeleteThisWidget = viewCustomization.findViewById(R.id.button_delete_this_widget);
 		final Button btDeleteWidget = viewCustomization.findViewById(R.id.button_delete_widget);
+		final ImageButton btPreviousWidget = viewCustomization.findViewById(R.id.previous_mask_widget);
+		final ImageButton btNextWidget = viewCustomization.findViewById(R.id.next_mask_widget);
 		final Button btDeleteSkipText = viewCustomization.findViewById(R.id.button_delete_skip);
 		final Button btDeleteAidText = viewCustomization.findViewById(R.id.button_delete_emergency_aid);
 		final Button btDeleteDynamicText = viewCustomization.findViewById(R.id.button_delete_dynamic);
-		//Button btShowTarget = viewCustomization.findViewById(R.id.button_show_target);
-		//Button btReGetTarget = viewCustomization.findViewById(R.id.button_reget_outline);
-		//final Button btAddPosition = viewCustomization.findViewById(R.id.button_add_position);
+		ImageView lastChoice = new ImageView(mService);
+
+
+		AtomicReference<List<RuleInfo>> tempList = new AtomicReference<>(gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+		}.getType()));
+		RuleInfo tempRule = tempList.get().get(position);
+		if (!tempRule.getFilter().equals(new ArrayList<>()))
+			btDeleteWidget.setEnabled(true);
+		if (tempRule.getAidText() != null) btDeleteAidText.setEnabled(true);
+		if (tempRule.getSkipText() != null) btDeleteSkipText.setEnabled(true);
+		if (tempRule.getFilterLength() != 0) {
+			tvCurrentMaskWidgetNum.setText("1");
+		} else tvCurrentMaskWidgetNum.setText("0");
+		tvAllMaskWidgetNum.setText("" + tempRule.getFilterLength());
 
 		//if type is only skip, hide other things
-		if (rulesList.get(position).getType() == 1) {
+		if (tempRule.getType() == 1) {
 			viewCustomization.findViewById(R.id.normal_mask_settings).setVisibility(View.GONE);
 			viewCustomization.findViewById(R.id.skip_settings).setVisibility(View.GONE);
 			viewCustomization.findViewById(R.id.dynamic_mask_settings).setVisibility(View.GONE);
 			((TextView) viewCustomization.findViewById(R.id.emergency_aid_settings_title)).setText(R.string.simple_return);
-		} else if (rulesList.get(position).getType() == 2) {
+		} else if (tempRule.getType() == 2) {
 			viewCustomization.findViewById(R.id.skip_settings).setVisibility(View.GONE);
 		} else {
 			viewCustomization.findViewById(R.id.dynamic_mode_normal_settings_help).setVisibility(View.GONE);
 			viewCustomization.findViewById(R.id.dynamic_mask_settings).setVisibility(View.GONE);
 		}
 
-		AtomicReference<List<RuleInfo>> tempList = new AtomicReference<>(gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
-		}.getType()));
-		RuleInfo tempRule = tempList.get().get(position);
-		if (!tempRule.getFilter().equals(new WidgetInfo()))
-			btDeleteWidget.setEnabled(true);
-		if (tempRule.getAidText() != null) btDeleteAidText.setEnabled(true);
-		if (tempRule.getSkipText() != null) btDeleteSkipText.setEnabled(true);
-
 		@SuppressLint("InflateParams") final View viewTarget = inflater.inflate(R.layout.layout_accessibility_node_desc, null);
 		final FrameLayout layoutOverlayOutline = viewTarget.findViewById(R.id.frame);
-
-		final ImageView imageTarget = new ImageView(mService);
-		imageTarget.setImageResource(R.drawable.target);
+		@SuppressLint("InflateParams") final View viewLastTimeChoice = inflater.inflate(R.layout.layout_last_choice_frame, null);
+		final FrameLayout layoutLastTimeChoiceOutline = viewLastTimeChoice.findViewById(R.id.last_time_choice_frame);
 
 		// define view positions
-		final WindowManager.LayoutParams customizationParams, outlineParams, targetParams;
+		final WindowManager.LayoutParams customizationParams, outlineParams, targetParams, lastTimeFrameParams;
 		customizationParams = new WindowManager.LayoutParams();
 		customizationParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
 		customizationParams.format = PixelFormat.TRANSPARENT;
 		customizationParams.gravity = Gravity.START | Gravity.TOP;
 		customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		customizationParams.width = width;
-		customizationParams.height = (int) (height / 4);
+		customizationParams.height = height / 4;
 		customizationParams.x = (metrics.widthPixels - customizationParams.width) / 2;
 		customizationParams.y = metrics.heightPixels - customizationParams.height;
 		customizationParams.alpha = 0.8f;
 		customizationParams.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE;
+
+		lastTimeFrameParams = new WindowManager.LayoutParams();
+		lastTimeFrameParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
+		lastTimeFrameParams.format = PixelFormat.TRANSPARENT;
+		lastTimeFrameParams.gravity = Gravity.START | Gravity.TOP;
+		lastTimeFrameParams.width = metrics.widthPixels;
+		lastTimeFrameParams.height = metrics.heightPixels;
+		lastTimeFrameParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+		lastTimeFrameParams.alpha = 0.8f;
+		windowManager.addView(viewLastTimeChoice, lastTimeFrameParams);
 
 		outlineParams = new WindowManager.LayoutParams();
 		outlineParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
@@ -137,15 +151,47 @@ public class MaskAssignerUtils {
 		outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
 		outlineParams.alpha = 0f;
 
+
 		targetParams = new WindowManager.LayoutParams();
 		targetParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
 		targetParams.format = PixelFormat.TRANSPARENT;
 		targetParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
 		targetParams.gravity = Gravity.START | Gravity.TOP;
-		targetParams.width = targetParams.height = width / 4;
+		targetParams.width = targetParams.height = (int) (width / 3.3);
 		targetParams.x = (metrics.widthPixels - targetParams.width) / 2;
 		targetParams.y = (metrics.heightPixels - targetParams.height) / 2;
 		targetParams.alpha = 0f;
+
+		Function<ArrayList<Integer>, Rect> nodeSearcher = indices -> {
+			try {
+				AccessibilityNodeInfo node = mService.getRootInActiveWindow();
+				for (int i = 0; i < indices.size(); i++) {
+					node = node.getChild(indices.get(i));
+				}
+
+				Rect rect = new Rect();
+				node.getBoundsInScreen(rect);
+				return rect;
+			} catch (Exception e) {
+				return null;
+			}
+		};
+
+		Consumer<Integer> lastChoiceSelecter = (id) -> {
+			try {
+				layoutLastTimeChoiceOutline.removeView(lastChoice);
+			} catch (Exception ignored) {
+			}
+			try {
+				lastChoice.setBackgroundResource(R.drawable.node_last_choice);
+				Rect temRect = nodeSearcher.apply(tempRule.getFilter().get(id).indices);
+				FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(temRect.width(), temRect.height());
+				params.leftMargin = temRect.left;
+				params.topMargin = temRect.top;
+				layoutLastTimeChoiceOutline.addView(lastChoice, params);
+			} catch (Exception ignored) {
+			}
+		};
 
 		tvPressToMove.setOnTouchListener(new View.OnTouchListener() {
 			int x = 0, y = 0;
@@ -169,73 +215,42 @@ public class MaskAssignerUtils {
 			}
 		});
 
-		imageTarget.setOnTouchListener(new View.OnTouchListener() {
-			final int width = targetParams.width / 2;
-			final int height = targetParams.height / 2;
-			int x = 0;
-			int y = 0;
-
-			@SuppressLint("SetTextI18n")
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				switch (event.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						//btAddPosition.setEnabled(true);
-						targetParams.alpha = 0.9f;
-						windowManager.updateViewLayout(imageTarget, targetParams);
-						x = Math.round(event.getRawX());
-						y = Math.round(event.getRawY());
-						break;
-					case MotionEvent.ACTION_MOVE:
-						targetParams.x = Math.round(targetParams.x + (event.getRawX() - x));
-						targetParams.y = Math.round(targetParams.y + (event.getRawY() - y));
-						x = Math.round(event.getRawX());
-						y = Math.round(event.getRawY());
-						windowManager.updateViewLayout(imageTarget, targetParams);
-						positionDescription.packageName = ActivitySeekerService.foregroundPackageName;
-						positionDescription.activityName = ActivitySeekerService.foregroundClassName;
-						positionDescription.x = targetParams.x + width;
-						positionDescription.y = targetParams.y + height;
-						tvPackageName.setText(positionDescription.packageName);
-						tvActivityName.setText(positionDescription.activityName);
-						//tvPositionInfo.setText("X轴：" + positionDescription.x + "    " + "Y轴：" + positionDescription.y + "    " + "(其他参数默认)");
-						break;
-					case MotionEvent.ACTION_UP:
-						targetParams.alpha = 0.5f;
-						windowManager.updateViewLayout(imageTarget, targetParams);
-						break;
-				}
-				return true;
-			}
-		});
-
 		Consumer<String> btDeleteOperator = (mode) -> {
-			List<RuleInfo> list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
-			}.getType());
-			RuleInfo rule = list.get(position);
+			try {
+				layoutLastTimeChoiceOutline.removeView(lastChoice);
+			} catch (Exception ignored) {
+			}
 			switch (mode) {
 				case "widget":
-					rule.setFilter(new WidgetInfo());
+					tempRule.setFilter(new ArrayList<>());
+					tempRule.setFilterLength(0);
+					currentMaskWidget.set(0);
+					tvCurrentMaskWidgetNum.setText("0");
+					tvAllMaskWidgetNum.setText("0");
 					tvPackageName.setText(null);
+					tvActivityName.setText(null);
+					tvWidgetInfo.setText(null);
 				case "aid":
-					rule.setAidText(null);
-					if (rule.getType() == 1) rule.setFilter(new WidgetInfo());
+					tempRule.setAidText(null);
+					if (tempRule.getType() == 1) tempRule.setFilter(new ArrayList<>());
 					tvAidText.setText(null);
 					break;
 				case "skip":
-					rule.setSkipText(null);
+					tempRule.setSkipText(null);
 					tvSkipText.setText(null);
 					break;
 				case "dynamic":
-					rule.setDynamicText(null);
-					rule.setDynamicParentLevel(0);
+					tempRule.setDynamicText(null);
+					tempRule.setDynamicParentLevel(0);
 					tvDynamicText.setText(null);
 					break;
 			}
-			list.set(position, rule);
-			ActivitySeekerService.setRulesList(list);
+			List<RuleInfo> newList = tempList.get();
+			newList.set(position, tempRule);
+			tempList.set(newList);
+			ActivitySeekerService.setRulesList(newList);
 			SharedPreferences.Editor ruleEditor = sharedPreferences.edit();
-			ruleEditor.putString("rules", gson.toJson(list));
+			ruleEditor.putString("rules", gson.toJson(newList));
 			ruleEditor.apply();
 		};
 		btDeleteWidget.setOnClickListener(v -> {
@@ -276,40 +291,57 @@ public class MaskAssignerUtils {
 		};
 
 		Consumer<String> btOperator = (mode) -> {
-			WidgetInfo temWidget = new WidgetInfo(widgetDescription);
-			List<RuleInfo> list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
-			}.getType());
-			RuleInfo rule = list.get(position);
+			try {
+				layoutLastTimeChoiceOutline.removeView(lastChoice);
+			} catch (Exception ignored) {
+			}
 			switch (mode) {
 				case "widget":
-					rule.setFilter(temWidget);
+					ArrayList<WidgetInfo> tempArray = tempRule.getFilter();
+					WidgetInfo tempWidget = new WidgetInfo(widgetDescription);
+					if (currentMaskWidget.get() >= tempRule.getFilterLength()) {
+						tempArray.add(tempWidget);
+						tempRule.setFilterLength(tempRule.getFilterLength() + 1);
+						currentMaskWidget.addAndGet(1);
+						tvCurrentMaskWidgetNum.setText(Integer.toString(tempRule.getFilterLength()));
+						tvAllMaskWidgetNum.setText(Integer.toString(tempRule.getFilterLength()));
+					} else {
+						tempArray.set(currentMaskWidget.get(), tempWidget);
+					}
+					tempRule.setFilter(tempArray);
+
 					tvPackageName.setText(widgetDescription.packageName + " (控件数据已保存)");
 					if (!getApplicationNameFunction.apply(widgetDescription.packageName).equals(""))
-						rule.setFor(getApplicationNameFunction.apply(widgetDescription.packageName));
+						tempRule.setFor(getApplicationNameFunction.apply(widgetDescription.packageName));
 					if (!getApplicationVersionFunction.apply(widgetDescription.packageName).equals(""))
-						rule.setForVersion(getApplicationVersionFunction.apply(widgetDescription.packageName));
+						tempRule.setForVersion(getApplicationVersionFunction.apply(widgetDescription.packageName));
 					break;
 				case "aid":
-					rule.setAidText(tvAidText.getText().toString());
+					tempArray = new ArrayList<>();
+					tempWidget = new WidgetInfo(widgetDescription);
+					tempArray.add(tempWidget);
+					tempRule.setAidText(tvAidText.getText().toString());
 					tvAidText.setText(tvAidText.getText() + " (控件数据已保存)");
-					if (rule.getType() == 1) {
-						rule.setFilter(temWidget);
+					if (tempRule.getType() == 1) {
+						tempRule.setFilter(tempArray);
 					}
 					break;
 				case "skip":
-					rule.setSkipText((String) tvSkipText.getText());
+					tempRule.setSkipText((String) tvSkipText.getText());
 					tvSkipText.setText(tvSkipText.getText() + " (控件数据已保存)");
 					break;
 				case "dynamic":
-					rule.setDynamicText((String) tvDynamicText.getText());
-					rule.setDynamicParentLevel(dynamicParentLevel.get());
+					tempRule.setDynamicText((String) tvDynamicText.getText());
+					tempRule.setDynamicParentLevel(dynamicParentLevel.get());
 					tvDynamicText.setText(tvDynamicText.getText() + " (控件数据已保存)");
 					break;
 			}
-			list.set(position, rule);
-			ActivitySeekerService.setRulesList(list);
+			List<RuleInfo> newList = tempList.get();
+			newList.set(position, tempRule);
+			tempList.set(newList);
+			ActivitySeekerService.setRulesList(newList);
 			SharedPreferences.Editor ruleEditor = sharedPreferences.edit();
-			ruleEditor.putString("rules", gson.toJson(list));
+			ruleEditor.putString("rules", gson.toJson(newList));
 			ruleEditor.apply();
 
 			//auto disable outline after settings saved
@@ -414,7 +446,7 @@ public class MaskAssignerUtils {
 										try {
 											dynamicParentLevel.set(0);
 
-											WidgetInfo filterWidget = rulesList.get(position).getFilter();
+											WidgetInfo filterWidget = tempRule.getFilter().get(currentMaskWidget.get());
 											AccessibilityNodeInfo node = root, textNode = e;
 											int level = 0;
 											for (int i = 0; i < filterWidget.indices.size(); i++) {
@@ -481,22 +513,36 @@ public class MaskAssignerUtils {
 		btShowOutline2.setOnClickListener(v -> showOutlineOperator.accept(2));
 		btShowOutline3.setOnClickListener(v -> showOutlineOperator.accept(3));
 		btShowOutline4.setOnClickListener(v -> {
-			if (!rulesList.get(position).getFilter().equals(new WidgetInfo()))
+			if (!tempRule.getFilter().equals(new ArrayList<>()))
 				showOutlineOperator.accept(4);
 			else
 				Toast.makeText(jianfou.getAppContext(), "需要先定义要被屏蔽的元素", Toast.LENGTH_LONG).show();
 		});
 
+		btPreviousWidget.setOnClickListener(v -> {
+			if (tempRule.getFilterLength() > 0 && currentMaskWidget.get() > 0) {
+				lastChoiceSelecter.accept(currentMaskWidget.addAndGet(-1));
+				tvCurrentMaskWidgetNum.setText(Integer.toString(currentMaskWidget.get() + 1));
+				tvWidgetInfo.setText(null);
+			}
+		});
+
+		btNextWidget.setOnClickListener(v -> {
+			if (tempRule.getFilterLength() > 0 && currentMaskWidget.get() < tempRule.getFilterLength() - 1) {
+				lastChoiceSelecter.accept(currentMaskWidget.addAndGet(1));
+				tvCurrentMaskWidgetNum.setText(Integer.toString(currentMaskWidget.get() + 1));
+				tvWidgetInfo.setText(null);
+			}
+		});
+
 		btQuit.setOnClickListener(v -> {
 			windowManager.removeViewImmediate(viewTarget);
 			windowManager.removeViewImmediate(viewCustomization);
-			windowManager.removeViewImmediate(imageTarget);
 			ActivitySeekerService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
 		});
 
 		windowManager.addView(viewTarget, outlineParams);
 		windowManager.addView(viewCustomization, customizationParams);
-		windowManager.addView(imageTarget, targetParams);
 	}
 
 	private static void findAllNode(List<AccessibilityNodeInfo> roots, List<AccessibilityNodeInfo> list, String indent) {

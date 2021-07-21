@@ -48,7 +48,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			isSoftInputPanelOn = false, hasSoftInputPanelJustFound = false, isSkipping = false,
 			isMaskOn = false, isSplitScreenAcceptable = false, isDarkModeOn = false;
 	public static int foregroundWindowId = 0, foregroundWindowLayer = 1;
-	public static String foregroundClassName = "", foregroundPackageName = "", currentHomePackage = "";
+	public static String foregroundClassName = "", foregroundPackageName = "com.scrisstudio.jianfou", currentHomePackage = "";
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
 	private final Handler mHandler = new Handler();
@@ -230,7 +230,7 @@ public class ActivitySeekerService extends AccessibilityService {
 				if (!hasSoftInputPanelJustFound && isSoftInputPanelOn) {
 					isSoftInputPanelOn = false;
 					l("Input method closed.");
-					maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().indices), currentRuleId);
+					maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().get(0).indices), currentRuleId);
 				}
 			}
 
@@ -241,14 +241,15 @@ public class ActivitySeekerService extends AccessibilityService {
 			}
 			ComponentName cName = new ComponentName(foregroundPackageName, foregroundClassName);
 			if (currentRuleId != -1) {
-				if (foregroundPackageName.equals(currentHomePackage)) {
+				if (foregroundPackageName.equals(currentHomePackage) || foregroundPackageName.equals("com.scrisstudio.jianfou")) {
 					if (isMaskOn) maskCreator(false, -1);
 					currentRuleId = -1;
 					isSkipping = false;
-				} else if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
+					return;
+				} else if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().get(0).packageName) && !foregroundPackageName.equals("")) {
 					if (tryGetActivity(cName) != null) {
 						if (isCapableClass(foregroundClassName)) {
-							if (!foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
+							if (!foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().get(0).activityName)) {
 								if (isMaskOn) maskCreator(false, -1);
 								currentRuleId = -1;
 								isSkipping = false;
@@ -271,15 +272,15 @@ public class ActivitySeekerService extends AccessibilityService {
 										if (isMaskOn && !isSkipping) {
 											//find if node cannot be found
 											//if (rulesList.get(currentRuleId).getType() == 0)
-											//nodeSearcher(rulesList.get(currentRuleId).getFilter().indices);
+											//nodeSearcher(rulesList.get(currentRuleId).getFilter().get(0).indices);
 
 											if (rect.width() == windowTrueWidth) {
 												if (windowOrientation.equals("landscape")) {
 													windowOrientation = "portrait";
 													l("Change to Portrait");
-													if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
-														if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
-															maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().indices), currentRuleId);
+													if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().get(0).packageName) && !foregroundPackageName.equals("")) {
+														if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().get(0).activityName)) {
+															maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().get(0).indices), currentRuleId);
 														}
 													}
 												}
@@ -287,9 +288,9 @@ public class ActivitySeekerService extends AccessibilityService {
 												if (windowOrientation.equals("portrait")) {
 													windowOrientation = "landscape";
 													l("Change to Landscape");
-													if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().packageName) && !foregroundPackageName.equals("")) {
-														if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().activityName)) {
-															maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().indices), currentRuleId);
+													if (foregroundPackageName.equals(rulesList.get(currentRuleId).getFilter().get(0).packageName) && !foregroundPackageName.equals("")) {
+														if (foregroundClassName.equals(rulesList.get(currentRuleId).getFilter().get(0).activityName)) {
+															maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().get(0).indices), currentRuleId);
 															l("Recover");
 														}
 													}
@@ -310,18 +311,22 @@ public class ActivitySeekerService extends AccessibilityService {
 			if (!isHandlerRunning && !isMaskOn && !isSoftInputPanelOn && !isSkipping && isServiceRunning) {
 				isHandlerRunning = true;
 				for (int i = 0; i < rulesList.size(); i++) {
-					if (rulesList.get(i).getStatus()) {
-						if (foregroundPackageName.equals(rulesList.get(i).getFilter().packageName) && !foregroundPackageName.equals("")) {
-							if (foregroundClassName.equals(rulesList.get(i).getFilter().activityName)) {
-								currentRuleId = i;
-								l("currentRuleId: " + currentRuleId);
-								if (rulesList.get(i).getType() == 0)
-									maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().indices), currentRuleId);
-								else if (rulesList.get(i).getType() == 1 || rulesList.get(i).getType() == 2)
-									wordFinder(getRootInActiveWindow(), true);
-								break;
+					try {
+						if (rulesList.get(i).getStatus()) {
+							if (foregroundPackageName.equals(rulesList.get(i).getFilter().get(0).packageName) && !foregroundPackageName.equals("")) {
+								if (foregroundClassName.equals(rulesList.get(i).getFilter().get(0).activityName)) {
+									currentRuleId = i;
+									l("currentRuleId: " + currentRuleId);
+									if (rulesList.get(i).getType() == 0)
+										maskSet(nodeSearcher(rulesList.get(currentRuleId).getFilter().get(0).indices), currentRuleId);
+									else if (rulesList.get(i).getType() == 1 || rulesList.get(i).getType() == 2)
+										wordFinder(getRootInActiveWindow(), true);
+									break;
+								}
 							}
 						}
+					} catch (Exception e) {
+						le("Bad rule " + e.getLocalizedMessage());
 					}
 				}
 				new Handler().postDelayed(() -> isHandlerRunning = false, 250);

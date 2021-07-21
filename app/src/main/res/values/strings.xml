@@ -51,8 +51,8 @@
     <string name="activity_name">页面：</string>
     <string name="package_name">软件：</string>
     <string name="show_package_name">显示当前应用的软件 Package 名称</string>
-    <string name="re_get">重新获取</string>
-    <string name="add_widget">添加控件</string>
+    <string name="add_widget">添加为遮罩</string>
+    <string name="delete_widget">删除遮罩</string>
     <string name="cannot_open_assigner">已经打开设置窗口或服务未运行，请检查</string>
     <string name="about">关于</string>
     <string name="scris_std_app">A Scris Studio App.</string>
@@ -116,4 +116,9 @@
     <string name="dynamic_mask_text_info">显示动态遮罩触发文字</string>
     <string name="select_dynamic">选中触发文字</string>
     <string name="dynamic_text_help">此处用于设置含有动态遮罩的触发文字的元素。需要注意的是，由于部分软件限制，一些文字可能无法添加。</string>
+    <string name="delete_all_widgets">删除全部</string>
+    <string name="previous">上一个</string>
+    <string name="next">下一个</string>
+    <string name="slash">/</string>
+    <string name="multi_mask_widgets_help">若要添加多个遮罩，请确保它们处于同一软件的同一页面上，避免软件运行出错。</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.scrisstudio.jianfou.mask;
 
+import java.util.ArrayList;
+
 public class RuleInfo {
 	private final int id;
 	private boolean status;
@@ -12,10 +14,11 @@ public class RuleInfo {
 	private String skipText;
 	private String dynamicText;
 	private int dynamicParentLevel;
-	private WidgetInfo filter;
+	private ArrayList<WidgetInfo> filter;
+	private int filterLength;
 
 	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion,
-	                int ruleType, WidgetInfo filter, String aidText, String skipText, String dynamicText, int dynamicParentLevel) {
+	                int ruleType, ArrayList<WidgetInfo> filter, String aidText, String skipText, String dynamicText, int dynamicParentLevel, int filterLength) {
 		this.status = status;
 		this.id = id;
 		this.ruleTitle = ruleTitle;
@@ -28,6 +31,7 @@ public class RuleInfo {
 		this.skipText = skipText;
 		this.dynamicText = dynamicText;
 		this.dynamicParentLevel = dynamicParentLevel;
+		this.filterLength = filterLength;
 	}
 
 	public boolean getStatus() {
@@ -82,11 +86,11 @@ public class RuleInfo {
 		this.ruleType = ruleType;
 	}
 
-	public WidgetInfo getFilter() {
+	public ArrayList<WidgetInfo> getFilter() {
 		return filter;
 	}
 
-	public void setFilter(WidgetInfo filter) {
+	public void setFilter(ArrayList<WidgetInfo> filter) {
 		this.filter = filter;
 	}
 
@@ -120,5 +124,13 @@ public class RuleInfo {
 
 	public void setDynamicParentLevel(int dynamicParentLevel) {
 		this.dynamicParentLevel = dynamicParentLevel;
+	}
+
+	public int getFilterLength() {
+		return filterLength;
+	}
+
+	public void setFilterLength(int filterLength) {
+		this.filterLength = filterLength;
 	}
 }

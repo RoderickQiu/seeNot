@@ -132,6 +132,8 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 				edit.putString("rules", gson.toJson(mList));
 				edit.apply();
 
+				ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
+
 				Toast.makeText(jianfou.getAppContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
 			});
 		}
