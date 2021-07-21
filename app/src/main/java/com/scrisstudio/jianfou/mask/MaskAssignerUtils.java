@@ -97,7 +97,10 @@ public class MaskAssignerUtils {
 		if (tempRule.getSkipText() != null) btDeleteSkipText.setEnabled(true);
 		if (tempRule.getFilterLength() != 0) {
 			tvCurrentMaskWidgetNum.setText("1");
-		} else tvCurrentMaskWidgetNum.setText("0");
+		} else {
+			currentMaskWidget.set(-1);
+			tvCurrentMaskWidgetNum.setText("0");
+		}
 		tvAllMaskWidgetNum.setText("" + tempRule.getFilterLength());
 
 		//if type is only skip, hide other things
@@ -119,14 +122,14 @@ public class MaskAssignerUtils {
 		final FrameLayout layoutLastTimeChoiceOutline = viewLastTimeChoice.findViewById(R.id.last_time_choice_frame);
 
 		// define view positions
-		final WindowManager.LayoutParams customizationParams, outlineParams, targetParams, lastTimeFrameParams;
+		final WindowManager.LayoutParams customizationParams, outlineParams, lastTimeFrameParams;
 		customizationParams = new WindowManager.LayoutParams();
 		customizationParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
 		customizationParams.format = PixelFormat.TRANSPARENT;
 		customizationParams.gravity = Gravity.START | Gravity.TOP;
 		customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		customizationParams.width = width;
-		customizationParams.height = height / 4;
+		customizationParams.height = (int) (height / 3.3);
 		customizationParams.x = (metrics.widthPixels - customizationParams.width) / 2;
 		customizationParams.y = metrics.heightPixels - customizationParams.height;
 		customizationParams.alpha = 0.8f;
@@ -150,17 +153,6 @@ public class MaskAssignerUtils {
 		outlineParams.height = metrics.heightPixels;
 		outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
 		outlineParams.alpha = 0f;
-
-
-		targetParams = new WindowManager.LayoutParams();
-		targetParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
-		targetParams.format = PixelFormat.TRANSPARENT;
-		targetParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-		targetParams.gravity = Gravity.START | Gravity.TOP;
-		targetParams.width = targetParams.height = (int) (width / 3.3);
-		targetParams.x = (metrics.widthPixels - targetParams.width) / 2;
-		targetParams.y = (metrics.heightPixels - targetParams.height) / 2;
-		targetParams.alpha = 0f;
 
 		Function<ArrayList<Integer>, Rect> nodeSearcher = indices -> {
 			try {
