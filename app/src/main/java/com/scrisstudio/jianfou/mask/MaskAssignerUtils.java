@@ -109,8 +109,12 @@ public class MaskAssignerUtils {
 			viewCustomization.findViewById(R.id.skip_settings).setVisibility(View.GONE);
 			viewCustomization.findViewById(R.id.dynamic_mask_settings).setVisibility(View.GONE);
 			((TextView) viewCustomization.findViewById(R.id.emergency_aid_settings_title)).setText(R.string.simple_return);
+			viewCustomization.findViewById(R.id.multi_masks_help).setVisibility(View.GONE);
+			viewCustomization.findViewById(R.id.multi_masks_switch).setVisibility(View.GONE);
 		} else if (tempRule.getType() == 2) {
 			viewCustomization.findViewById(R.id.skip_settings).setVisibility(View.GONE);
+			viewCustomization.findViewById(R.id.multi_masks_help).setVisibility(View.GONE);
+			viewCustomization.findViewById(R.id.multi_masks_switch).setVisibility(View.GONE);
 		} else {
 			viewCustomization.findViewById(R.id.dynamic_mode_normal_settings_help).setVisibility(View.GONE);
 			viewCustomization.findViewById(R.id.dynamic_mask_settings).setVisibility(View.GONE);
@@ -287,6 +291,10 @@ public class MaskAssignerUtils {
 				layoutLastTimeChoiceOutline.removeView(lastChoice);
 			} catch (Exception ignored) {
 			}
+			if (!getApplicationNameFunction.apply(widgetDescription.packageName).equals(""))
+				tempRule.setFor(getApplicationNameFunction.apply(widgetDescription.packageName));
+			if (!getApplicationVersionFunction.apply(widgetDescription.packageName).equals(""))
+				tempRule.setForVersion(getApplicationVersionFunction.apply(widgetDescription.packageName));
 			switch (mode) {
 				case "widget":
 					ArrayList<WidgetInfo> tempArray = tempRule.getFilter();
@@ -303,10 +311,6 @@ public class MaskAssignerUtils {
 					tempRule.setFilter(tempArray);
 
 					tvPackageName.setText(widgetDescription.packageName + " (控件数据已保存)");
-					if (!getApplicationNameFunction.apply(widgetDescription.packageName).equals(""))
-						tempRule.setFor(getApplicationNameFunction.apply(widgetDescription.packageName));
-					if (!getApplicationVersionFunction.apply(widgetDescription.packageName).equals(""))
-						tempRule.setForVersion(getApplicationVersionFunction.apply(widgetDescription.packageName));
 					break;
 				case "aid":
 					tempArray = new ArrayList<>();
@@ -357,6 +361,11 @@ public class MaskAssignerUtils {
 		Consumer<Integer> showOutlineOperator = (num) -> {
 			if (outlineParams.alpha == 0) {
 				if (!ActivitySeekerService.foregroundPackageName.equals(ActivitySeekerService.currentHomePackage) && !ActivitySeekerService.foregroundPackageName.equals("com.scrisstudio.jianfou")) {
+					if (currentMaskWidget.get() > 4) {
+						Toast.makeText(jianfou.getAppContext(), "只允许同时存在5个遮罩", Toast.LENGTH_LONG).show();
+						return;
+					}
+
 					AccessibilityNodeInfo root = mService.getRootInActiveWindow();
 					if (root == null) return;
 					widgetDescription.packageName = ActivitySeekerService.foregroundPackageName;
@@ -529,6 +538,7 @@ public class MaskAssignerUtils {
 
 		btQuit.setOnClickListener(v -> {
 			windowManager.removeViewImmediate(viewTarget);
+			windowManager.removeViewImmediate(viewLastTimeChoice);
 			windowManager.removeViewImmediate(viewCustomization);
 			ActivitySeekerService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
 		});

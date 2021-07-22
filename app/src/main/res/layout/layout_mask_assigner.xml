@@ -168,6 +168,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/multi_masks_help"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp">
@@ -182,6 +183,7 @@
                 </LinearLayout>
 
                 <RelativeLayout
+                    android:id="@+id/multi_masks_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"

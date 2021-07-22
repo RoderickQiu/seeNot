@@ -4,13 +4,14 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.jianfou;
+
+import java.util.ArrayList;
 
 public class FloatingViewManager {
 	private static final WindowManager.LayoutParams layoutParams;
@@ -33,60 +34,48 @@ public class FloatingViewManager {
 
 	private final Context mContext;
 	private final WindowManager mWindowManager;
-	private View mFloatingView;
+	private ArrayList<View> mFloatingViews = new ArrayList<>();
 
 	public FloatingViewManager(Context context) {
 		this.mContext = context;
 		this.mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 	}
 
-	public void addView(int x, int y, int width, int height) {
-		if (this.mFloatingView == null) {
-			FloatingView floatingView = new FloatingView(this.mContext);
-			this.mFloatingView = floatingView;
+	public void addView(int x, int y, int width, int height, int maskId) {
+		FloatingView floatingView = new FloatingView(this.mContext);
+		layoutParams.x = x;
+		layoutParams.y = y;
+		layoutParams.width = width;
+		layoutParams.height = height;
+		floatingView.setLayoutParams(layoutParams);
+		this.mFloatingViews.add(floatingView);
+		this.mWindowManager.addView(this.mFloatingViews.get(maskId), layoutParams);
+	}
+
+	public void updateView(int x, int y, int width, int height, int maskId) {
+		try {
 			layoutParams.x = x;
 			layoutParams.y = y;
-			floatingView.setLayoutParams(layoutParams);
-			this.mWindowManager.addView(this.mFloatingView, layoutParams);
-
-			LinearLayout floatingLinear = mFloatingView.findViewById(R.id.floating);
-			ViewGroup.LayoutParams linearParams;
-			linearParams = floatingLinear.getLayoutParams();
-			linearParams.width = width;
-			linearParams.height = height;
-			floatingLinear.setLayoutParams(linearParams);
-
-			changeForDarkMode(floatingLinear);
+			layoutParams.width = width;
+			layoutParams.height = height;
+			mFloatingViews.get(maskId).setLayoutParams(layoutParams);
+			this.mWindowManager.updateViewLayout(mFloatingViews.get(maskId), layoutParams);
+		} catch (Exception ignored) {
 		}
 	}
 
-	public void updateView(int x, int y, int width, int height) {
-		if (mFloatingView != null) {
-			layoutParams.x = x;
-			layoutParams.y = y;
-			mFloatingView.setLayoutParams(layoutParams);
-			this.mWindowManager.updateViewLayout(mFloatingView, layoutParams);
-
-			LinearLayout floatingLinear = mFloatingView.findViewById(R.id.floating);
-			ViewGroup.LayoutParams linearParams;
-			linearParams = floatingLinear.getLayoutParams();
-			linearParams.width = width;
-			linearParams.height = height;
-			floatingLinear.setLayoutParams(linearParams);
-
-			changeForDarkMode(floatingLinear);
+	public void removeViews() {
+		for (int i = 0; i < mFloatingViews.size(); i++) {
+			View view = this.mFloatingViews.get(i);
+			if (view != null) {
+				this.mWindowManager.removeView(view);
+			}
 		}
+		mFloatingViews.clear();
 	}
 
-	public void removeView() {
-		View view = this.mFloatingView;
-		if (view != null) {
-			this.mWindowManager.removeView(view);
-			this.mFloatingView = null;
-		}
-	}
-
-	public void changeForDarkMode(LinearLayout floatingLinear) {
+	public void changeForDarkMode(int maskId) {
+		LinearLayout floatingLinear = mFloatingViews.get(maskId).findViewById(R.id.floating);
 		if (ActivitySeekerService.isNightMode(jianfou.getAppContext())) {
 			floatingLinear.findViewById(R.id.floating).setBackgroundColor(Color.parseColor("#1B1B1B"));
 			((TextView) floatingLinear.findViewById(R.id.floating_text)).setTextColor(Color.parseColor("#E8D21B"));
