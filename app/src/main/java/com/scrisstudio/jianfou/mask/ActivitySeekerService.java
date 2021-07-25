@@ -55,8 +55,9 @@ public class ActivitySeekerService extends AccessibilityService {
 	private final Handler mHandler = new Handler();
 	public NotificationChannel normalNotificationChannel;
 	public NotificationManager normalNotificationManager;
-	private long lastContentChangedTime = 0, lastHandlerRunningTime = 0;
+	private long lastContentChangedTime = 0, lastHandlerRunningTime = 0, contentChangeTime = 0, handlerTime = 0;
 	private FloatingViewManager mWindowManager;
+	private Rect contentRect = new Rect(), nodeSearcherRect = new Rect(), dynamicRect = new Rect();
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
 	private final BroadcastReceiver mScreenOReceiver = new BroadcastReceiver() {
 		@Override
@@ -258,32 +259,33 @@ public class ActivitySeekerService extends AccessibilityService {
 								isSkipping = false;
 							} else {
 								//prevent a lot of events flood in to cause crash
-								long time = SystemClock.uptimeMillis();
-								if (time - lastContentChangedTime >= 128) {
-									lastContentChangedTime = time;
+								contentChangeTime = SystemClock.uptimeMillis();
+								if (contentChangeTime - lastContentChangedTime >= 128) {
+									lastContentChangedTime = contentChangeTime;
 
 									//can't find skip text, stop being skipping
 									if (!wordFinder(getRootInActiveWindow(), true)) {
 										isSkipping = false;
 										if (currentRule.getType() == 2)
 											maskCreator(false, currentRuleId, 0);
+
 									}
 
 									try {
-										Rect rect = new Rect();
-										event.getSource().getBoundsInScreen(rect);
+										event.getSource().getBoundsInScreen(contentRect);
 										if (isMaskOn && !isSkipping) {
-											if (rect.width() == windowTrueWidth) {
+											if (contentRect.width() == windowTrueWidth) {
 												if (windowOrientation.equals("landscape")) {
 													windowOrientation = "portrait";
 													l("Change to Portrait");
 													if (foregroundPackageName.equals(currentRule.getFilter().get(0).packageName) && !foregroundPackageName.equals("")) {
 														if (foregroundClassName.equals(currentRule.getFilter().get(0).activityName)) {
 															multiMaskSet();
+															l("Recover");
 														}
 													}
 												}
-											} else if (rect.width() == windowTrueHeight) {
+											} else if (contentRect.width() == windowTrueHeight) {
 												if (windowOrientation.equals("portrait")) {
 													windowOrientation = "landscape";
 													l("Change to Landscape");
@@ -308,29 +310,32 @@ public class ActivitySeekerService extends AccessibilityService {
 
 			//移到此处以解决快速切换的问题
 			if (!isMaskOn && !isSoftInputPanelOn && !isSkipping && isServiceRunning) {
-				long handlerTime = SystemClock.uptimeMillis();
+				handlerTime = SystemClock.uptimeMillis();
 				if (handlerTime - lastHandlerRunningTime >= 128) {
 					lastHandlerRunningTime = handlerTime;
-					for (int i = 0; i < rulesList.size(); i++) {
-						try {
-							if (rulesList.get(i).getStatus()) {
-								if (foregroundPackageName.equals(rulesList.get(i).getFilter().get(0).packageName) && !foregroundPackageName.equals("")) {
-									if (foregroundClassName.equals(rulesList.get(i).getFilter().get(0).activityName)) {
-										currentRuleId = i;
-										currentRule = rulesList.get(currentRuleId);
-										l("currentRuleId: " + currentRuleId);
-										if (rulesList.get(i).getType() == 0)
-											multiMaskSet();
-										else if (rulesList.get(i).getType() == 1 || rulesList.get(i).getType() == 2)
-											wordFinder(getRootInActiveWindow(), true);
-										break;
+					if (currentRuleId == -1)
+						for (int i = 0; i < rulesList.size(); i++) {
+							try {
+								if (rulesList.get(i).getStatus()) {
+									if (foregroundPackageName.equals(rulesList.get(i).getFilter().get(0).packageName) && !foregroundPackageName.equals("")) {
+										if (foregroundClassName.equals(rulesList.get(i).getFilter().get(0).activityName)) {
+											currentRuleId = i;
+											currentRule = rulesList.get(currentRuleId);
+											l("currentRuleId: " + currentRuleId);
+											if (rulesList.get(i).getType() == 0)
+												multiMaskSet();
+											else if (rulesList.get(i).getType() == 1 || rulesList.get(i).getType() == 2)
+												wordFinder(getRootInActiveWindow(), true);
+											break;
+										}
 									}
 								}
+							} catch (Exception e) {
+								le("Bad rule " + e.getLocalizedMessage());
 							}
-						} catch (Exception e) {
-							le("Bad rule " + e.getLocalizedMessage());
 						}
-					}
+					else if (currentRule.getType() == 0)
+						multiMaskSet();
 				}
 			}
 
@@ -369,6 +374,14 @@ public class ActivitySeekerService extends AccessibilityService {
 				foregroundClassName = event.getClassName().toString();
 				foregroundWindowId = event.getWindowId();
 				l(event.getClassName().toString() + event.getWindowId());
+
+				if (currentRule != null)
+					if (!foregroundClassName.equals(currentRule.getFilter().get(0).activityName)) {
+						if (isMaskOn) maskCreator(false, -1, 0);
+						currentRuleId = -1;
+						currentRule = null;
+						isSkipping = false;
+					}
 			}
 
 			if ((isNightMode(jianfou.getAppContext()) && !isDarkModeOn) || (!isNightMode(jianfou.getAppContext()) && isDarkModeOn)) {
@@ -419,14 +432,10 @@ public class ActivitySeekerService extends AccessibilityService {
 				node = node.getChild(indices.get(i));
 			}
 
-			Rect rect = new Rect();
-			node.getBoundsInScreen(rect);
-			return rect;
+			node.getBoundsInScreen(nodeSearcherRect);
+			return nodeSearcherRect;
 		} catch (Exception e) {
 			le("Node search really went wrong: " + e);
-			if (isMaskOn) {
-				maskCreator(false, -1, 0);
-			}
 			return null;
 		}
 	}
@@ -450,9 +459,8 @@ public class ActivitySeekerService extends AccessibilityService {
 		for (int i = 0; i < currentRule.getDynamicParentLevel(); i++) {
 			info = info.getParent();
 		}
-		Rect rect = new Rect();
-		info.getBoundsInScreen(rect);
-		maskSet(rect, currentRuleId, 0);
+		info.getBoundsInScreen(dynamicRect);
+		maskSet(dynamicRect, currentRuleId, 0);
 		isMaskOn = true;
 	}
 
@@ -508,14 +516,20 @@ public class ActivitySeekerService extends AccessibilityService {
 	}
 
 	private void multiMaskSet() {
-		for (int i = 0; i < currentRule.getFilterLength(); i++) {
-			maskSet(nodeSearcher(currentRule.getFilter().get(i).indices), currentRuleId, i);
+		try {
+			boolean flag = false;
+			for (int i = 0; i < currentRule.getFilterLength(); i++) {
+				if (maskSet(nodeSearcher(currentRule.getFilter().get(i).indices), currentRuleId, i))
+					flag = true;
+			}
+			if (flag) isMaskOn = true;
+			l("Multi multi");
+		} catch (Exception e) {
+			le(e.getMessage());
 		}
-		isMaskOn = true;
-		l("Multi multi");
 	}
 
-	private void maskSet(Rect rect, int indice, int maskId) {
+	private boolean maskSet(Rect rect, int indice, int maskId) {
 		if (isServiceRunning && !isSkipping) {
 			if (rect != null) {
 				x = rect.centerX() - rect.width() / 2;
@@ -532,16 +546,19 @@ public class ActivitySeekerService extends AccessibilityService {
 
 				if (x == -1 || y == -1 || width == -1 || height == -1) {
 					le("Item rect wrong.");
-					//maskCreator(false, -1);
+					return false;
 				} else {
 					if (!isMaskOn) maskCreator(true, indice, maskId);
 					else maskPositionMover(maskId);
+					return true;
 				}
 			} else {
 				le("Item rect wrong.");
+				return false;
 				//maskCreator(false, -1);
 			}
 		}
+		return false;
 	}
 
 	private void maskThemeChanger(int maskId) {
