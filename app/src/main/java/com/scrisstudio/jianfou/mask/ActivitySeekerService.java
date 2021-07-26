@@ -136,7 +136,7 @@ public class ActivitySeekerService extends AccessibilityService {
 				}
 			} catch (Exception ignored) {
 			}
-		}, 3000);
+		}, 2000);
 	}
 
 	private void createNotificationChannel() {
@@ -145,7 +145,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		normalNotificationChannel = new NotificationChannel(CHANNEL_NORMAL_NOTIFICATION_ID, name, importance);
 		normalNotificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
 		normalNotificationChannel.setBypassDnd(true);
-		normalNotificationManager = (NotificationManager) getSystemService(NotificationManager.class);
+		normalNotificationManager = getSystemService(NotificationManager.class);
 		normalNotificationManager.createNotificationChannel(normalNotificationChannel);
 	}
 
@@ -456,7 +456,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	}
 
 	private void dynamicTextExecutor(AccessibilityNodeInfo info) {
-		for (int i = 0; i < currentRule.getDynamicParentLevel(); i++) {
+		for (int i = 0; i < currentRule.getDynamicParentLevel().get(0); i++) {
 			info = info.getParent();
 		}
 		info.getBoundsInScreen(dynamicRect);
@@ -484,7 +484,7 @@ public class ActivitySeekerService extends AccessibilityService {
 						} else if (info.getText().toString().equals(currentRule.getSkipText())) {
 							skipTextExecutor();
 							hasExecutionSucceeded = true;
-						} else if (info.getText().toString().equals(currentRule.getDynamicText())) {
+						} else if (info.getText().toString().equals(currentRule.getDynamicText().get(0))) {
 							dynamicTextExecutor(info);
 							hasExecutionSucceeded = true;
 						}
@@ -495,7 +495,7 @@ public class ActivitySeekerService extends AccessibilityService {
 						} else if (info.getContentDescription().equals(currentRule.getSkipText())) {
 							skipTextExecutor();
 							hasExecutionSucceeded = true;
-						} else if (info.getContentDescription().toString().equals(currentRule.getDynamicText())) {
+						} else if (info.getContentDescription().toString().equals(currentRule.getDynamicText().get(0))) {
 							dynamicTextExecutor(info);
 							hasExecutionSucceeded = true;
 						}

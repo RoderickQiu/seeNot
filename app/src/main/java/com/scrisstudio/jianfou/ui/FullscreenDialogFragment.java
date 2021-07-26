@@ -60,9 +60,10 @@ public class FullscreenDialogFragment extends DialogFragment {
 				RuleInfo rule = list.get(position);
 				rule.setSkipText(null);
 				rule.setAidText(null);
-				rule.setDynamicText(null);
-				rule.setDynamicParentLevel(0);
+				rule.setDynamicText(new ArrayList<>());
+				rule.setDynamicParentLevel(new ArrayList<>());
 				rule.setFilter(new ArrayList<>());
+				rule.setFilterLength(0);
 				list.set(position, rule);
 			} else {
 				//revert the choice

@@ -121,4 +121,5 @@
     <string name="next">下一个</string>
     <string name="slash">/</string>
     <string name="multi_mask_widgets_help">若要添加多个遮罩，请确保它们处于同一软件的同一页面上，避免软件运行出错。</string>
+    <string name="which_now_dynamic_sets">现在正在设置的遮罩编号为：</string>
 </resources>

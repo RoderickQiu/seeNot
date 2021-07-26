@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
 			AlertDialog alertDialog = new MaterialAlertDialogBuilder(this).setTitle(R.string.add_rule).setItems(choices, (dialog, which) -> {
 				if (which == 0) {// manual add rule
 					SharedPreferences.Editor edit = sharedPreferences.edit();
-					list.add(new RuleInfo(true, sharedPreferences.getInt("rule-id-max", 0), "新建规则", "1.0", "软件名称", "any", 0, new ArrayList<>(), null, null, null, 0, 0));
+					list.add(new RuleInfo(true, sharedPreferences.getInt("rule-id-max", 0), "新建规则", "1.0", "软件名称", "any", 0, new ArrayList<>(), null, null, new ArrayList<>(), new ArrayList<>(), 0));
 					edit.putString("rules", gson.toJson(list));
 					edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
 					edit.apply();

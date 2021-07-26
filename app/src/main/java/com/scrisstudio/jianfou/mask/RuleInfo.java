@@ -12,13 +12,13 @@ public class RuleInfo {
 	private int ruleType;
 	private String aidText;
 	private String skipText;
-	private String dynamicText;
-	private int dynamicParentLevel;
+	private ArrayList<String> dynamicText;
+	private ArrayList<Integer> dynamicParentLevel;
 	private ArrayList<WidgetInfo> filter;
 	private int filterLength;
 
 	public RuleInfo(boolean status, int id, String ruleTitle, String ruleVersion, String ruleFor, String ruleForVersion,
-	                int ruleType, ArrayList<WidgetInfo> filter, String aidText, String skipText, String dynamicText, int dynamicParentLevel, int filterLength) {
+	                int ruleType, ArrayList<WidgetInfo> filter, String aidText, String skipText, ArrayList<String> dynamicText, ArrayList<Integer> dynamicParentLevel, int filterLength) {
 		this.status = status;
 		this.id = id;
 		this.ruleTitle = ruleTitle;
@@ -110,19 +110,19 @@ public class RuleInfo {
 		this.skipText = skipText;
 	}
 
-	public String getDynamicText() {
+	public ArrayList<String> getDynamicText() {
 		return dynamicText;
 	}
 
-	public void setDynamicText(String dynamicText) {
+	public void setDynamicText(ArrayList<String> dynamicText) {
 		this.dynamicText = dynamicText;
 	}
 
-	public int getDynamicParentLevel() {
+	public ArrayList<Integer> getDynamicParentLevel() {
 		return dynamicParentLevel;
 	}
 
-	public void setDynamicParentLevel(int dynamicParentLevel) {
+	public void setDynamicParentLevel(ArrayList<Integer> dynamicParentLevel) {
 		this.dynamicParentLevel = dynamicParentLevel;
 	}
 

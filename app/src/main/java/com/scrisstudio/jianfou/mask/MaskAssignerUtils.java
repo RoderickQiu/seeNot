@@ -65,6 +65,7 @@ public class MaskAssignerUtils {
 		final TextView tvWidgetInfo = viewCustomization.findViewById(R.id.tv_widget_info);
 		final TextView tvAidText = viewCustomization.findViewById(R.id.emergency_aid_text_info);
 		final TextView tvSkipText = viewCustomization.findViewById(R.id.skip_text_info);
+		final TextView tvDynamicId = viewCustomization.findViewById(R.id.dynamic_mask_id);
 		final TextView tvDynamicText = viewCustomization.findViewById(R.id.dynamic_mask_text_info);
 		final TextView tvPressToMove = viewCustomization.findViewById(R.id.press_here_move);
 		final TextView tvCurrentMaskWidgetNum = viewCustomization.findViewById(R.id.current_mask_widget);
@@ -113,8 +114,6 @@ public class MaskAssignerUtils {
 			viewCustomization.findViewById(R.id.multi_masks_switch).setVisibility(View.GONE);
 		} else if (tempRule.getType() == 2) {
 			viewCustomization.findViewById(R.id.skip_settings).setVisibility(View.GONE);
-			viewCustomization.findViewById(R.id.multi_masks_help).setVisibility(View.GONE);
-			viewCustomization.findViewById(R.id.multi_masks_switch).setVisibility(View.GONE);
 		} else {
 			viewCustomization.findViewById(R.id.dynamic_mode_normal_settings_help).setVisibility(View.GONE);
 			viewCustomization.findViewById(R.id.dynamic_mask_settings).setVisibility(View.GONE);
@@ -220,7 +219,7 @@ public class MaskAssignerUtils {
 				case "widget":
 					tempRule.setFilter(new ArrayList<>());
 					tempRule.setFilterLength(0);
-					currentMaskWidget.set(0);
+					currentMaskWidget.set(-1);
 					tvCurrentMaskWidgetNum.setText("0");
 					tvAllMaskWidgetNum.setText("0");
 					tvPackageName.setText(null);
@@ -236,8 +235,8 @@ public class MaskAssignerUtils {
 					tvSkipText.setText(null);
 					break;
 				case "dynamic":
-					tempRule.setDynamicText(null);
-					tempRule.setDynamicParentLevel(0);
+					tempRule.setDynamicText(new ArrayList<>());
+					tempRule.setDynamicParentLevel(new ArrayList<>());
 					tvDynamicText.setText(null);
 					break;
 			}
@@ -299,12 +298,24 @@ public class MaskAssignerUtils {
 				case "widget":
 					ArrayList<WidgetInfo> tempArray = tempRule.getFilter();
 					WidgetInfo tempWidget = new WidgetInfo(widgetDescription);
-					if (currentMaskWidget.get() >= tempRule.getFilterLength()) {
+					if (currentMaskWidget.get() >= tempRule.getFilterLength() - 1 || currentMaskWidget.get() == -1) {
 						tempArray.add(tempWidget);
 						tempRule.setFilterLength(tempRule.getFilterLength() + 1);
-						currentMaskWidget.addAndGet(1);
+						currentMaskWidget.set(tempRule.getFilterLength() - 1);
 						tvCurrentMaskWidgetNum.setText(Integer.toString(tempRule.getFilterLength()));
 						tvAllMaskWidgetNum.setText(Integer.toString(tempRule.getFilterLength()));
+						tvDynamicId.setText(Integer.toString(tempRule.getFilterLength()));
+
+						//pre-occupy memory for dynamic
+						if (tempRule.getType() == 2) {
+							ArrayList<String> textArrayWidget = tempRule.getDynamicText();
+							ArrayList<Integer> levelArrayWidget = tempRule.getDynamicParentLevel();
+							textArrayWidget.add("SAMPLE TEXT");
+							levelArrayWidget.add(0);
+
+							tempRule.setDynamicText(textArrayWidget);
+							tempRule.setDynamicParentLevel(levelArrayWidget);
+						}
 					} else {
 						tempArray.set(currentMaskWidget.get(), tempWidget);
 					}
@@ -327,8 +338,13 @@ public class MaskAssignerUtils {
 					tvSkipText.setText(tvSkipText.getText() + " (控件数据已保存)");
 					break;
 				case "dynamic":
-					tempRule.setDynamicText((String) tvDynamicText.getText());
-					tempRule.setDynamicParentLevel(dynamicParentLevel.get());
+					ArrayList<String> textArray = tempRule.getDynamicText();
+					ArrayList<Integer> levelArray = tempRule.getDynamicParentLevel();
+					textArray.set(currentMaskWidget.get(), (String) tvDynamicText.getText());
+					levelArray.set(currentMaskWidget.get(), dynamicParentLevel.get());
+
+					tempRule.setDynamicText(textArray);
+					tempRule.setDynamicParentLevel(levelArray);
 					tvDynamicText.setText(tvDynamicText.getText() + " (控件数据已保存)");
 					break;
 			}
@@ -444,6 +460,10 @@ public class MaskAssignerUtils {
 									case 4:
 										// get dynamic parent level in the same time
 										// abort when cannot get dynamic parent level
+										if (((e.getText() != null) ? ("" + e.getText()) : e.getContentDescription()) == null) {
+											Toast.makeText(jianfou.getAppContext(), "选择失败，获取不到文字", Toast.LENGTH_LONG).show();
+											break;
+										}
 										try {
 											dynamicParentLevel.set(0);
 
@@ -524,6 +544,7 @@ public class MaskAssignerUtils {
 			if (tempRule.getFilterLength() > 0 && currentMaskWidget.get() > 0) {
 				lastChoiceSelecter.accept(currentMaskWidget.addAndGet(-1));
 				tvCurrentMaskWidgetNum.setText(Integer.toString(currentMaskWidget.get() + 1));
+				tvDynamicId.setText(Integer.toString(currentMaskWidget.get() + 1));
 				tvWidgetInfo.setText(null);
 			}
 		});
@@ -532,6 +553,7 @@ public class MaskAssignerUtils {
 			if (tempRule.getFilterLength() > 0 && currentMaskWidget.get() < tempRule.getFilterLength() - 1) {
 				lastChoiceSelecter.accept(currentMaskWidget.addAndGet(1));
 				tvCurrentMaskWidgetNum.setText(Integer.toString(currentMaskWidget.get() + 1));
+				tvDynamicId.setText(Integer.toString(currentMaskWidget.get() + 1));
 				tvWidgetInfo.setText(null);
 			}
 		});
