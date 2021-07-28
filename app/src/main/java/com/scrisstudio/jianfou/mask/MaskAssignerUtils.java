@@ -92,8 +92,10 @@ public class MaskAssignerUtils {
 		AtomicReference<List<RuleInfo>> tempList = new AtomicReference<>(gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
 		}.getType()));
 		RuleInfo tempRule = tempList.get().get(position);
-		if (!tempRule.getFilter().equals(new ArrayList<>()))
+		if (!tempRule.getFilter().equals(new ArrayList<>())) {
 			btDeleteWidget.setEnabled(true);
+			btDeleteThisWidget.setEnabled(true);
+		}
 		if (tempRule.getAidText() != null) btDeleteAidText.setEnabled(true);
 		if (tempRule.getSkipText() != null) btDeleteSkipText.setEnabled(true);
 		if (tempRule.getFilterLength() != 0) {
@@ -251,6 +253,7 @@ public class MaskAssignerUtils {
 		btDeleteWidget.setOnClickListener(v -> {
 			btDeleteOperator.accept("widget");
 			btDeleteWidget.setEnabled(false);
+			btDeleteThisWidget.setEnabled(false);
 		});
 		btDeleteAidText.setOnClickListener(v -> {
 			btDeleteOperator.accept("aid");
@@ -263,6 +266,42 @@ public class MaskAssignerUtils {
 		btDeleteDynamicText.setOnClickListener(v -> {
 			btDeleteOperator.accept("dynamic");
 			btDeleteDynamicText.setEnabled(false);
+		});
+
+		btDeleteThisWidget.setOnClickListener(v -> {
+			ArrayList<WidgetInfo> ruleArray = tempRule.getFilter();
+			ArrayList<String> dynamicTextArray = tempRule.getDynamicText();
+			ArrayList<Integer> dynamicNumArray = tempRule.getDynamicParentLevel();
+			if (currentMaskWidget.get() >= 0) {
+				ruleArray.remove(currentMaskWidget.get());
+				tempRule.setFilter(ruleArray);
+				tempRule.setFilterLength(tempRule.getFilterLength() - 1);
+				if (tempRule.getType() == 2) {
+					dynamicTextArray.remove(currentMaskWidget.get());
+					dynamicNumArray.remove(currentMaskWidget.get());
+					tempRule.setDynamicParentLevel(dynamicNumArray);
+					tempRule.setDynamicText(dynamicTextArray);
+				}
+			}
+			if (tempRule.getFilterLength() >= currentMaskWidget.get() && currentMaskWidget.get() > 0)
+				currentMaskWidget.addAndGet(-1);
+			tvCurrentMaskWidgetNum.setText((tempRule.getFilterLength() > 0) ? Integer.toString(currentMaskWidget.get() + 1) : "0");
+			tvAllMaskWidgetNum.setText(Integer.toString(tempRule.getFilterLength()));
+			tvPackageName.setText(null);
+			tvActivityName.setText(null);
+			tvWidgetInfo.setText(null);
+
+			if (tempRule.getFilterLength() > 0) {
+				lastChoiceSelecter.accept(currentMaskWidget.get());
+			}
+
+			List<RuleInfo> newList = tempList.get();
+			newList.set(position, tempRule);
+			tempList.set(newList);
+			ActivitySeekerService.setRulesList(newList);
+			SharedPreferences.Editor ruleEditor = sharedPreferences.edit();
+			ruleEditor.putString("rules", gson.toJson(newList));
+			ruleEditor.apply();
 		});
 
 		Function<String, String> getApplicationNameFunction = in -> {
@@ -447,6 +486,7 @@ public class MaskAssignerUtils {
 										tvActivityName.setText(widgetDescription.activityName);
 										tvWidgetInfo.setText("bonus:" + temRect.toShortString() + " " + "id:" + (cId == null ? "null" : cId.toString().substring(cId.toString().indexOf("id/") + 3)) + " " + "desc:" + (cDesc == null ? "null" : cDesc.toString()) + " " + "text:" + cText.toString());
 										btDeleteWidget.setEnabled(true);
+										btDeleteThisWidget.setEnabled(true);
 										break;
 									case 2:
 										//"" added to transform spannable to normal string
@@ -562,6 +602,15 @@ public class MaskAssignerUtils {
 			windowManager.removeViewImmediate(viewTarget);
 			windowManager.removeViewImmediate(viewLastTimeChoice);
 			windowManager.removeViewImmediate(viewCustomization);
+
+			List<RuleInfo> newList = tempList.get();
+			newList.set(position, tempRule);
+			tempList.set(newList);
+			ActivitySeekerService.setRulesList(newList);
+			SharedPreferences.Editor ruleEditor = sharedPreferences.edit();
+			ruleEditor.putString("rules", gson.toJson(newList));
+			ruleEditor.apply();
+
 			ActivitySeekerService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
 		});
 

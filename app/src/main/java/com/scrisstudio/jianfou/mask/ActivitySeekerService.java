@@ -484,9 +484,11 @@ public class ActivitySeekerService extends AccessibilityService {
 						} else if (info.getText().toString().equals(currentRule.getSkipText())) {
 							skipTextExecutor();
 							hasExecutionSucceeded = true;
-						} else if (info.getText().toString().equals(currentRule.getDynamicText().get(0))) {
-							dynamicTextExecutor(info);
-							hasExecutionSucceeded = true;
+						} else if (currentRule.getDynamicText().size() > 0) {
+							if (info.getText().toString().equals(currentRule.getDynamicText().get(0))) {
+								dynamicTextExecutor(info);
+								hasExecutionSucceeded = true;
+							}
 						}
 					} else if (info.getContentDescription() != null) {
 						if (info.getContentDescription().equals(currentRule.getAidText())) {
@@ -495,9 +497,11 @@ public class ActivitySeekerService extends AccessibilityService {
 						} else if (info.getContentDescription().equals(currentRule.getSkipText())) {
 							skipTextExecutor();
 							hasExecutionSucceeded = true;
-						} else if (info.getContentDescription().toString().equals(currentRule.getDynamicText().get(0))) {
-							dynamicTextExecutor(info);
-							hasExecutionSucceeded = true;
+						} else if (currentRule.getDynamicText().size() > 0) {
+							if (info.getText().toString().equals(currentRule.getDynamicText().get(0))) {
+								dynamicTextExecutor(info);
+								hasExecutionSucceeded = true;
+							}
 						}
 					}
 				}
