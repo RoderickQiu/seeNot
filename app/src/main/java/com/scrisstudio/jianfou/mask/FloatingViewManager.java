@@ -1,5 +1,7 @@
 package com.scrisstudio.jianfou.mask;
 
+import static com.scrisstudio.jianfou.mask.ActivitySeekerService.le;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
@@ -23,7 +25,7 @@ public class FloatingViewManager {
 		params.width = -2;
 		params.height = -2;
 		params.gravity = 51;
-		params.type = 2032;
+		params.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
 		params.format = 1;
 		params.flags = 40;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -42,14 +44,29 @@ public class FloatingViewManager {
 	}
 
 	public void addView(int x, int y, int width, int height, int maskId) {
-		FloatingView floatingView = new FloatingView(this.mContext);
 		layoutParams.x = x;
 		layoutParams.y = y;
 		layoutParams.width = width;
 		layoutParams.height = height;
-		floatingView.setLayoutParams(layoutParams);
-		this.mFloatingViews.add(floatingView);
-		this.mWindowManager.addView(this.mFloatingViews.get(maskId), layoutParams);
+		if (this.mFloatingViews.size() <= maskId) {
+			try {
+				FloatingView floatingView = new FloatingView(this.mContext);
+				floatingView.setLayoutParams(layoutParams);
+				this.mFloatingViews.add(floatingView);
+				this.mWindowManager.addView(this.mFloatingViews.get(maskId), layoutParams);
+			} catch (Exception e) {
+				le("add failed" + e.getLocalizedMessage());
+			}
+		} else {
+			try {
+				FloatingView floatingView = (FloatingView) this.mFloatingViews.get(maskId);
+				floatingView.setLayoutParams(layoutParams);
+				this.mFloatingViews.set(maskId, floatingView);
+				this.mWindowManager.addView(this.mFloatingViews.get(maskId), layoutParams);
+			} catch (Exception e) {
+				le("show failed" + e.getLocalizedMessage());
+			}
+		}
 	}
 
 	public void updateView(int x, int y, int width, int height, int maskId) {
@@ -60,18 +77,32 @@ public class FloatingViewManager {
 			layoutParams.height = height;
 			mFloatingViews.get(maskId).setLayoutParams(layoutParams);
 			this.mWindowManager.updateViewLayout(mFloatingViews.get(maskId), layoutParams);
-		} catch (Exception ignored) {
+		} catch (Exception e) {
+			le("update failed" + e.getLocalizedMessage());
+		}
+	}
+
+	public void hideView(int maskId) {
+		try {
+			View view = this.mFloatingViews.get(maskId);
+			if (view != null) this.mWindowManager.removeView(view);
+		} catch (Exception e) {
+			le("hide failed" + e.getLocalizedMessage());
 		}
 	}
 
 	public void removeViews() {
-		for (int i = 0; i < mFloatingViews.size(); i++) {
-			View view = this.mFloatingViews.get(i);
-			if (view != null) {
-				this.mWindowManager.removeView(view);
+		try {
+			for (int i = 0; i < mFloatingViews.size(); i++) {
+				View view = this.mFloatingViews.get(i);
+				if (view != null) {
+					this.mWindowManager.removeView(view);
+				}
 			}
+			mFloatingViews.clear();
+		} catch (Exception e) {
+			le("remove failed" + e.getLocalizedMessage());
 		}
-		mFloatingViews.clear();
 	}
 
 	public void changeForDarkMode(int maskId) {

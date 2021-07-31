@@ -35,6 +35,7 @@ import com.scrisstudio.jianfou.activity.PermissionGrantActivity;
 import com.scrisstudio.jianfou.jianfou;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ActivitySeekerService extends AccessibilityService {
@@ -52,13 +53,15 @@ public class ActivitySeekerService extends AccessibilityService {
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
 	private static RuleInfo currentRule;
+	private static ArrayList<Boolean> dynamicList = null;
+	private static ArrayList<Integer> dynamicCntList = null;
 	private final Handler mHandler = new Handler();
 	public NotificationChannel normalNotificationChannel;
 	public NotificationManager normalNotificationManager;
 	private long lastContentChangedTime = 0, lastHandlerRunningTime = 0, contentChangeTime = 0, handlerTime = 0;
 	private FloatingViewManager mWindowManager;
 	private Rect contentRect = new Rect(), nodeSearcherRect = new Rect(), dynamicRect = new Rect();
-	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1;
+	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1, dynamicMaskCnt = 0;
 	private final BroadcastReceiver mScreenOReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -98,6 +101,15 @@ public class ActivitySeekerService extends AccessibilityService {
 		isSplitScreenAcceptable = !split;
 	}
 
+	private static void setDynamicMaskOnListEmpty() {
+		dynamicList = new ArrayList<>();
+		dynamicCntList = new ArrayList<>();
+		for (int i = 0; i < 5; i++) {
+			dynamicList.add(false);
+			dynamicCntList.add(-1);
+		}
+	}
+
 	//log
 	public static void l(Object input) {
 		if (input != null)
@@ -125,6 +137,8 @@ public class ActivitySeekerService extends AccessibilityService {
 		currentHomePackage = resolveInfo.activityInfo.packageName;
 
 		createNotificationChannel();
+
+		setDynamicMaskOnListEmpty();
 
 		mHandler.postDelayed(() -> {
 			try {
@@ -268,7 +282,10 @@ public class ActivitySeekerService extends AccessibilityService {
 										isSkipping = false;
 										if (currentRule.getType() == 2)
 											maskCreator(false, currentRuleId, 0);
-
+									} else {
+										if (currentRule.getType() == 2 && dynamicMaskCnt > 0) {
+											isMaskOn = true;
+										}
 									}
 
 									try {
@@ -324,9 +341,11 @@ public class ActivitySeekerService extends AccessibilityService {
 											l("currentRuleId: " + currentRuleId);
 											if (rulesList.get(i).getType() == 0)
 												multiMaskSet();
-											else if (rulesList.get(i).getType() == 1 || rulesList.get(i).getType() == 2)
+											else if (rulesList.get(i).getType() == 1 || rulesList.get(i).getType() == 2) {
+												setDynamicMaskOnListEmpty();
 												wordFinder(getRootInActiveWindow(), true);
-											break;
+												break;
+											}
 										}
 									}
 								}
@@ -455,58 +474,70 @@ public class ActivitySeekerService extends AccessibilityService {
 		}
 	}
 
-	private void dynamicTextExecutor(AccessibilityNodeInfo info) {
-		for (int i = 0; i < currentRule.getDynamicParentLevel().get(0); i++) {
+	private void dynamicTextExecutor(AccessibilityNodeInfo info, int dynamicId, int maskId) {
+		for (int i = 0; i < currentRule.getDynamicParentLevel().get(dynamicId); i++) {
 			info = info.getParent();
 		}
 		info.getBoundsInScreen(dynamicRect);
-		maskSet(dynamicRect, currentRuleId, 0);
-		isMaskOn = true;
+		maskSet(dynamicRect, currentRuleId, maskId, dynamicId);
 	}
 
-	public boolean wordFinder(AccessibilityNodeInfo info, boolean isOnlyVisible) {
+	public boolean wordFinder(AccessibilityNodeInfo root, boolean isOnlyVisible) {
 		if (isServiceRunning) {
-			boolean hasExecutionSucceeded = false;
-			if (currentRuleId != -1 && info != null) {
-				if (info.getChildCount() != 0) {
-					for (int i = 0; i < info.getChildCount(); i++) {
-						if (info.getChild(i) != null) {
-							if (wordFinder(info.getChild(i), isOnlyVisible)) {
-								hasExecutionSucceeded = true;
+			if (currentRuleId != -1 && root != null) {
+				boolean hasExecutionSucceeded = false;
+				ArrayList<AccessibilityNodeInfo> queue = new ArrayList<>();
+				ArrayList<Boolean> tempDynamicList = new ArrayList<>(Collections.nCopies(5, false));
+				queue.add(root);
+				while (queue.size() > 0) {
+					AccessibilityNodeInfo info = queue.remove(0);
+					if (!isOnlyVisible || info.isVisibleToUser()) {
+						if (info.getChildCount() != 0) {
+							for (int i = 0; i < info.getChildCount(); i++) {
+								if (info.getChild(i) != null) {
+									queue.add(info.getChild(i));
+								}
 							}
 						}
-					}
-				} else if (!isOnlyVisible || info.isVisibleToUser()) {
-					if (info.getText() != null) {
-						if (info.getText().toString().equals(currentRule.getAidText())) {
-							aidTextTriggerExecutor();
-							hasExecutionSucceeded = true;
-						} else if (info.getText().toString().equals(currentRule.getSkipText())) {
-							skipTextExecutor();
-							hasExecutionSucceeded = true;
-						} else if (currentRule.getDynamicText().size() > 0) {
-							if (info.getText().toString().equals(currentRule.getDynamicText().get(0))) {
-								dynamicTextExecutor(info);
+
+						String text = null;
+						if (info.getText() != null) text = info.getText().toString();
+						else if (info.getContentDescription() != null)
+							text = info.getContentDescription().toString();
+						if (text != null) {
+							if (text.equals(currentRule.getAidText())) {
+								aidTextTriggerExecutor();
 								hasExecutionSucceeded = true;
-							}
-						}
-					} else if (info.getContentDescription() != null) {
-						if (info.getContentDescription().equals(currentRule.getAidText())) {
-							aidTextTriggerExecutor();
-							hasExecutionSucceeded = true;
-						} else if (info.getContentDescription().equals(currentRule.getSkipText())) {
-							skipTextExecutor();
-							hasExecutionSucceeded = true;
-						} else if (currentRule.getDynamicText().size() > 0) {
-							if (info.getText().toString().equals(currentRule.getDynamicText().get(0))) {
-								dynamicTextExecutor(info);
+							} else if (text.equals(currentRule.getSkipText())) {
+								skipTextExecutor();
 								hasExecutionSucceeded = true;
+							} else if (currentRule.getDynamicText().size() > 0) {
+								for (int i = 0; i < currentRule.getFilterLength(); i++) {
+									if (text.equals(currentRule.getDynamicText().get(i))) {
+										if (dynamicCntList.get(i) == -1) {
+											dynamicCntList.set(i, dynamicMaskCnt);
+											dynamicMaskCnt++;
+										}
+										dynamicTextExecutor(info, i, dynamicCntList.get(i));
+										hasExecutionSucceeded = true;
+										tempDynamicList.set(i, true);
+									}
+								}
 							}
 						}
 					}
 				}
+
+				for (int i = 0; i < 4; i++) {
+					if (!tempDynamicList.get(i) && dynamicList.get(i)) {
+						dynamicList.set(i, false);
+						maskHider(dynamicCntList.get(i));
+					}
+				}
+				l("MASKMASK" + dynamicList);
+
+				return hasExecutionSucceeded;
 			}
-			return hasExecutionSucceeded;
 		}
 		return false;
 	}
@@ -523,7 +554,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		try {
 			boolean flag = false;
 			for (int i = 0; i < currentRule.getFilterLength(); i++) {
-				if (maskSet(nodeSearcher(currentRule.getFilter().get(i).indices), currentRuleId, i))
+				if (maskSet(nodeSearcher(currentRule.getFilter().get(i).indices), currentRuleId, i, 0))
 					flag = true;
 			}
 			if (flag) isMaskOn = true;
@@ -533,7 +564,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		}
 	}
 
-	private boolean maskSet(Rect rect, int indice, int maskId) {
+	private boolean maskSet(Rect rect, int indice, int maskFloatingId, int maskRuleId) {
 		if (isServiceRunning && !isSkipping) {
 			if (rect != null) {
 				x = rect.centerX() - rect.width() / 2;
@@ -552,14 +583,17 @@ public class ActivitySeekerService extends AccessibilityService {
 					le("Item rect wrong.");
 					return false;
 				} else {
-					if (!isMaskOn) maskCreator(true, indice, maskId);
-					else maskPositionMover(maskId);
+					//TODO If only one thing is shown, the another thing that displays later will fail to be added then
+					if (!isMaskOn || (currentRule.getType() == 2 && !dynamicList.get(maskRuleId))) {
+						maskCreator(true, indice, maskFloatingId);
+						dynamicList.set(maskRuleId, true);
+						l("MASKRULEID " + maskRuleId + " MASKFLOATINGID " + maskFloatingId + "MSAKMASK" + dynamicList);
+					} else maskPositionMover(maskFloatingId);
 					return true;
 				}
 			} else {
 				le("Item rect wrong.");
 				return false;
-				//maskCreator(false, -1);
 			}
 		}
 		return false;
@@ -574,13 +608,17 @@ public class ActivitySeekerService extends AccessibilityService {
 		}
 	}
 
+	private void maskHider(int maskId) {
+		if (isServiceRunning) {
+			l("Mask target hided.");
+			this.mWindowManager.hideView(maskId);
+		}
+	}
+
 	private void maskPositionMover(int maskId) {
-		try {
-			if (isServiceRunning) {
-				l("Mask target moved.");
-				this.mWindowManager.updateView(x, y, width, height, maskId);
-			}
-		} catch (Exception ignored) {
+		if (isServiceRunning) {
+			l("Mask target moved.");
+			this.mWindowManager.updateView(x, y, width, height, maskId);
 		}
 	}
 
@@ -593,6 +631,8 @@ public class ActivitySeekerService extends AccessibilityService {
 			if (indice == -1) {
 				currentRuleId = -1;
 				currentRule = null;
+				dynamicMaskCnt = 0;
+				setDynamicMaskOnListEmpty();
 			}
 			this.mWindowManager.removeViews();
 			isMaskOn = false;
