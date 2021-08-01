@@ -58,6 +58,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	private final Handler mHandler = new Handler();
 	public NotificationChannel normalNotificationChannel;
 	public NotificationManager normalNotificationManager;
+	private SharedPreferences sharedPreferences;
 	private long lastContentChangedTime = 0, lastHandlerRunningTime = 0, contentChangeTime = 0, handlerTime = 0;
 	private FloatingViewManager mWindowManager;
 	private Rect contentRect = new Rect(), nodeSearcherRect = new Rect(), dynamicRect = new Rect();
@@ -140,6 +141,13 @@ public class ActivitySeekerService extends AccessibilityService {
 
 		setDynamicMaskOnListEmpty();
 
+		Gson gson = new Gson();
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(jianfou.getAppContext());
+		if (sharedPreferences != null) {
+			rulesList = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+			}.getType());
+		}
+
 		mHandler.postDelayed(() -> {
 			try {
 				if (!isStart()) {
@@ -214,11 +222,9 @@ public class ActivitySeekerService extends AccessibilityService {
 
 			l("Service invoking...");
 
-			Gson gson = new Gson();
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(jianfou.getAppContext());
-			isServiceRunning = sharedPreferences.getBoolean("master-switch", true);
-			rulesList = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
-			}.getType());
+			if (sharedPreferences != null) {
+				isServiceRunning = sharedPreferences.getBoolean("master-switch", true);
+			}
 
 			/* 注册机器锁屏时的广播 */
 			try {
