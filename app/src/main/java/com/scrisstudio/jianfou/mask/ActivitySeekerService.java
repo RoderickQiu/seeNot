@@ -15,12 +15,20 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -55,12 +63,15 @@ public class ActivitySeekerService extends AccessibilityService {
 	private static RuleInfo currentRule;
 	private static ArrayList<Boolean> dynamicList = null;
 	private static ArrayList<Integer> dynamicCntList = null;
+	private static WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
 	private final Handler mHandler = new Handler();
 	public NotificationChannel normalNotificationChannel;
 	public NotificationManager normalNotificationManager;
+	private ArrayList<View> mFloatingViews = new ArrayList<>();
+	private LayoutInflater inflater;
 	private SharedPreferences sharedPreferences;
 	private long lastContentChangedTime = 0, lastHandlerRunningTime = 0, contentChangeTime = 0, handlerTime = 0;
-	private FloatingViewManager mWindowManager;
+	private WindowManager mWindowManager;
 	private Rect contentRect = new Rect(), nodeSearcherRect = new Rect(), dynamicRect = new Rect();
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1, dynamicMaskCnt = 0;
 	private final BroadcastReceiver mScreenOReceiver = new BroadcastReceiver() {
@@ -207,14 +218,102 @@ public class ActivitySeekerService extends AccessibilityService {
 		isForegroundServiceRunning = true;
 	}
 
+	public void addView(int x, int y, int width, int height, int maskId) {
+		layoutParams.x = x;
+		layoutParams.y = y;
+		layoutParams.width = width;
+		layoutParams.height = height;
+		if (mFloatingViews.size() <= maskId) {
+			try {
+				FrameLayout frameLayout = new FrameLayout(this);
+				View view = inflater.inflate(R.layout.layout_floating, frameLayout);
+				view.findViewById(R.id.floating).setBackgroundColor(Color.parseColor("#F7F7F7"));
+				((TextView) view.findViewById(R.id.floating_text)).setTextColor(Color.parseColor("#DF850D"));
+				view.setLayoutParams(layoutParams);
+				mFloatingViews.add(view);
+				changeForDarkMode(mFloatingViews.size() - 1);
+				mWindowManager.addView(mFloatingViews.get(maskId), layoutParams);
+			} catch (Exception e) {
+				le("add failed" + e.getLocalizedMessage());
+			}
+		} else {
+			try {
+				View view = mFloatingViews.get(maskId);
+				view.setLayoutParams(layoutParams);
+				mFloatingViews.set(maskId, view);
+				mWindowManager.addView(mFloatingViews.get(maskId), layoutParams);
+			} catch (Exception e) {
+				le("show failed" + e.getLocalizedMessage());
+			}
+		}
+	}
+
+	public void updateView(int x, int y, int width, int height, int maskId) {
+		try {
+			layoutParams.x = x;
+			layoutParams.y = y;
+			layoutParams.width = width;
+			layoutParams.height = height;
+			mFloatingViews.get(maskId).setLayoutParams(layoutParams);
+			mWindowManager.updateViewLayout(mFloatingViews.get(maskId), layoutParams);
+		} catch (Exception e) {
+			le("update failed" + e.getLocalizedMessage());
+		}
+	}
+
+	public void hideView(int maskId) {
+		try {
+			View view = mFloatingViews.get(maskId);
+			if (view != null) mWindowManager.removeView(view);
+		} catch (Exception e) {
+			le("hide failed" + e.getLocalizedMessage());
+		}
+	}
+
+	public void removeViews() {
+		try {
+			for (int i = 0; i < mFloatingViews.size(); i++) {
+				View view = mFloatingViews.get(i);
+				if (view != null) {
+					mWindowManager.removeView(view);
+				}
+			}
+			mFloatingViews.clear();
+		} catch (Exception e) {
+			le("remove failed" + e.getLocalizedMessage());
+		}
+	}
+
+	public void changeForDarkMode(int maskId) {
+		LinearLayout floatingLinear = mFloatingViews.get(maskId).findViewById(R.id.floating);
+		if (ActivitySeekerService.isNightMode(jianfou.getAppContext())) {
+			floatingLinear.findViewById(R.id.floating).setBackgroundColor(Color.parseColor("#1B1B1B"));
+			((TextView) floatingLinear.findViewById(R.id.floating_text)).setTextColor(Color.parseColor("#E8D21B"));
+		} else {
+			floatingLinear.findViewById(R.id.floating).setBackgroundColor(Color.parseColor("#F7F7F7"));
+			((TextView) floatingLinear.findViewById(R.id.floating_text)).setTextColor(Color.parseColor("#DF850D"));
+		}
+	}
+
 	//初始化
 	@Override
 	protected void onServiceConnected() {
 		super.onServiceConnected();
 		mService = this;
 
-		if (this.mWindowManager == null) {
-			this.mWindowManager = new FloatingViewManager(this);
+		inflater = LayoutInflater.from(this);
+		mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+		layoutParams = new WindowManager.LayoutParams();
+		layoutParams.x = 0;
+		layoutParams.y = 0;
+		layoutParams.width = -2;
+		layoutParams.height = -2;
+		layoutParams.gravity = 51;
+		layoutParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
+		layoutParams.format = 1;
+		layoutParams.flags = 40;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			layoutParams.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
 		}
 
 		if (isFirstTimeInvokeService) {
@@ -241,7 +340,7 @@ public class ActivitySeekerService extends AccessibilityService {
 				Toast.makeText(jianfou.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
 				le("Starting foreground service failed, err message: " + e.toString());
 			}
-		}
+		} else le("Service already invoked");
 	}
 
 	//实现辅助功能
@@ -608,7 +707,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	private void maskThemeChanger(int maskId) {
 		try {
 			if (isServiceRunning) {
-				this.mWindowManager.changeForDarkMode(maskId);
+				changeForDarkMode(maskId);
 			}
 		} catch (Exception ignored) {
 		}
@@ -617,21 +716,21 @@ public class ActivitySeekerService extends AccessibilityService {
 	private void maskHider(int maskId) {
 		if (isServiceRunning) {
 			l("Mask target hided.");
-			this.mWindowManager.hideView(maskId);
+			hideView(maskId);
 		}
 	}
 
 	private void maskPositionMover(int maskId) {
 		if (isServiceRunning) {
 			l("Mask target moved.");
-			this.mWindowManager.updateView(x, y, width, height, maskId);
+			updateView(x, y, width, height, maskId);
 		}
 	}
 
 	private void maskCreator(boolean shouldCreate, int indice, int maskId) {
 		if (shouldCreate) {
 			l("Find mask target.");
-			this.mWindowManager.addView(x, y, width, height, maskId);
+			addView(x, y, width, height, maskId);
 		} else if (isMaskOn) {
 			l("Mask target was destroyed.");
 			if (indice == -1) {
@@ -640,19 +739,21 @@ public class ActivitySeekerService extends AccessibilityService {
 				dynamicMaskCnt = 0;
 				setDynamicMaskOnListEmpty();
 			}
-			this.mWindowManager.removeViews();
+			removeViews();
 			isMaskOn = false;
 		}
 	}
 
 	@Override
 	public void onInterrupt() {
+		le("Service interrupt");
 		mService = null;
 	}
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
+		le("Service destroy");
+		isFirstTimeInvokeService = true;
 		if (isReceiverRegistered) {
 			this.unregisterReceiver(mScreenOReceiver);
 			isReceiverRegistered = false;
@@ -662,6 +763,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			isForegroundServiceRunning = false;
 		}
 		mService = null;
+		super.onDestroy();
 	}
 }
 
