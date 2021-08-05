@@ -6,11 +6,6 @@
         <item name="android:windowExitAnimation">@anim/slide_down</item>
     </style>
 
-    <style name="YOURSTYLE" parent="Widget.AppCompat.PopupMenu">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:itemBackground">@android:color/holo_red_light</item>
-    </style>
-
     <style name="Theme.Jianfou.About.Toolbar" parent="@style/Widget.MaterialComponents.Toolbar.Primary">
         <item name="android:background">@color/scris</item>
         <item name="android:statusBarColor">@color/scris</item>

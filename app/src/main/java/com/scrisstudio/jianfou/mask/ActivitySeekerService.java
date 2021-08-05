@@ -28,6 +28,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -200,14 +201,14 @@ public class ActivitySeekerService extends AccessibilityService {
 	}
 
 	public void setForegroundService() {
+		RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.layout_foreground_notification);
 		String channelName = getString(R.string.channel_name);
 		int importance = NotificationManager.IMPORTANCE_LOW;
 		NotificationChannel channel = new NotificationChannel(CHANNEL_SERVICE_KEEPER_ID, channelName, importance);
 		channel.setDescription(getString(R.string.channel_description));
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_SERVICE_KEEPER_ID);
 		builder.setSmallIcon(R.drawable.jianfou_no_bg)
-				.setContentTitle(getString(R.string.channel_notification_text))
-				.setContentText("为防止服务被杀，必须显示一个通知")
+				.setCustomContentView(notificationLayout)
 				.setOngoing(true);
 		Intent resultIntent = new Intent(this, MainActivity.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
