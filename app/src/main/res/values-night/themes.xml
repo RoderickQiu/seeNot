@@ -22,4 +22,8 @@
         <item name="backgroundColor">@color/gray_900</item>
         <item name="android:windowBackground">@color/gray_900</item>
     </style>
+
+    <style name="Theme.Jianfou.Foreground" parent="@style/TextAppearance.AppCompat.Small">
+        <item name="android:textColor">#B2B2B2</item>
+    </style>
 </resources>
