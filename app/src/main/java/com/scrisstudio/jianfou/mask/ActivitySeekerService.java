@@ -73,8 +73,6 @@ public class ActivitySeekerService extends AccessibilityService {
 	private SharedPreferences sharedPreferences;
 	private long lastContentChangedTime = 0, lastHandlerRunningTime = 0, contentChangeTime = 0, handlerTime = 0;
 	private WindowManager mWindowManager;
-	private Rect contentRect = new Rect(), nodeSearcherRect = new Rect(), dynamicRect = new Rect();
-	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1, dynamicMaskCnt = 0;
 	private final BroadcastReceiver mScreenOReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -83,7 +81,7 @@ public class ActivitySeekerService extends AccessibilityService {
 			if (action.equals("android.intent.action.SCREEN_OFF")) {
 				le("Screen Off");
 				try {
-					if (isMaskOn) maskCreator(false, -1, 0);
+					removeViews();
 				} catch (Exception e) {
 					le("Failed to remove mask");
 				}
@@ -91,6 +89,8 @@ public class ActivitySeekerService extends AccessibilityService {
 		}
 
 	};
+	private Rect contentRect = new Rect(), nodeSearcherRect = new Rect(), dynamicRect = new Rect();
+	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1, dynamicMaskCnt = 0;
 
 	public static boolean isStart() {
 		return mService != null;
@@ -276,12 +276,13 @@ public class ActivitySeekerService extends AccessibilityService {
 			for (int i = 0; i < mFloatingViews.size(); i++) {
 				View view = mFloatingViews.get(i);
 				if (view != null) {
-					mWindowManager.removeView(view);
+					mWindowManager.removeViewImmediate(view);
 				}
 			}
 			mFloatingViews.clear();
 		} catch (Exception e) {
 			le("remove failed" + e.getLocalizedMessage());
+			Toast.makeText(jianfou.getAppContext(), "消除遮罩失败，如果遮罩一直错误地存在，烦请手动前往系统无障碍设置重启见否服务", Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -537,7 +538,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		if (className == null) return false;
 		else if (className.contains("Activity")) return true;
 		else
-			return !className.startsWith("android.widget.") && !className.startsWith("android.view.") && !className.startsWith("androidx.");
+			return !className.startsWith("android.widget.") && !className.startsWith("android.view.") && !className.startsWith("androidx.") && !className.startsWith("com.android.systemui");
 	}
 
 	AccessibilityNodeInfo getRightWindowNode() {
