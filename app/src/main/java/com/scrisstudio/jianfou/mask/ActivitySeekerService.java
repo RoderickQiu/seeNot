@@ -51,6 +51,7 @@ public class ActivitySeekerService extends AccessibilityService {
 	public static final String TAG = "Jianfou-AccessibilityService";
 	private static final String CHANNEL_SERVICE_KEEPER_ID = "ServiceKeeper", CHANNEL_NORMAL_NOTIFICATION_ID = "NormalNotification";
 	private static final int KEEPER_NOTIFICATION_ID = 9221, NORMAL_NOTIFICATION_ID = 9311;
+	private static final int NORMAL_MASK_CONST = 4;
 	public static ActivitySeekerService mService;
 	public static List<RuleInfo> rulesList;
 	public static boolean isServiceRunning = true, isFirstTimeInvokeService = true,
@@ -62,8 +63,8 @@ public class ActivitySeekerService extends AccessibilityService {
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
 	private static RuleInfo currentRule;
-	private static ArrayList<Boolean> dynamicList = null;
-	private static ArrayList<Integer> dynamicCntList = null;
+	private static ArrayList<Boolean> maskList = null;
+	private static ArrayList<Integer> cntList = null;
 	private static WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
 	private final Handler mHandler = new Handler();
 	public NotificationChannel normalNotificationChannel;
@@ -90,7 +91,7 @@ public class ActivitySeekerService extends AccessibilityService {
 
 	};
 	private Rect contentRect = new Rect(), nodeSearcherRect = new Rect(), dynamicRect = new Rect();
-	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1, dynamicMaskCnt = 0;
+	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1, maskCnt = 0;
 
 	public static boolean isStart() {
 		return mService != null;
@@ -114,12 +115,12 @@ public class ActivitySeekerService extends AccessibilityService {
 		isSplitScreenAcceptable = !split;
 	}
 
-	private static void setDynamicMaskOnListEmpty() {
-		dynamicList = new ArrayList<>();
-		dynamicCntList = new ArrayList<>();
-		for (int i = 0; i < 5; i++) {
-			dynamicList.add(false);
-			dynamicCntList.add(-1);
+	private static void setMaskCntListEmpty() {
+		maskList = new ArrayList<>();
+		cntList = new ArrayList<>();
+		for (int i = 0; i < NORMAL_MASK_CONST * 2 + 2; i++) {
+			maskList.add(false);
+			cntList.add(-1);
 		}
 	}
 
@@ -151,7 +152,7 @@ public class ActivitySeekerService extends AccessibilityService {
 
 		createNotificationChannel();
 
-		setDynamicMaskOnListEmpty();
+		setMaskCntListEmpty();
 
 		Gson gson = new Gson();
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(jianfou.getAppContext());
@@ -166,7 +167,8 @@ public class ActivitySeekerService extends AccessibilityService {
 					Toast.makeText(jianfou.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
 					le("Service invoking didn't respond, a manual start might be needed.");
 
-					sendSimpleNotification("见否服务未开启", "见否服务没有成功开启，请前往系统无障碍设置手动开启");
+					if (!jianfou.isDebugApp())
+						sendSimpleNotification("见否服务未开启", "见否服务没有成功开启，请前往系统无障碍设置手动开启");
 				}
 			} catch (Exception ignored) {
 			}
@@ -283,6 +285,7 @@ public class ActivitySeekerService extends AccessibilityService {
 		} catch (Exception e) {
 			le("remove failed" + e.getLocalizedMessage());
 			Toast.makeText(jianfou.getAppContext(), "消除遮罩失败，如果遮罩一直错误地存在，烦请手动前往系统无障碍设置重启见否服务", Toast.LENGTH_LONG).show();
+			sendSimpleNotification("见否可能出了个错？", "消除遮罩失败，如果遮罩一直错误地存在，烦请手动前往系统无障碍设置重启见否服务");
 		}
 	}
 
@@ -390,7 +393,7 @@ public class ActivitySeekerService extends AccessibilityService {
 										if (currentRule.getType() == 2)
 											maskCreator(false, currentRuleId, 0);
 									} else {
-										if (currentRule.getType() == 2 && dynamicMaskCnt > 0) {
+										if (currentRule.getType() == 2 && maskCnt > 0) {
 											isMaskOn = true;
 										}
 									}
@@ -449,7 +452,7 @@ public class ActivitySeekerService extends AccessibilityService {
 											if (rulesList.get(i).getType() == 0)
 												multiMaskSet();
 											else if (rulesList.get(i).getType() == 1 || rulesList.get(i).getType() == 2) {
-												setDynamicMaskOnListEmpty();
+												setMaskCntListEmpty();
 												wordFinder(getRootInActiveWindow(), true);
 												break;
 											}
@@ -621,11 +624,11 @@ public class ActivitySeekerService extends AccessibilityService {
 							} else if (currentRule.getDynamicText().size() > 0) {
 								for (int i = 0; i < currentRule.getFilterLength(); i++) {
 									if (text.equals(currentRule.getDynamicText().get(i))) {
-										if (dynamicCntList.get(i) == -1) {
-											dynamicCntList.set(i, dynamicMaskCnt);
-											dynamicMaskCnt++;
+										if (cntList.get(i) == -1) {
+											cntList.set(i, maskCnt);
+											maskCnt++;
 										}
-										dynamicTextExecutor(info, i, dynamicCntList.get(i));
+										dynamicTextExecutor(info, i, cntList.get(i));
 										hasExecutionSucceeded = true;
 										tempDynamicList.set(i, true);
 									}
@@ -636,12 +639,13 @@ public class ActivitySeekerService extends AccessibilityService {
 				}
 
 				for (int i = 0; i < 4; i++) {
-					if (!tempDynamicList.get(i) && dynamicList.get(i)) {
-						dynamicList.set(i, false);
-						maskHider(dynamicCntList.get(i));
+					if (!tempDynamicList.get(i) && maskList.get(i)) {
+						maskList.set(i, false);
+						maskHider(cntList.get(i));
 					}
 				}
-				l("MASKMASK" + dynamicList);
+				if (maskCnt < 1) isMaskOn = false;
+				l("MASKMASK" + maskList);
 
 				return hasExecutionSucceeded;
 			}
@@ -661,10 +665,20 @@ public class ActivitySeekerService extends AccessibilityService {
 		try {
 			boolean flag = false;
 			for (int i = 0; i < currentRule.getFilterLength(); i++) {
-				if (maskSet(nodeSearcher(currentRule.getFilter().get(i).indices), currentRuleId, i, 0))
+				if (cntList.get(i + NORMAL_MASK_CONST) == -1) {
+					cntList.set(i + NORMAL_MASK_CONST, maskCnt);
+					maskCnt++;
+				}
+				if (maskSet(nodeSearcher(currentRule.getFilter().get(i).indices), currentRuleId, cntList.get(i + NORMAL_MASK_CONST), i + NORMAL_MASK_CONST)) {
 					flag = true;
+				} else {
+					cntList.set(i + NORMAL_MASK_CONST, -1);
+					maskList.set(i + NORMAL_MASK_CONST, false);
+					maskCnt--;
+				}
 			}
 			if (flag) isMaskOn = true;
+			if (maskCnt < 1) isMaskOn = false;
 			l("Multi multi");
 		} catch (Exception e) {
 			le(e.getMessage());
@@ -690,11 +704,10 @@ public class ActivitySeekerService extends AccessibilityService {
 					le("Item rect wrong.");
 					return false;
 				} else {
-					//TODO If only one thing is shown, the another thing that displays later will fail to be added then
-					if (!isMaskOn || (currentRule.getType() == 2 && !dynamicList.get(maskRuleId))) {
+					if (!isMaskOn || !maskList.get(maskRuleId)) {
 						maskCreator(true, indice, maskFloatingId);
-						dynamicList.set(maskRuleId, true);
-						l("MASKRULEID " + maskRuleId + " MASKFLOATINGID " + maskFloatingId + "MSAKMASK" + dynamicList);
+						maskList.set(maskRuleId, true);
+						l("MASKRULEID " + maskRuleId + " MASKFLOATINGID " + maskFloatingId + "MSAKMASK" + maskList);
 					} else maskPositionMover(maskFloatingId);
 					return true;
 				}
@@ -738,8 +751,8 @@ public class ActivitySeekerService extends AccessibilityService {
 			if (indice == -1) {
 				currentRuleId = -1;
 				currentRule = null;
-				dynamicMaskCnt = 0;
-				setDynamicMaskOnListEmpty();
+				maskCnt = 0;
+				setMaskCntListEmpty();
 			}
 			removeViews();
 			isMaskOn = false;
