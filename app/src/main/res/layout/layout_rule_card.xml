@@ -150,7 +150,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/expand_more"
                         android:src="@drawable/expand_more_36dp"
-                        android:tint="?attr/colorPrimary" />
+                        app:tint="?attr/colorPrimary" />
 
                     <ImageButton
                         android:id="@+id/edit_button"
@@ -161,7 +161,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/edit"
                         android:src="@drawable/mode_edit_24dp"
-                        android:tint="?attr/colorPrimary" />
+                        app:tint="?attr/colorPrimary" />
 
                     <ImageButton
                         android:id="@+id/delete_button"
@@ -172,7 +172,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/delete"
                         android:src="@drawable/delete_24dp"
-                        android:tint="?attr/colorPrimary" />
+                        app:tint="?attr/colorPrimary" />
 
                     <Button
                         android:id="@+id/delete_button_recheck"

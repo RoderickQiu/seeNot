@@ -1,5 +1,11 @@
 package com.scrisstudio.jianfou.mask;
 
+import static com.scrisstudio.jianfou.mask.MaskOperatorUtil.addView;
+import static com.scrisstudio.jianfou.mask.MaskOperatorUtil.changeForDarkMode;
+import static com.scrisstudio.jianfou.mask.MaskOperatorUtil.hideView;
+import static com.scrisstudio.jianfou.mask.MaskOperatorUtil.removeViews;
+import static com.scrisstudio.jianfou.mask.MaskOperatorUtil.updateView;
+
 import android.accessibilityservice.AccessibilityService;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -15,7 +21,6 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
@@ -26,10 +31,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -60,20 +62,17 @@ public class ActivitySeekerService extends AccessibilityService {
 			isMaskOn = false, isSplitScreenAcceptable = false, isDarkModeOn = false;
 	public static int foregroundWindowId = 0, foregroundWindowLayer = 1;
 	public static String foregroundClassName = "", foregroundPackageName = "com.scrisstudio.jianfou", currentHomePackage = "";
+	public static LayoutInflater inflater;
+	public static WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+	public static ArrayList<View> mFloatingViews = new ArrayList<>();
+	public static WindowManager mWindowManager;
+	public static NotificationManager normalNotificationManager;
 	private static String windowOrientation = "portrait";
 	private static int windowTrueWidth, windowTrueHeight;
 	private static RuleInfo currentRule;
 	private static ArrayList<Boolean> maskList = null;
 	private static ArrayList<Integer> cntList = null;
-	private static WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
 	private final Handler mHandler = new Handler();
-	public NotificationChannel normalNotificationChannel;
-	public NotificationManager normalNotificationManager;
-	private ArrayList<View> mFloatingViews = new ArrayList<>();
-	private LayoutInflater inflater;
-	private SharedPreferences sharedPreferences;
-	private long lastContentChangedTime = 0, lastHandlerRunningTime = 0, contentChangeTime = 0, handlerTime = 0;
-	private WindowManager mWindowManager;
 	private final BroadcastReceiver mScreenOReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -90,6 +89,9 @@ public class ActivitySeekerService extends AccessibilityService {
 		}
 
 	};
+	public NotificationChannel normalNotificationChannel;
+	private SharedPreferences sharedPreferences;
+	private long lastContentChangedTime = 0, lastHandlerRunningTime = 0, contentChangeTime = 0, handlerTime = 0;
 	private Rect contentRect = new Rect(), nodeSearcherRect = new Rect(), dynamicRect = new Rect();
 	private int x = -1, y = -1, width = -1, height = -1, currentRuleId = -1, maskCnt = 0;
 
@@ -136,6 +138,19 @@ public class ActivitySeekerService extends AccessibilityService {
 		if (input != null)
 			Log.e(TAG, input.toString() + " " + System.currentTimeMillis());
 		else Log.e(TAG, "NULL" + " " + System.currentTimeMillis());
+	}
+
+	public static void sendSimpleNotification(String title, String content) {
+		Intent intent = new Intent(mService, PermissionGrantActivity.class);
+		PendingIntent pi = PendingIntent.getActivity(mService, 0, intent, 0);
+		NotificationCompat.Builder nb = new NotificationCompat.Builder(mService, CHANNEL_NORMAL_NOTIFICATION_ID)
+				.setSmallIcon(R.drawable.jianfou_no_bg)
+				.setContentTitle(title)
+				.setContentText(content)
+				.setContentIntent(pi)
+				.setAutoCancel(true)
+				.setShowWhen(true);
+		normalNotificationManager.notify(NORMAL_NOTIFICATION_ID, nb.build());
 	}
 
 	@Override
@@ -185,19 +200,6 @@ public class ActivitySeekerService extends AccessibilityService {
 		normalNotificationManager.createNotificationChannel(normalNotificationChannel);
 	}
 
-	public void sendSimpleNotification(String title, String content) {
-		Intent intent = new Intent(this, PermissionGrantActivity.class);
-		PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
-		NotificationCompat.Builder nb = new NotificationCompat.Builder(this, CHANNEL_NORMAL_NOTIFICATION_ID)
-				.setSmallIcon(R.drawable.jianfou_no_bg)
-				.setContentTitle(title)
-				.setContentText(content)
-				.setContentIntent(pi)
-				.setAutoCancel(true)
-				.setShowWhen(true);
-		normalNotificationManager.notify(NORMAL_NOTIFICATION_ID, nb.build());
-	}
-
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		return START_STICKY;
 	}
@@ -219,85 +221,6 @@ public class ActivitySeekerService extends AccessibilityService {
 		notificationManager.createNotificationChannel(channel);
 		startForeground(KEEPER_NOTIFICATION_ID, builder.build());
 		isForegroundServiceRunning = true;
-	}
-
-	public void addView(int x, int y, int width, int height, int maskId) {
-		layoutParams.x = x;
-		layoutParams.y = y;
-		layoutParams.width = width;
-		layoutParams.height = height;
-		if (mFloatingViews.size() <= maskId) {
-			try {
-				FrameLayout frameLayout = new FrameLayout(this);
-				View view = inflater.inflate(R.layout.layout_floating, frameLayout);
-				view.findViewById(R.id.floating).setBackgroundColor(Color.parseColor("#F7F7F7"));
-				((TextView) view.findViewById(R.id.floating_text)).setTextColor(Color.parseColor("#DF850D"));
-				view.setLayoutParams(layoutParams);
-				mFloatingViews.add(view);
-				changeForDarkMode(mFloatingViews.size() - 1);
-				mWindowManager.addView(mFloatingViews.get(maskId), layoutParams);
-			} catch (Exception e) {
-				le("add failed" + e.getLocalizedMessage());
-			}
-		} else {
-			try {
-				View view = mFloatingViews.get(maskId);
-				view.setLayoutParams(layoutParams);
-				mFloatingViews.set(maskId, view);
-				mWindowManager.addView(mFloatingViews.get(maskId), layoutParams);
-			} catch (Exception e) {
-				le("show failed" + e.getLocalizedMessage());
-			}
-		}
-	}
-
-	public void updateView(int x, int y, int width, int height, int maskId) {
-		try {
-			layoutParams.x = x;
-			layoutParams.y = y;
-			layoutParams.width = width;
-			layoutParams.height = height;
-			mFloatingViews.get(maskId).setLayoutParams(layoutParams);
-			mWindowManager.updateViewLayout(mFloatingViews.get(maskId), layoutParams);
-		} catch (Exception e) {
-			le("update failed" + e.getLocalizedMessage());
-		}
-	}
-
-	public void hideView(int maskId) {
-		try {
-			View view = mFloatingViews.get(maskId);
-			if (view != null) mWindowManager.removeView(view);
-		} catch (Exception e) {
-			le("hide failed" + e.getLocalizedMessage());
-		}
-	}
-
-	public void removeViews() {
-		try {
-			for (int i = 0; i < mFloatingViews.size(); i++) {
-				View view = mFloatingViews.get(i);
-				if (view != null) {
-					mWindowManager.removeViewImmediate(view);
-				}
-			}
-			mFloatingViews.clear();
-		} catch (Exception e) {
-			le("remove failed" + e.getLocalizedMessage());
-			Toast.makeText(jianfou.getAppContext(), "消除遮罩失败，如果遮罩一直错误地存在，烦请手动前往系统无障碍设置重启见否服务", Toast.LENGTH_LONG).show();
-			sendSimpleNotification("见否可能出了个错？", "消除遮罩失败，如果遮罩一直错误地存在，烦请手动前往系统无障碍设置重启见否服务");
-		}
-	}
-
-	public void changeForDarkMode(int maskId) {
-		LinearLayout floatingLinear = mFloatingViews.get(maskId).findViewById(R.id.floating);
-		if (ActivitySeekerService.isNightMode(jianfou.getAppContext())) {
-			floatingLinear.findViewById(R.id.floating).setBackgroundColor(Color.parseColor("#1B1B1B"));
-			((TextView) floatingLinear.findViewById(R.id.floating_text)).setTextColor(Color.parseColor("#E8D21B"));
-		} else {
-			floatingLinear.findViewById(R.id.floating).setBackgroundColor(Color.parseColor("#F7F7F7"));
-			((TextView) floatingLinear.findViewById(R.id.floating_text)).setTextColor(Color.parseColor("#DF850D"));
-		}
 	}
 
 	//初始化

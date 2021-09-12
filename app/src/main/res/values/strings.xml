@@ -65,7 +65,7 @@
     <string name="emergency_aid_text_info">显示补救触发文字</string>
     <string name="emergency_aid_text_help">在特殊情况下进入不应进入的页面后，强制退出以进行补救；因此应进入那个页面进行设置。点击“显示布局”然后选中含文字的元素，点击“选中”以设置。若软件阻止你获取一些字，则请尝试以其它文字为线索。</string>
     <string name="select">选中</string>
-    <string name="press_here_move">按住此处以拖动弹窗</string>
+    <string name="press_here_move">按住来拖动</string>
     <string name="divider">|</string>
     <string name="expand_more">更多内容</string>
     <string name="channel_name">服务保活</string>
@@ -122,4 +122,26 @@
     <string name="slash">/</string>
     <string name="multi_mask_widgets_help">若要添加多个遮罩，请确保它们处于同一软件的同一页面上，避免软件运行出错。</string>
     <string name="which_now_dynamic_sets">现在正在设置的遮罩编号为：</string>
+    <string name="which_now_break_sets">现在正在设置的遮罩跳出编号为：</string>
+    <string name="rule_for_msg">对于</string>
+    <string name="empty_subrules">列表为空。点击\"+\"按钮添加一条子规则。</string>
+    <string name="empty_sub_conditions">条件列表为空。</string>
+    <string name="subrule_condition">若满足条件</string>
+    <string name="new_subrule">新建子规则</string>
+    <string name="condition_type">条件种类</string>
+    <string name="condition_type_set">设置</string>
+    <string name="on_app">位于 App</string>
+    <string name="on_activity">位于某 Activity</string>
+    <string name="select_condition_type">选择条件种类</string>
+    <string name="add_skip">添加跳出</string>
+    <string name="in_app">APP：</string>
+    <string name="in_activity">Activity：</string>
+    <string name="condition_tip">名词解释：Activity 是安卓中对页面的称呼，但也存在一个 Activity 对应多个页面的情况。</string>
+    <string name="try_recatch">如不正确或为空，则是由于软件限制，请尝试重新获取</string>
+    <string name="refresh">刷新</string>
+    <string name="subrule_text_title">设置跳出文字</string>
+    <string name="subrule_mask">则执行遮罩</string>
+    <string name="subrule_set_mask_msg">对页面需要遮蔽的内容遮罩</string>
+    <string name="copy_skip">复制条件到新子规则</string>
+    <string name="delete_current">删除当前遮罩</string>
 </resources>

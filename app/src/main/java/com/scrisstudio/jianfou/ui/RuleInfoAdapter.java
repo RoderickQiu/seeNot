@@ -1,4 +1,6 @@
 package com.scrisstudio.jianfou.ui;
+import static com.scrisstudio.jianfou.jianfou.getRuleTypeRealName;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -41,19 +43,6 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 		gson = new Gson();
 	}
 
-	public static String getRuleTypeRealName(int type) {
-		switch (type) {
-			case 0:
-				return "常规遮罩";
-			case 1:
-				return "简单返回";
-			case 2:
-				return "动态遮罩";
-			default:
-				return "未知类型";
-		}
-	}
-
 	@NonNull
 	@Override
 	public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -75,7 +64,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 		}
 	}
 
-	@SuppressLint("SetTextI18n")
+	@SuppressLint({"SetTextI18n", "NotifyDataSetChanged"})
 	@Override
 	public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 		int viewType = getItemViewType(position);
@@ -140,6 +129,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 
 	}
 
+	@SuppressLint("NotifyDataSetChanged")
 	public void dataChange(List<RuleInfo> l) {
 		mList = l;
 		notifyDataSetChanged();

@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/baseline_arrow_back_ios_24dp.xml" value="0.3411458333333333" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/delete_24dp.xml" value="0.3411458333333333" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/edit_18dp.xml" value="0.3411458333333333" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/expand_more_36dp.xml" value="0.3411458333333333" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/mode_edit_24dp.xml" value="0.3411458333333333" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/refresh_24.xml" value="0.21822916666666667" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/remove_18dp.xml" value="0.3411458333333333" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/scrollbar.xml" value="0.21822916666666667" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/settings_18dp.xml" value="0.3411458333333333" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/settings_24dp.xml" value="0.3411458333333333" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/activity_main.xml" value="0.325" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_accessibility_node_desc.xml" value="0.31846153846153846" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_empty_recyclerview.xml" value="0.325" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_empty_sub_rules.xml" value="0.325" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_mask_assigner.xml" value="0.375" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_mixed_mask_assigner.xml" value="0.25" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_rule_card.xml" value="0.325" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_skip_set.xml" value="0.325" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_sub_condition.xml" value="0.325" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_sub_rule.xml" value="0.325" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_subrule.xml" value="0.325" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/menu/menu_condition_types.xml" value="0.12685185185185185" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/menu/menu_dialog_bar.xml" value="0.325" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/menu/menu_sub_types.xml" value="0.12685185185185185" />
+      </map>
+    </option>
+  </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="org.jetbrains.annotations.Nullable" />
     <option name="myDefaultNotNull" value="androidx.annotation.NonNull" />

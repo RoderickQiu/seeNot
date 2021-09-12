@@ -1,5 +1,7 @@
 package com.scrisstudio.jianfou.activity;
 
+import static com.scrisstudio.jianfou.activity.PermissionGrantActivity.isAccessibilitySettingsOn;
+
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +14,7 @@ import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +33,10 @@ import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.databinding.ActivityMainBinding;
 import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.mask.ActivitySeekerService;
+import com.scrisstudio.jianfou.mask.MixedAssignerUtil;
+import com.scrisstudio.jianfou.mask.MixedRuleInfo;
 import com.scrisstudio.jianfou.mask.RuleInfo;
+import com.scrisstudio.jianfou.mask.SubRuleInfo;
 import com.scrisstudio.jianfou.ui.FullscreenDialogFragment;
 import com.scrisstudio.jianfou.ui.RuleInfoAdapter;
 import com.scrisstudio.jianfou.ui.RuleInfoCardDecoration;
@@ -38,11 +44,10 @@ import com.scrisstudio.jianfou.ui.SimpleDialogFragment;
 import com.sergivonavi.materialbanner.Banner;
 import com.sergivonavi.materialbanner.BannerInterface;
 
+import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.scrisstudio.jianfou.activity.PermissionGrantActivity.isAccessibilitySettingsOn;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,9 +59,12 @@ public class MainActivity extends AppCompatActivity {
 	public static int windowTrueWidth, windowTrueHeight;
 	public static SharedPreferences sharedPreferences;
 	public static FragmentManager fragmentManager;
+	public static LayoutInflater inflater;
+	public static SoftReference<View> viewCustomization = null, viewTarget = null, viewLastTimeChoice = null;
 	public Banner banner;
 	private ActivityMainBinding binding;
 	private List<RuleInfo> list = new ArrayList<>();
+	private List<MixedRuleInfo> mixed = new ArrayList<>();
 	private RecyclerView recyclerView;
 	private RuleInfoAdapter adapter;
 
@@ -122,6 +130,10 @@ public class MainActivity extends AppCompatActivity {
 		resources = this.getResources();
 		theme = this.getTheme();
 		fragmentManager = getSupportFragmentManager();
+		inflater = LayoutInflater.from(MainActivity.this);
+		viewCustomization = new SoftReference<>(inflater.inflate(R.layout.layout_mixed_mask_assigner, null));//workaround for static view
+		viewTarget = new SoftReference<>(inflater.inflate(R.layout.layout_accessibility_node_desc, null));
+		viewLastTimeChoice = new SoftReference<>(inflater.inflate(R.layout.layout_last_choice_frame, null));
 
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -135,7 +147,18 @@ public class MainActivity extends AppCompatActivity {
 			ruleInitEditor.putString("rules", gson.toJson(list));
 			ruleInitEditor.apply();
 		}
+		if (!sharedPreferences.contains("mixed")) {
+			SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
+			SubRuleInfo sub = new SubRuleInfo(0, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 0, null, new ArrayList<>(), 0);
+			ArrayList<SubRuleInfo> subArray = new ArrayList<>();
+			subArray.add(sub);
+			mixed.add(new MixedRuleInfo(true, 0, "Title", "1.0.0", "software", "(any)", "com.example.software", subArray, 1));
+			ruleInitEditor.putString("mixed", gson.toJson(mixed));
+			ruleInitEditor.apply();
+		}
 		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+		}.getType());
+		mixed = gson.fromJson(sharedPreferences.getString("mixed", "{}"), new TypeToken<List<MixedRuleInfo>>() {
 		}.getType());
 
 		banner = binding.banner;
@@ -161,12 +184,14 @@ public class MainActivity extends AppCompatActivity {
 		Intent serviceIntent = new Intent(this, ActivitySeekerService.class);
 		startService(serviceIntent);
 
-		//如果处于Debug状态
-		if (jianfou.isDebugApp()) {
-			if (!ActivitySeekerService.isStart()) {
-				startActivityForResult(new Intent("android.settings.ACCESSIBILITY_SETTINGS"), 111);
-				banner.dismiss();
-			}
+		if (jianfou.isDebugApp() && Settings.System.canWrite(MainActivity.this)) {
+			Settings.Secure.putString(getContentResolver(),
+					Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.mask.ActivitySeekerService");
+			Settings.Secure.putString(getContentResolver(),
+					Settings.Secure.ACCESSIBILITY_ENABLED, "1");
+			banner.dismiss();
+		} else {
+			permissionBannerOpener();
 		}
 
 		recyclerView = binding.ruleList;
@@ -188,11 +213,15 @@ public class MainActivity extends AppCompatActivity {
 			adapter.dataChange(list);
 		});
 
-		binding.topAppBar.setOnMenuItemClickListener(menuItem -> {
+		/*binding.topAppBar.setOnMenuItemClickListener(menuItem -> {
 			if (menuItem.getItemId() == R.id.help) {
 				Toast.makeText(this.getApplicationContext(), "还没有完成。", Toast.LENGTH_LONG).show();
 				return true;
 			}
+			return false;
+		});*/
+		binding.topAppBar.setOnMenuItemClickListener(menuItem -> {
+			MixedAssignerUtil.showActivityCustomizationDialog(viewCustomization.get(), viewTarget.get(), viewLastTimeChoice.get(), 0, 0, 0, 0);
 			return false;
 		});
 
@@ -250,8 +279,6 @@ public class MainActivity extends AppCompatActivity {
 				e.printStackTrace();
 			}
 		});
-
-		permissionBannerOpener();
 	}
 
 	private void permissionBannerOpener() {
@@ -267,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
 				banner2.dismiss();
 			});
 			bannerForPermissions.setMessage(R.string.service_not_running);
-			bannerForPermissions.show();
+			if (!jianfou.isDebugApp()) bannerForPermissions.show();
 		}
 	}
 
@@ -275,6 +302,11 @@ public class MainActivity extends AppCompatActivity {
 	protected void onResume() {
 		super.onResume();
 		reloader();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
 	}
 
 	private void reloader() {
@@ -290,6 +322,8 @@ public class MainActivity extends AppCompatActivity {
 			banner.setMessage(R.string.function_closed);
 			banner.show();
 		} else banner.dismiss();
-		ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), false, sharedPreferences.getBoolean("split", true));
+		ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-switch", true), sharedPreferences.getBoolean("split", true));
+
+		viewCustomization = new SoftReference<>(MainActivity.inflater.inflate(R.layout.layout_mixed_mask_assigner, null));
 	}
 }
