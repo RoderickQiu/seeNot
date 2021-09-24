@@ -29,7 +29,6 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,6 +45,8 @@ import com.scrisstudio.jianfou.ui.SubRuleAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -58,9 +59,10 @@ public class MixedAssignerUtil {
 	private static WindowManager windowManager;
 	private static SharedPreferences sharedPreferences;
 	private static AtomicInteger mode = new AtomicInteger();
+	private static View viewCustomization = null, viewTarget = null, viewLastTimeChoice = null, viewToast = null;
 
 	@SuppressLint("ClickableViewAccessibility")
-	public static void showActivityCustomizationDialog(View viewCustomization, View viewTarget, View viewLastTimeChoice, int modeId, int position, int current, int subCurrent) {
+	public static void showActivityCustomizationDialog(int modeId, int position, int current, int subCurrent) {
 		windowManager = (WindowManager) mService.getSystemService(WINDOW_SERVICE);
 		sharedPreferences = MainActivity.sharedPreferences;
 		mode.set(modeId);
@@ -78,7 +80,7 @@ public class MixedAssignerUtil {
 		final int width = b ? metrics.widthPixels : metrics.heightPixels;
 		final int height = b ? metrics.heightPixels : metrics.widthPixels;
 
-		final WindowManager.LayoutParams customizationParams, outlineParams, lastTimeFrameParams;
+		final WindowManager.LayoutParams customizationParams, outlineParams, lastTimeFrameParams, toastParams;
 		customizationParams = new WindowManager.LayoutParams();
 		customizationParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
 		customizationParams.format = PixelFormat.TRANSPARENT;
@@ -109,6 +111,14 @@ public class MixedAssignerUtil {
 		lastTimeFrameParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
 		lastTimeFrameParams.alpha = 0.8f;
 
+		toastParams = ActivitySeekerService.layoutParams;
+		toastParams.alpha = 0f;
+
+		viewCustomization = MainActivity.viewCustomization.get();
+		viewTarget = MainActivity.viewTarget.get();
+		viewLastTimeChoice = MainActivity.viewLastTimeChoice.get();
+		viewToast = inflater.inflate(R.layout.layout_toast_view, null);
+
 		final FrameLayout layoutOverlayOutline = viewTarget.findViewById(R.id.frame),
 				layoutLastTimeChoiceOutline = viewLastTimeChoice.findViewById(R.id.last_time_choice_frame);
 
@@ -118,6 +128,52 @@ public class MixedAssignerUtil {
 			Log.e(TAG, "View customization does not exist.");
 			return;
 		} else Log.i(TAG, "Assigner running.");
+
+		Consumer<Object> toastSender = (input) -> {
+			AtomicInteger contentWidth = new AtomicInteger();
+			TextView content = viewToast.findViewById(R.id.tv_toast_content);
+			content.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+				@Override
+				public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+					content.removeOnLayoutChangeListener(this);
+					contentWidth.set(content.getWidth());
+				}
+			});
+			content.setText(input == null ? "发生错误" : input.toString());
+
+			MainActivity.runOnUI(() -> {
+				windowManager.addView(viewToast, toastParams);
+			});
+
+			new Timer().schedule(new TimerTask() {
+				@Override
+				public void run() {
+					try {
+						toastParams.x = (metrics.widthPixels - contentWidth.get()) / 2 - 26;
+						toastParams.y = metrics.heightPixels - 300;
+						toastParams.alpha = 1f;
+						MainActivity.runOnUI(() -> {
+							windowManager.updateViewLayout(viewToast, toastParams);
+						});
+					} catch (Exception e) {
+						le(e.getLocalizedMessage());
+					}
+				}
+			}, 200);
+
+			new Timer().schedule(new TimerTask() {
+				@Override
+				public void run() {
+					try {
+						MainActivity.runOnUI(() -> {
+							windowManager.removeViewImmediate(viewToast);
+						});
+					} catch (Exception e) {
+						le(e.getLocalizedMessage());
+					}
+				}
+			}, 3000);
+		};
 
 		if (mode.get() == -1) {
 			try {
@@ -215,7 +271,7 @@ public class MixedAssignerUtil {
 				if (outlineParams.alpha == 0) {
 					if (!ActivitySeekerService.foregroundPackageName.equals(ActivitySeekerService.currentHomePackage) && !ActivitySeekerService.foregroundPackageName.equals("com.scrisstudio.jianfou")) {
 						if (currentMaskWidgetId.get() > 4) {
-							Toast.makeText(jianfou.getAppContext(), "只允许同时存在5个遮罩", Toast.LENGTH_LONG).show();
+							toastSender.accept("只允许同时存在5个遮罩");
 							return;
 						}
 						AccessibilityNodeInfo root = mService.getRootInActiveWindow();
@@ -285,7 +341,7 @@ public class MixedAssignerUtil {
 						btShowConditionOutline.setText("隐藏布局");
 						btShowMaskOutline.setText("隐藏布局");
 					} else
-						Toast.makeText(jianfou.getAppContext(), "不允许在此处设置规则", Toast.LENGTH_SHORT).show();
+						toastSender.accept("不允许在此处设置规则");
 				} else {
 					outlineParams.alpha = 0f;
 					outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
@@ -372,12 +428,12 @@ public class MixedAssignerUtil {
 								((TextView) viewCustomization.findViewById(R.id.rule_for_text)).setText(mix.get(position).getFor());
 								popupOpener.accept(voided);
 							} else
-								Toast.makeText(jianfou.getAppContext(), "不能给见否本身和系统桌面添加规则，请重试", Toast.LENGTH_LONG).show();
+								toastSender.accept("不能给见否本身和系统桌面添加规则，请重试");
 						} else {
 							if (mix.get(position).getForPackageName().equals(packageName))
 								popupOpener.accept(voided);
 							else
-								Toast.makeText(jianfou.getAppContext(), "这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置", Toast.LENGTH_LONG).show();
+								toastSender.accept("这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置");
 						}
 					});
 				} else if (mode.get() == 1) {
@@ -481,7 +537,7 @@ public class MixedAssignerUtil {
 						newSub.setText(new ArrayList<>());
 						subArray.add(newSub);
 						subRuleCommitter.accept(subArray, true);
-						Toast.makeText(jianfou.getAppContext(), "规则复制成功", Toast.LENGTH_SHORT).show();
+						toastSender.accept("规则复制成功");
 					});
 
 					// mask assign set
@@ -493,7 +549,7 @@ public class MixedAssignerUtil {
 						if (mix.get(position).getForPackageName().equals(ActivitySeekerService.foregroundPackageName)) {
 							showOutlineOperator.accept(voided);
 						} else {
-							Toast.makeText(jianfou.getAppContext(), "这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置", Toast.LENGTH_LONG).show();
+							toastSender.accept("这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置");
 						}
 					});
 					btConfirmMask.setOnClickListener(v -> {
@@ -580,7 +636,8 @@ public class MixedAssignerUtil {
 						else {
 							tvPackageName.setText("---");
 							tvActivityName.setText("---");
-							Toast.makeText(jianfou.getAppContext(), "这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置", Toast.LENGTH_LONG).show();
+							toastSender.accept("这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置");
+
 						}
 					});
 
@@ -591,7 +648,7 @@ public class MixedAssignerUtil {
 								subArray.get(current).setConditionActivity(ActivitySeekerService.foregroundClassName);
 								subRuleCommitter.accept(subArray, false);
 							} else
-								Toast.makeText(jianfou.getAppContext(), "这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置", Toast.LENGTH_LONG).show();
+								toastSender.accept("这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置");
 						});
 					} else {//skip activity
 						ArrayList<SkipInfo> skipArray = subArray.get(current).getSkip();
@@ -605,7 +662,8 @@ public class MixedAssignerUtil {
 									subArray.get(current).setSkip(skipArray);
 									subRuleCommitter.accept(subArray, false);
 								} else
-									Toast.makeText(jianfou.getAppContext(), "这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置", Toast.LENGTH_LONG).show();
+									toastSender.accept("这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置");
+
 							});
 							viewCustomization.findViewById(R.id.condition_skip).setVisibility(View.GONE);
 						} else {//skip text
@@ -619,7 +677,7 @@ public class MixedAssignerUtil {
 								} else {
 									tvPackageName.setText("---");
 									tvActivityName.setText("---");
-									Toast.makeText(jianfou.getAppContext(), "这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置", Toast.LENGTH_LONG).show();
+									toastSender.accept("这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置");
 								}
 							});
 							btConfirmConditionText.setOnClickListener(v -> {
@@ -632,7 +690,7 @@ public class MixedAssignerUtil {
 								if (mix.get(position).getForPackageName().equals(ActivitySeekerService.foregroundPackageName)) {
 									subRuleCommitter.accept(subArray, false);
 								} else
-									Toast.makeText(jianfou.getAppContext(), "这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置", Toast.LENGTH_LONG).show();
+									toastSender.accept("这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置");
 							});
 							viewCustomization.findViewById(R.id.condition_skip).setVisibility(View.VISIBLE);
 						}

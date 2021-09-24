@@ -80,7 +80,7 @@ public class SkipSetAdapter extends RecyclerView.Adapter<SkipSetAdapter.MyViewHo
 		int viewType = getItemViewType(skipId);
 		if (viewType == VIEW_TYPE_CARD) {
 			holder.setButton.setOnClickListener(v -> {
-				MixedAssignerUtil.showActivityCustomizationDialog(MainActivity.viewCustomization.get(), MainActivity.viewTarget.get(), MainActivity.viewLastTimeChoice.get(), 2, position, current, skipId);
+				MixedAssignerUtil.showActivityCustomizationDialog(2, position, current, skipId);
 			});
 			holder.deleteButton.setOnClickListener(v -> {
 				holder.deleteButton.setVisibility(View.GONE);

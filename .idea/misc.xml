@@ -13,6 +13,7 @@
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/scrollbar.xml" value="0.21822916666666667" />
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/settings_18dp.xml" value="0.3411458333333333" />
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/settings_24dp.xml" value="0.3411458333333333" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/drawable/toast_view.xml" value="0.28354978354978355" />
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/activity_main.xml" value="0.325" />
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_accessibility_node_desc.xml" value="0.31846153846153846" />
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_empty_recyclerview.xml" value="0.325" />
@@ -24,6 +25,8 @@
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_sub_condition.xml" value="0.325" />
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_sub_rule.xml" value="0.325" />
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_subrule.xml" value="0.325" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/layout_toast_view.xml" value="0.2736842105263158" />
+        <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/layout/view_toast.xml" value="0.2736842105263158" />
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/menu/menu_condition_types.xml" value="0.12685185185185185" />
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/menu/menu_dialog_bar.xml" value="0.325" />
         <entry key="..\:/Users/scris/Documents/jianfou/app/src/main/res/menu/menu_sub_types.xml" value="0.12685185185185185" />

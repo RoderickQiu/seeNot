@@ -76,7 +76,7 @@ public class SubRuleAdapter extends RecyclerView.Adapter<SubRuleAdapter.MyViewHo
 
 			holder.titleText.setText(getRuleTypeRealName(sub.get(pos).getType()));
 			holder.setButton.setOnClickListener(v -> {
-				MixedAssignerUtil.showActivityCustomizationDialog(MainActivity.viewCustomization.get(), MainActivity.viewTarget.get(), MainActivity.viewLastTimeChoice.get(), 1, ruleId, pos, 0);
+				MixedAssignerUtil.showActivityCustomizationDialog(1, ruleId, pos, 0);
 			});
 			holder.deleteButton.setOnClickListener(v -> {
 				holder.deleteButton.setVisibility(View.GONE);

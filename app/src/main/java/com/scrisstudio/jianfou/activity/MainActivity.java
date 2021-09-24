@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
 	public static SharedPreferences sharedPreferences;
 	public static FragmentManager fragmentManager;
 	public static LayoutInflater inflater;
-	public static SoftReference<View> viewCustomization = null, viewTarget = null, viewLastTimeChoice = null;
+	public static SoftReference<View> viewCustomization = null,
+			viewTarget = null, viewLastTimeChoice = null, viewToast = null;
 	public Banner banner;
 	private ActivityMainBinding binding;
 	private List<RuleInfo> list = new ArrayList<>();
@@ -134,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
 		viewCustomization = new SoftReference<>(inflater.inflate(R.layout.layout_mixed_mask_assigner, null));//workaround for static view
 		viewTarget = new SoftReference<>(inflater.inflate(R.layout.layout_accessibility_node_desc, null));
 		viewLastTimeChoice = new SoftReference<>(inflater.inflate(R.layout.layout_last_choice_frame, null));
+		viewToast = new SoftReference<>(inflater.inflate(R.layout.layout_toast_view, null));
 
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -221,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
 			return false;
 		});*/
 		binding.topAppBar.setOnMenuItemClickListener(menuItem -> {
-			MixedAssignerUtil.showActivityCustomizationDialog(viewCustomization.get(), viewTarget.get(), viewLastTimeChoice.get(), 0, 0, 0, 0);
+			MixedAssignerUtil.showActivityCustomizationDialog(0, 0, 0, 0);
 			return false;
 		});
 
