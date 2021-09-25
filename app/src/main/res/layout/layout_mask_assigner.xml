@@ -39,7 +39,7 @@
             android:backgroundTint="#00000000"
             android:contentDescription="@string/exit"
             android:padding="0dp"
-            android:src="@drawable/close_white_18dp" />
+            android:src="@drawable/close_18dp" />
 
     </LinearLayout>
 

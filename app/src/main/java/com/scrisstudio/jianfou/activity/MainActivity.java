@@ -35,10 +35,7 @@ import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.mask.ActivitySeekerService;
 import com.scrisstudio.jianfou.mask.MixedAssignerUtil;
 import com.scrisstudio.jianfou.mask.MixedRuleInfo;
-import com.scrisstudio.jianfou.mask.RuleInfo;
-import com.scrisstudio.jianfou.mask.SubRuleInfo;
-import com.scrisstudio.jianfou.ui.FullscreenDialogFragment;
-import com.scrisstudio.jianfou.ui.RuleInfoAdapter;
+import com.scrisstudio.jianfou.ui.MixedInfoAdapter;
 import com.scrisstudio.jianfou.ui.RuleInfoCardDecoration;
 import com.scrisstudio.jianfou.ui.SimpleDialogFragment;
 import com.sergivonavi.materialbanner.Banner;
@@ -64,19 +61,13 @@ public class MainActivity extends AppCompatActivity {
 			viewTarget = null, viewLastTimeChoice = null, viewToast = null;
 	public Banner banner;
 	private ActivityMainBinding binding;
-	private List<RuleInfo> list = new ArrayList<>();
 	private List<MixedRuleInfo> mixed = new ArrayList<>();
 	private RecyclerView recyclerView;
-	private RuleInfoAdapter adapter;
+	private MixedInfoAdapter adapter;
 
 	public static int dip2px(float dipValue) {
 		float m = jianfou.getAppContext().getResources().getDisplayMetrics().density;
 		return (int) (dipValue * m + 0.5f);
-	}
-
-	public static void openCardEditDialog(int position) {
-		FullscreenDialogFragment.display(fragmentManager, position, gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
-		}.getType()));
 	}
 
 	public static void openSimpleDialog(String type, String info) {
@@ -144,22 +135,12 @@ public class MainActivity extends AppCompatActivity {
 		binding.ruleList.setMinimumHeight(windowTrueHeight);
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(jianfou.getAppContext());
-		if (!sharedPreferences.contains("rules")) {
-			SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
-			ruleInitEditor.putString("rules", gson.toJson(list));
-			ruleInitEditor.apply();
-		}
 		if (!sharedPreferences.contains("mixed")) {
 			SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
-			SubRuleInfo sub = new SubRuleInfo(0, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 0, null, new ArrayList<>(), 0);
-			ArrayList<SubRuleInfo> subArray = new ArrayList<>();
-			subArray.add(sub);
-			mixed.add(new MixedRuleInfo(true, 0, "Title", "1.0.0", "software", "(any)", "com.example.software", subArray, 1));
+			mixed.add(new MixedRuleInfo(true, 0, "未设置", "1.0.0", "未设置", "any", "com.example.software", new ArrayList<>(), 0));
 			ruleInitEditor.putString("mixed", gson.toJson(mixed));
 			ruleInitEditor.apply();
 		}
-		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
-		}.getType());
 		mixed = gson.fromJson(sharedPreferences.getString("mixed", "{}"), new TypeToken<List<MixedRuleInfo>>() {
 		}.getType());
 
@@ -200,20 +181,9 @@ public class MainActivity extends AppCompatActivity {
 		LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
 		layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 		recyclerView.setLayoutManager(layoutManager);
-		adapter = new RuleInfoAdapter(getBaseContext(), list, sharedPreferences);
+		adapter = new MixedInfoAdapter(getBaseContext(), mixed, sharedPreferences);
 		recyclerView.setAdapter(adapter);
 		recyclerView.addItemDecoration(new RuleInfoCardDecoration());
-
-		FullscreenDialogFragment.setOnSubmitListener((pos, l) -> {
-			list = l;
-			SharedPreferences.Editor submitEditer = sharedPreferences.edit();
-			submitEditer.putString("rules", gson.toJson(list));
-			submitEditer.apply();
-
-			ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
-
-			adapter.dataChange(list);
-		});
 
 		/*binding.topAppBar.setOnMenuItemClickListener(menuItem -> {
 			if (menuItem.getItemId() == R.id.help) {
@@ -223,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 			return false;
 		});*/
 		binding.topAppBar.setOnMenuItemClickListener(menuItem -> {
-			MixedAssignerUtil.showActivityCustomizationDialog(0, 0, 0, 0);
+			Toast.makeText(this.getApplicationContext(), "还没有完成。", Toast.LENGTH_LONG).show();
 			return false;
 		});
 
@@ -255,11 +225,11 @@ public class MainActivity extends AppCompatActivity {
 			AlertDialog alertDialog = new MaterialAlertDialogBuilder(this).setTitle(R.string.add_rule).setItems(choices, (dialog, which) -> {
 				if (which == 0) {// manual add rule
 					SharedPreferences.Editor edit = sharedPreferences.edit();
-					list.add(new RuleInfo(true, sharedPreferences.getInt("rule-id-max", 0), "新建规则", "1.0", "软件名称", "any", 0, new ArrayList<>(), null, null, new ArrayList<>(), new ArrayList<>(), 0));
-					edit.putString("rules", gson.toJson(list));
+					mixed.add(new MixedRuleInfo(true, sharedPreferences.getInt("rule-id-max", 0), "未设置", "1.0.0", "未设置", "any", "com.example.software", new ArrayList<>(), 0));
+					edit.putString("mixed", gson.toJson(mixed));
 					edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
 					edit.apply();
-					adapter.dataChange(list);
+					adapter.dataChange(mixed);
 					ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
 				} else
 					Toast.makeText(jianfou.getAppContext(), "还没有完成。", Toast.LENGTH_LONG).show();
@@ -280,6 +250,12 @@ public class MainActivity extends AppCompatActivity {
 			} catch (IllegalAccessException | NoSuchFieldException e) {
 				e.printStackTrace();
 			}
+		});
+
+		MixedAssignerUtil.setOnQuitListener((position, list) -> {
+			mixed = list;
+			ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));//TODO rules->mixed
+			adapter.dataChange(list);
 		});
 	}
 
@@ -315,9 +291,9 @@ public class MainActivity extends AppCompatActivity {
 		permissionBannerOpener();
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(jianfou.getAppContext());
-		list = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+		mixed = gson.fromJson(sharedPreferences.getString("mixed", "{}"), new TypeToken<List<MixedRuleInfo>>() {
 		}.getType());
-		adapter = new RuleInfoAdapter(getBaseContext(), list, sharedPreferences);
+		adapter = new MixedInfoAdapter(getBaseContext(), mixed, sharedPreferences);
 		recyclerView.setAdapter(adapter);
 
 		if (!sharedPreferences.getBoolean("master-switch", true)) {

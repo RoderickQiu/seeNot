@@ -33,7 +33,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
@@ -45,6 +45,7 @@ import com.scrisstudio.jianfou.ui.SubRuleAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -59,7 +60,11 @@ public class MixedAssignerUtil {
 	private static WindowManager windowManager;
 	private static SharedPreferences sharedPreferences;
 	private static AtomicInteger mode = new AtomicInteger();
-	private static View viewCustomization = null, viewTarget = null, viewLastTimeChoice = null, viewToast = null;
+	private static OnQuitListener callBack;
+
+	public static void setOnQuitListener(OnQuitListener callback) {
+		callBack = callback;
+	}
 
 	@SuppressLint("ClickableViewAccessibility")
 	public static void showActivityCustomizationDialog(int modeId, int position, int current, int subCurrent) {
@@ -85,13 +90,13 @@ public class MixedAssignerUtil {
 		customizationParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
 		customizationParams.format = PixelFormat.TRANSPARENT;
 		customizationParams.gravity = Gravity.START | Gravity.TOP;
-		customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+		customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 		customizationParams.width = width;
 		customizationParams.height = (int) (height / 2.97);
 		customizationParams.x = (metrics.widthPixels - customizationParams.width) / 2;
-		customizationParams.y = metrics.heightPixels - customizationParams.height - 250;
+		customizationParams.y = 0;
 		customizationParams.alpha = 0.84f;
-		customizationParams.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE;
+		customizationParams.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING;
 
 		outlineParams = new WindowManager.LayoutParams();
 		outlineParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
@@ -114,10 +119,10 @@ public class MixedAssignerUtil {
 		toastParams = ActivitySeekerService.layoutParams;
 		toastParams.alpha = 0f;
 
-		viewCustomization = MainActivity.viewCustomization.get();
-		viewTarget = MainActivity.viewTarget.get();
-		viewLastTimeChoice = MainActivity.viewLastTimeChoice.get();
-		viewToast = inflater.inflate(R.layout.layout_toast_view, null);
+		View viewCustomization = MainActivity.viewCustomization.get(),
+				viewTarget = MainActivity.viewTarget.get(),
+				viewLastTimeChoice = MainActivity.viewLastTimeChoice.get(),
+				viewToast = inflater.inflate(R.layout.layout_toast_view, null);
 
 		final FrameLayout layoutOverlayOutline = viewTarget.findViewById(R.id.frame),
 				layoutLastTimeChoiceOutline = viewLastTimeChoice.findViewById(R.id.last_time_choice_frame);
@@ -260,9 +265,14 @@ public class MixedAssignerUtil {
 			ImageButton btSelectPreviousMask = viewCustomization.findViewById(R.id.previous_mask_widget),
 					btSelectNextMask = viewCustomization.findViewById(R.id.next_mask_widget);
 
-			if (mix.get(position).getSubRules().get(current).getFilterLength() != 0) {
-				tvCurrentMaskWidgetNum.setText("1");
-			} else {
+			try {
+				if (mix.get(position).getSubRules().get(current).getFilterLength() != 0) {
+					tvCurrentMaskWidgetNum.setText("1");
+				} else {
+					currentMaskWidgetId.set(-1);
+					tvCurrentMaskWidgetNum.setText("0");
+				}
+			} catch (Exception e) {
 				currentMaskWidgetId.set(-1);
 				tvCurrentMaskWidgetNum.setText("0");
 			}
@@ -361,14 +371,13 @@ public class MixedAssignerUtil {
 					viewCustomization.findViewById(R.id.mixed_subrule_set).setVisibility(View.GONE);
 					viewCustomization.findViewById(R.id.mixed_condition_set).setVisibility(View.GONE);
 					viewCustomization.findViewById(R.id.new_mask_subrule).setVisibility(View.VISIBLE);
+					viewCustomization.findViewById(R.id.set_mask_info).setVisibility(View.VISIBLE);
 					viewCustomization.findViewById(R.id.button_save_condition).setVisibility(View.GONE);
 
-					if (mix.get(position).getFor().equals("software")) {
-						viewCustomization.findViewById(R.id.rule_for_text_pre).setVisibility(View.GONE);
-						viewCustomization.findViewById(R.id.rule_for_text).setVisibility(View.GONE);
+					if (mix.get(position).getFor().equals("未设置")) {
+						viewCustomization.findViewById(R.id.mixed_rule_for).setVisibility(View.GONE);
 					} else {
-						viewCustomization.findViewById(R.id.rule_for_text_pre).setVisibility(View.VISIBLE);
-						viewCustomization.findViewById(R.id.rule_for_text).setVisibility(View.VISIBLE);
+						viewCustomization.findViewById(R.id.mixed_rule_for).setVisibility(View.VISIBLE);
 						((TextView) viewCustomization.findViewById(R.id.rule_for_text)).setText(mix.get(position).getFor());
 					}
 
@@ -381,7 +390,7 @@ public class MixedAssignerUtil {
 					SubRuleAdapter adapter = new SubRuleAdapter(inflater, mix, position, sharedPreferences);
 					recyclerView.setAdapter(adapter);
 
-					final ExtendedFloatingActionButton btAdd = viewCustomization.findViewById(R.id.new_mask_subrule);
+					final Button btAdd = viewCustomization.findViewById(R.id.new_mask_subrule);
 					btAdd.setOnClickListener(v -> {
 						AtomicInteger type = new AtomicInteger();
 						String packageName = ActivitySeekerService.foregroundPackageName;
@@ -417,14 +426,13 @@ public class MixedAssignerUtil {
 							popup.show();
 						};
 
-						if (mix.get(position).getFor().equals("software")) {
+						if (mix.get(position).getFor().equals("未设置")) {
 							if (!packageName.equals("") && !packageName.equals("com.scrisstudio.jianfou") && !packageName.equals(ActivitySeekerService.currentHomePackage)) {
 								mix.get(position).setFor(getApplicationNameFunction.apply(packageName));
 								mix.get(position).setForVersion(getApplicationVersionFunction.apply(packageName));
 								mix.get(position).setForPackageName(packageName);
 
-								viewCustomization.findViewById(R.id.rule_for_text_pre).setVisibility(View.VISIBLE);
-								viewCustomization.findViewById(R.id.rule_for_text).setVisibility(View.VISIBLE);
+								viewCustomization.findViewById(R.id.mixed_rule_for).setVisibility(View.VISIBLE);
 								((TextView) viewCustomization.findViewById(R.id.rule_for_text)).setText(mix.get(position).getFor());
 								popupOpener.accept(voided);
 							} else
@@ -442,6 +450,7 @@ public class MixedAssignerUtil {
 					viewCustomization.findViewById(R.id.mixed_rule_for).setVisibility(View.GONE);
 					viewCustomization.findViewById(R.id.mixed_back).setVisibility(View.VISIBLE);
 					viewCustomization.findViewById(R.id.mixed_condition_set).setVisibility(View.GONE);
+					viewCustomization.findViewById(R.id.set_mask_info).setVisibility(View.GONE);
 					viewCustomization.findViewById(R.id.new_mask_subrule).setVisibility(View.GONE);
 					viewCustomization.findViewById(R.id.button_save_condition).setVisibility(View.GONE);
 
@@ -695,6 +704,32 @@ public class MixedAssignerUtil {
 							viewCustomization.findViewById(R.id.condition_skip).setVisibility(View.VISIBLE);
 						}
 					}
+				} else if (mode.get() == 3) {
+					viewCustomization.findViewById(R.id.mixed_home).setVisibility(View.GONE);
+					viewCustomization.findViewById(R.id.mixed_subrule_set).setVisibility(View.GONE);
+					viewCustomization.findViewById(R.id.mixed_rule_for).setVisibility(View.GONE);
+					viewCustomization.findViewById(R.id.mixed_back).setVisibility(View.VISIBLE);
+					viewCustomization.findViewById(R.id.mixed_condition_set).setVisibility(View.GONE);
+					viewCustomization.findViewById(R.id.button_save_condition).setVisibility(View.VISIBLE);
+					viewCustomization.findViewById(R.id.set_mask_info).setVisibility(View.GONE);
+					viewCustomization.findViewById(R.id.new_mask_subrule).setVisibility(View.GONE);
+
+					TextInputLayout tvRuleName = viewCustomization.findViewById(R.id.rule_name),
+							tvRuleVersion = viewCustomization.findViewById(R.id.rule_version),
+							tvRuleForVersion = viewCustomization.findViewById(R.id.rule_for_version);
+					Button btSave = viewCustomization.findViewById(R.id.button_save_condition);
+					Objects.requireNonNull(tvRuleName.getEditText()).setText(mix.get(position).getTitle());
+					Objects.requireNonNull(tvRuleVersion.getEditText()).setText(mix.get(position).getVersion());
+					Objects.requireNonNull(tvRuleForVersion.getEditText()).setText(mix.get(position).getForVersion());
+					btSave.setOnClickListener(v -> {
+						mix.get(position).setTitle(tvRuleName.getEditText().getText().toString());
+						mix.get(position).setVersion(tvRuleVersion.getEditText().getText().toString());
+						mix.get(position).setForVersion(tvRuleForVersion.getEditText().getText().toString());
+
+						SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
+						ruleInitEditor.putString("mixed", gson.toJson(mix));
+						ruleInitEditor.apply();
+					});
 				}
 			};
 
@@ -705,9 +740,17 @@ public class MixedAssignerUtil {
 				modeChanger.accept("1");
 			});
 
+			final Button btSetMaskInfo = viewCustomization.findViewById(R.id.set_mask_info);
+			btSetMaskInfo.setOnClickListener(v -> {
+				mode.set(3);
+				isSettingCondition.set(false);
+				modeChanger.accept("");
+			});
+
 			final ImageButton btBack = viewCustomization.findViewById(R.id.mixed_back);
 			btBack.setOnClickListener(v -> {
-				mode.decrementAndGet();
+				if (mode.get() != 3) mode.decrementAndGet();
+				else mode.set(0);
 				modeChanger.accept("");
 				layoutOverlayOutline.removeAllViews();
 				layoutLastTimeChoiceOutline.removeView(lastChoice);
@@ -744,6 +787,7 @@ public class MixedAssignerUtil {
 				windowManager.removeViewImmediate(viewTarget);
 				windowManager.removeViewImmediate(viewLastTimeChoice);
 				ActivitySeekerService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
+				callBack.onQuit(position, mix);
 			});
 
 			try {
@@ -770,5 +814,9 @@ public class MixedAssignerUtil {
 		if (!childrenList.isEmpty()) {
 			findAllNode(childrenList, list);
 		}
+	}
+
+	public interface OnQuitListener {
+		void onQuit(int position, List<MixedRuleInfo> list);
 	}
 }

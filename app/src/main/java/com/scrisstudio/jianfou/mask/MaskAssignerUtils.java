@@ -1,4 +1,7 @@
 package com.scrisstudio.jianfou.mask;
+import static com.scrisstudio.jianfou.mask.ActivitySeekerService.TAG;
+import static com.scrisstudio.jianfou.mask.ActivitySeekerService.mService;
+
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -33,9 +36,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static com.scrisstudio.jianfou.mask.ActivitySeekerService.TAG;
-import static com.scrisstudio.jianfou.mask.ActivitySeekerService.mService;
 
 public class MaskAssignerUtils {
 
@@ -138,7 +138,7 @@ public class MaskAssignerUtils {
 		customizationParams.x = (metrics.widthPixels - customizationParams.width) / 2;
 		customizationParams.y = metrics.heightPixels - customizationParams.height;
 		customizationParams.alpha = 0.8f;
-		customizationParams.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE;
+		customizationParams.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN;
 
 		lastTimeFrameParams = new WindowManager.LayoutParams();
 		lastTimeFrameParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;

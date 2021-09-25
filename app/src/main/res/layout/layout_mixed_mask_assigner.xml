@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E5BC18"
+    android:background="@color/orange_600"
     android:orientation="vertical"
     android:padding="10dp">
 
@@ -27,7 +27,7 @@
                 android:layout_alignParentStart="true"
                 android:paddingBottom="1dp"
                 android:text="@string/press_here_move"
-                android:textColor="#ffffff"
+                android:textColor="@color/gray_700"
                 android:textSize="14sp"
                 tools:ignore="RelativeOverlap" />
 
@@ -39,7 +39,7 @@
                 android:backgroundTint="#00000000"
                 android:contentDescription="@string/exit"
                 android:padding="1dp"
-                android:src="@drawable/close_white_18dp" />
+                android:src="@drawable/close_18dp" />
 
         </RelativeLayout>
 
@@ -48,19 +48,55 @@
             android:layout_height="0.3dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="6dp"
-            android:background="@color/gray_400" />
+            android:background="@color/gray_700" />
 
         <LinearLayout
             android:id="@+id/mixed_home"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/mixed_rule_for"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginStart="6dp"
+                android:paddingVertical="8dp"
+                tools:ignore="RtlSymmetry">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rule_for_msg"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/rule_for_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="："
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/subrule_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="6dp"
                 android:layout_marginBottom="52dp"
                 android:scrollbarAlwaysDrawVerticalTrack="true" />
 
@@ -75,7 +111,8 @@
             android:fadeScrollbars="false"
             android:scrollbarStyle="outsideOverlay"
             android:scrollbarThumbVertical="@drawable/scrollbar"
-            android:scrollbars="vertical">
+            android:scrollbars="vertical"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -94,7 +131,7 @@
                     android:layout_height="0.3dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="9dp"
-                    android:background="@color/gray_400" />
+                    android:background="@color/gray_700" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -223,7 +260,7 @@
                     android:layout_height="0.3dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="9dp"
-                    android:background="@color/gray_400" />
+                    android:background="@color/gray_700" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -267,7 +304,7 @@
                             android:contentDescription="@string/previous"
                             android:padding="0dp"
                             android:src="@drawable/arrow_left_24dp"
-                            app:tint="@color/black" />
+                            app:tint="@color/gray_700" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -311,7 +348,7 @@
                             android:contentDescription="@string/next"
                             android:padding="0dp"
                             android:src="@drawable/arrow_right_24dp"
-                            app:tint="@color/black" />
+                            app:tint="@color/gray_700" />
 
                     </RelativeLayout>
 
@@ -382,7 +419,8 @@
             android:fadeScrollbars="false"
             android:scrollbarStyle="outsideOverlay"
             android:scrollbarThumbVertical="@drawable/scrollbar"
-            android:scrollbars="vertical">
+            android:scrollbars="vertical"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -401,7 +439,7 @@
                     android:layout_height="0.3dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="9dp"
-                    android:background="@color/gray_400" />
+                    android:background="@color/gray_700" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -484,7 +522,7 @@
                     android:layout_height="0.3dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="9dp"
-                    android:background="@color/gray_400" />
+                    android:background="@color/gray_700" />
 
                 <LinearLayout
                     android:id="@+id/condition_skip"
@@ -555,6 +593,96 @@
 
         </androidx.core.widget.NestedScrollView>
 
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/mixed_info_set"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="52dp"
+            android:fadeScrollbars="false"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbarThumbVertical="@drawable/scrollbar"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="6dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:elevation="1dp"
+                    android:text="@string/rule_title" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/rule_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-20dp"
+                    android:inputType="textNoSuggestions"
+                    app:boxBackgroundColor="@color/orange_600"
+                    app:boxStrokeColor="@color/gray_700">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:elevation="1dp"
+                    android:text="@string/rule_version" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/rule_version"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-20dp"
+                    android:inputType="textNoSuggestions"
+                    app:boxBackgroundColor="@color/orange_600"
+                    app:boxStrokeColor="@color/gray_700">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/default_rule_version_number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:elevation="1dp"
+                    android:text="@string/rule_for_version" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/rule_for_version"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-20dp"
+                    android:inputType="textNoSuggestions"
+                    app:boxBackgroundColor="@color/orange_600"
+                    app:boxStrokeColor="@color/gray_700">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/default_rule_version_number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
     </LinearLayout>
 
     <RelativeLayout
@@ -562,36 +690,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         tools:ignore="RelativeOverlap">
-
-        <LinearLayout
-            android:id="@+id/mixed_rule_for"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="end"
-            android:paddingStart="5dp"
-            android:paddingBottom="4dp"
-            tools:ignore="RtlSymmetry">
-
-            <TextView
-                android:id="@+id/rule_for_text_pre"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/rule_for_msg"
-                android:textColor="#ffffff"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/rule_for_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:textColor="#ffffff"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
 
         <ImageButton
             android:id="@+id/mixed_back"
@@ -602,7 +700,22 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/expand_more"
             android:src="@drawable/baseline_arrow_back_ios_24dp"
-            app:tint="@color/white" />
+            app:tint="@color/gray_700" />
+
+        <Button
+            android:id="@+id/set_mask_info"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="6dp"
+            android:drawableLeft="@drawable/settings_18dp"
+            android:drawablePadding="4dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:text="@string/set_mask_info"
+            android:textColor="@color/gray_800"
+            tools:ignore="RtlHardcoded" />
 
         <Button
             android:id="@+id/button_save_condition"
@@ -621,22 +734,20 @@
             android:textColor="@color/gray_800"
             tools:ignore="RtlHardcoded" />
 
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        <Button
             android:id="@+id/new_mask_subrule"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="end"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="6dp"
-            android:contentDescription="@string/fab_content_desc"
+            android:layout_marginEnd="6dp"
+            android:drawableLeft="@drawable/add_18dp"
+            android:drawablePadding="4dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/new_subrule"
-            android:textSize="12sp"
-            app:icon="@drawable/add_18dp"
-            app:iconSize="16dp" />
+            android:textColor="@color/gray_800"
+            tools:ignore="RtlHardcoded" />
 
     </RelativeLayout>
 

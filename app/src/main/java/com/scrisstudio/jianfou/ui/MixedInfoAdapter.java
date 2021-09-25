@@ -1,6 +1,4 @@
 package com.scrisstudio.jianfou.ui;
-import static com.scrisstudio.jianfou.jianfou.getRuleTypeRealName;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,22 +19,23 @@ import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
 import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.mask.ActivitySeekerService;
-import com.scrisstudio.jianfou.mask.RuleInfo;
+import com.scrisstudio.jianfou.mask.MixedAssignerUtil;
+import com.scrisstudio.jianfou.mask.MixedRuleInfo;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyViewHolder> {
+public class MixedInfoAdapter extends RecyclerView.Adapter<MixedInfoAdapter.MyViewHolder> {
 
 	private static final int VIEW_TYPE_EMPTY = 0;
 	private static final int VIEW_TYPE_CARD = 1;
-	private static List<RuleInfo> mList = null;
+	private static List<MixedRuleInfo> mList = null;
 	private final SharedPreferences sharedPreferences;
 	private final Context context;
 	private final Gson gson;
 
-	public RuleInfoAdapter(Context context, List<RuleInfo> list, SharedPreferences sharedPreferences) {
+	public MixedInfoAdapter(Context context, List<MixedRuleInfo> list, SharedPreferences sharedPreferences) {
 		this.context = context;
 		this.sharedPreferences = sharedPreferences;
 		mList = list;
@@ -69,7 +68,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 	public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 		int viewType = getItemViewType(position);
 		if (viewType == VIEW_TYPE_CARD) {
-			RuleInfo rule = mList.get(position);
+			MixedRuleInfo rule = mList.get(position);
 
 			holder.ruleId.setContentDescription(String.valueOf(rule.getId()));
 			holder.ruleTitle.setText(rule.getTitle());
@@ -77,11 +76,10 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 			holder.ruleFor.setText(rule.getFor());
 			holder.ruleForVersion.setText(" (" + rule.getForVersion() + ")");
 			holder.ruleSwitch.setChecked(rule.getStatus());
-			holder.ruleType.setText(getRuleTypeRealName(rule.getType()));
 
 			holder.ruleSwitch.setOnCheckedChangeListener((v, isChecked) -> {
 				SharedPreferences.Editor edit = sharedPreferences.edit();
-				RuleInfo newRule = mList.get(position);
+				MixedRuleInfo newRule = mList.get(position);
 				newRule.setStatus(isChecked);
 
 				mList.set(position, newRule);
@@ -93,7 +91,9 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 
 			holder.moreButton.setOnClickListener(v -> MainActivity.openSimpleDialog("more-info", MainActivity.resources.getString(R.string.rule_version_info) + rule.getVersion()));
 
-			//holder.editButton.setOnClickListener(v -> MainActivity.openCardEditDialog(position));
+			holder.editButton.setOnClickListener(v -> {
+				MixedAssignerUtil.showActivityCustomizationDialog(0, position, 0, 0);
+			});
 
 			holder.deleteButton.setOnClickListener(v -> {
 				holder.deleteButton.setVisibility(View.GONE);
@@ -130,7 +130,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 	}
 
 	@SuppressLint("NotifyDataSetChanged")
-	public void dataChange(List<RuleInfo> l) {
+	public void dataChange(List<MixedRuleInfo> l) {
 		mList = l;
 		notifyDataSetChanged();
 	}
@@ -145,7 +145,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 	}
 
 	static class MyViewHolder extends RecyclerView.ViewHolder {
-		TextView ruleTitle, ruleVersion, ruleFor, ruleForVersion, ruleType, ruleId;
+		TextView ruleTitle, ruleVersion, ruleFor, ruleForVersion, ruleId;
 		ImageButton moreButton, editButton, deleteButton;
 		Button deleteRecheckButton;
 		SwitchMaterial ruleSwitch;
@@ -157,7 +157,6 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 			ruleVersion = view.findViewById(R.id.rule_version);
 			ruleFor = view.findViewById(R.id.rule_for);
 			ruleForVersion = view.findViewById(R.id.rule_for_version);
-			//ruleType = view.findViewById(R.id.rule_type);
 			moreButton = view.findViewById(R.id.more_button);
 			editButton = view.findViewById(R.id.edit_button);
 			deleteButton = view.findViewById(R.id.delete_button);

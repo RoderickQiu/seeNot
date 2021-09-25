@@ -144,4 +144,5 @@
     <string name="subrule_set_mask_msg">对页面需要遮蔽的内容遮罩</string>
     <string name="copy_skip">复制条件到新子规则</string>
     <string name="delete_current">删除当前遮罩</string>
+    <string name="set_mask_info">设置规则信息</string>
 </resources>
