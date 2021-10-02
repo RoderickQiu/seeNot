@@ -90,7 +90,7 @@ public class MixedAssignerUtil {
 		customizationParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
 		customizationParams.format = PixelFormat.TRANSPARENT;
 		customizationParams.gravity = Gravity.START | Gravity.TOP;
-		customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+		customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 		customizationParams.width = width;
 		customizationParams.height = (int) (height / 2.97);
 		customizationParams.x = (metrics.widthPixels - customizationParams.width) / 2;
@@ -147,35 +147,40 @@ public class MixedAssignerUtil {
 			content.setText(input == null ? "发生错误" : input.toString());
 
 			MainActivity.runOnUI(() -> {
-				windowManager.addView(viewToast, toastParams);
+				try {
+					windowManager.addView(viewToast, toastParams);
+				} catch (Exception e) {
+					le(e.getLocalizedMessage());
+				}
 			});
 
 			new Timer().schedule(new TimerTask() {
 				@Override
 				public void run() {
-					try {
-						toastParams.x = (metrics.widthPixels - contentWidth.get()) / 2 - 26;
-						toastParams.y = metrics.heightPixels - 300;
-						toastParams.alpha = 1f;
-						MainActivity.runOnUI(() -> {
+					toastParams.x = (metrics.widthPixels - contentWidth.get()) / 2 - 26;
+					toastParams.y = metrics.heightPixels - 300;
+					toastParams.alpha = 1f;
+					MainActivity.runOnUI(() -> {
+						try {
 							windowManager.updateViewLayout(viewToast, toastParams);
-						});
-					} catch (Exception e) {
-						le(e.getLocalizedMessage());
-					}
+						} catch (Exception e) {
+							le(e.getLocalizedMessage());
+						}
+					});
 				}
 			}, 200);
 
 			new Timer().schedule(new TimerTask() {
 				@Override
 				public void run() {
-					try {
-						MainActivity.runOnUI(() -> {
+					MainActivity.runOnUI(() -> {
+						try {
 							windowManager.removeViewImmediate(viewToast);
-						});
-					} catch (Exception e) {
-						le(e.getLocalizedMessage());
-					}
+
+						} catch (Exception e) {
+							le(e.getLocalizedMessage());
+						}
+					});
 				}
 			}, 3000);
 		};
@@ -427,6 +432,7 @@ public class MixedAssignerUtil {
 						};
 
 						if (mix.get(position).getFor().equals("未设置")) {
+							le(packageName);
 							if (!packageName.equals("") && !packageName.equals("com.scrisstudio.jianfou") && !packageName.equals(ActivitySeekerService.currentHomePackage)) {
 								mix.get(position).setFor(getApplicationNameFunction.apply(packageName));
 								mix.get(position).setForVersion(getApplicationVersionFunction.apply(packageName));
@@ -612,7 +618,7 @@ public class MixedAssignerUtil {
 							subRuleCommitter.accept(subArray, false);
 						}
 					});
-				} else if (mode.get() == 2) {
+				} else if (mode.get() == 2) {//mask more set
 					viewCustomization.findViewById(R.id.mixed_home).setVisibility(View.GONE);
 					viewCustomization.findViewById(R.id.mixed_subrule_set).setVisibility(View.GONE);
 					viewCustomization.findViewById(R.id.mixed_rule_for).setVisibility(View.GONE);
@@ -704,7 +710,13 @@ public class MixedAssignerUtil {
 							viewCustomization.findViewById(R.id.condition_skip).setVisibility(View.VISIBLE);
 						}
 					}
-				} else if (mode.get() == 3) {
+				} else if (mode.get() == 3) {//rule basis set
+					try {
+						customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+						windowManager.updateViewLayout(viewCustomization, customizationParams);
+					} catch (Exception e) {
+						le(e.getLocalizedMessage());
+					}
 					viewCustomization.findViewById(R.id.mixed_home).setVisibility(View.GONE);
 					viewCustomization.findViewById(R.id.mixed_subrule_set).setVisibility(View.GONE);
 					viewCustomization.findViewById(R.id.mixed_rule_for).setVisibility(View.GONE);
@@ -750,7 +762,15 @@ public class MixedAssignerUtil {
 			final ImageButton btBack = viewCustomization.findViewById(R.id.mixed_back);
 			btBack.setOnClickListener(v -> {
 				if (mode.get() != 3) mode.decrementAndGet();
-				else mode.set(0);
+				else {
+					mode.set(0);
+					try {
+						customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+						windowManager.updateViewLayout(viewCustomization, customizationParams);
+					} catch (Exception e) {
+						le(e.getLocalizedMessage());
+					}
+				}
 				modeChanger.accept("");
 				layoutOverlayOutline.removeAllViews();
 				layoutLastTimeChoiceOutline.removeView(lastChoice);
