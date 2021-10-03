@@ -60,7 +60,7 @@
         </receiver>
 
         <service
-            android:name=".mask.ActivitySeekerService"
+            android:name=".mask.MixedExecutorService"
             android:enabled="true"
             android:exported="true"
             android:label="@string/service_name"

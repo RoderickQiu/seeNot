@@ -2,10 +2,10 @@ package com.scrisstudio.jianfou.mask;
 import static android.content.Context.WINDOW_SERVICE;
 import static com.scrisstudio.jianfou.activity.MainActivity.resources;
 import static com.scrisstudio.jianfou.jianfou.voided;
-import static com.scrisstudio.jianfou.mask.ActivitySeekerService.TAG;
-import static com.scrisstudio.jianfou.mask.ActivitySeekerService.inflater;
-import static com.scrisstudio.jianfou.mask.ActivitySeekerService.le;
-import static com.scrisstudio.jianfou.mask.ActivitySeekerService.mService;
+import static com.scrisstudio.jianfou.mask.MixedExecutorService.TAG;
+import static com.scrisstudio.jianfou.mask.MixedExecutorService.inflater;
+import static com.scrisstudio.jianfou.mask.MixedExecutorService.mService;
+import static com.scrisstudio.jianfou.mask.MixedOperatorUtils.le;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -78,7 +78,7 @@ public class MixedAssignerUtil {
 		final AtomicReference<ArrayList<Integer>> resultWidget = new AtomicReference<>(new ArrayList<>());
 		final AtomicReference<String> resultText = new AtomicReference<>("");
 		final AtomicReference<Integer> resultFilterLength = new AtomicReference<>(0);
-		ActivitySeekerService.isServiceRunning = false;
+		MixedExecutorService.isServiceRunning = false;
 
 		windowManager.getDefaultDisplay().getRealMetrics(metrics);
 		boolean b = metrics.heightPixels > metrics.widthPixels;
@@ -116,7 +116,7 @@ public class MixedAssignerUtil {
 		lastTimeFrameParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
 		lastTimeFrameParams.alpha = 0.8f;
 
-		toastParams = ActivitySeekerService.layoutParams;
+		toastParams = MixedExecutorService.layoutParams;
 		toastParams.alpha = 0f;
 
 		View viewCustomization = MainActivity.viewCustomization.get(),
@@ -284,7 +284,7 @@ public class MixedAssignerUtil {
 
 			Consumer<Void> showOutlineOperator = (v) -> {
 				if (outlineParams.alpha == 0) {
-					if (!ActivitySeekerService.foregroundPackageName.equals(ActivitySeekerService.currentHomePackage) && !ActivitySeekerService.foregroundPackageName.equals("com.scrisstudio.jianfou")) {
+					if (!MixedExecutorService.foregroundPackageName.equals(MixedExecutorService.currentHomePackage) && !MixedExecutorService.foregroundPackageName.equals("com.scrisstudio.jianfou")) {
 						if (currentMaskWidgetId.get() > 4) {
 							toastSender.accept("只允许同时存在5个遮罩");
 							return;
@@ -398,7 +398,7 @@ public class MixedAssignerUtil {
 					final Button btAdd = viewCustomization.findViewById(R.id.new_mask_subrule);
 					btAdd.setOnClickListener(v -> {
 						AtomicInteger type = new AtomicInteger();
-						String packageName = ActivitySeekerService.foregroundPackageName;
+						String packageName = MixedExecutorService.foregroundPackageName;
 
 						Consumer<Void> popupOpener = (v1) -> {
 							PopupMenu popup = new PopupMenu(jianfou.getAppContext(), v);
@@ -433,7 +433,7 @@ public class MixedAssignerUtil {
 
 						if (mix.get(position).getFor().equals("未设置")) {
 							le(packageName);
-							if (!packageName.equals("") && !packageName.equals("com.scrisstudio.jianfou") && !packageName.equals(ActivitySeekerService.currentHomePackage)) {
+							if (!packageName.equals("") && !packageName.equals("com.scrisstudio.jianfou") && !packageName.equals(MixedExecutorService.currentHomePackage)) {
 								mix.get(position).setFor(getApplicationNameFunction.apply(packageName));
 								mix.get(position).setForVersion(getApplicationVersionFunction.apply(packageName));
 								mix.get(position).setForPackageName(packageName);
@@ -561,7 +561,7 @@ public class MixedAssignerUtil {
 						btDeleteThisMask.setVisibility(View.VISIBLE);
 					}
 					btShowMaskOutline.setOnClickListener(v -> {
-						if (mix.get(position).getForPackageName().equals(ActivitySeekerService.foregroundPackageName)) {
+						if (mix.get(position).getForPackageName().equals(MixedExecutorService.foregroundPackageName)) {
 							showOutlineOperator.accept(voided);
 						} else {
 							toastSender.accept("这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置");
@@ -633,12 +633,12 @@ public class MixedAssignerUtil {
 
 					Consumer<Void> getPackageAndClassName = (v) -> {
 						try {
-							tvPackageName.setText(ActivitySeekerService.foregroundPackageName);
-							tvActivityName.setText(ActivitySeekerService.foregroundClassName.replace(ActivitySeekerService.foregroundPackageName, ""));
+							tvPackageName.setText(MixedExecutorService.foregroundPackageName);
+							tvActivityName.setText(MixedExecutorService.foregroundClassName.replace(MixedExecutorService.foregroundPackageName, ""));
 						} catch (Exception ignored) {
 						}
 					};
-					if (mix.get(position).getForPackageName().equals(ActivitySeekerService.foregroundPackageName))
+					if (mix.get(position).getForPackageName().equals(MixedExecutorService.foregroundPackageName))
 						getPackageAndClassName.accept(voided);
 					else {
 						tvPackageName.setText("---");
@@ -646,7 +646,7 @@ public class MixedAssignerUtil {
 					}
 
 					btRefresh.setOnClickListener(v -> {
-						if (mix.get(position).getForPackageName().equals(ActivitySeekerService.foregroundPackageName))
+						if (mix.get(position).getForPackageName().equals(MixedExecutorService.foregroundPackageName))
 							getPackageAndClassName.accept(voided);
 						else {
 							tvPackageName.setText("---");
@@ -659,8 +659,8 @@ public class MixedAssignerUtil {
 					if (isSettingCondition.get()) {//condition
 						tvConditionTitle.setText(resources.getStringArray(R.array.condition_spinner)[subArray.get(current).getConditionActivity() == null ? 0 : 1]);
 						btSave.setOnClickListener(v -> {
-							if (mix.get(position).getForPackageName().equals(ActivitySeekerService.foregroundPackageName)) {
-								subArray.get(current).setConditionActivity(ActivitySeekerService.foregroundClassName);
+							if (mix.get(position).getForPackageName().equals(MixedExecutorService.foregroundPackageName)) {
+								subArray.get(current).setConditionActivity(MixedExecutorService.foregroundClassName);
 								subRuleCommitter.accept(subArray, false);
 							} else
 								toastSender.accept("这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置");
@@ -672,8 +672,8 @@ public class MixedAssignerUtil {
 
 						if (skipArray.get(subCurrent).getType() == 0) {
 							btSave.setOnClickListener(v -> {
-								if (mix.get(position).getForPackageName().equals(ActivitySeekerService.foregroundPackageName)) {
-									skipArray.get(subCurrent).setParam(ActivitySeekerService.foregroundClassName);
+								if (mix.get(position).getForPackageName().equals(MixedExecutorService.foregroundPackageName)) {
+									skipArray.get(subCurrent).setParam(MixedExecutorService.foregroundClassName);
 									subArray.get(current).setSkip(skipArray);
 									subRuleCommitter.accept(subArray, false);
 								} else
@@ -686,7 +686,7 @@ public class MixedAssignerUtil {
 							tvConditionSkipText.setText(skipArray.get(subCurrent).getParam());
 
 							btShowConditionOutline.setOnClickListener(v -> {
-								if (mix.get(position).getForPackageName().equals(ActivitySeekerService.foregroundPackageName)) {
+								if (mix.get(position).getForPackageName().equals(MixedExecutorService.foregroundPackageName)) {
 									getPackageAndClassName.accept(voided);
 									showOutlineOperator.accept(voided);
 								} else {
@@ -702,7 +702,7 @@ public class MixedAssignerUtil {
 								subArray.get(current).setSkip(skipArray);
 							});
 							btSave.setOnClickListener(v -> {
-								if (mix.get(position).getForPackageName().equals(ActivitySeekerService.foregroundPackageName)) {
+								if (mix.get(position).getForPackageName().equals(MixedExecutorService.foregroundPackageName)) {
 									subRuleCommitter.accept(subArray, false);
 								} else
 									toastSender.accept("这条规则是关于" + mix.get(position).getFor() + "的，只能在那个程序打开时设置");
@@ -806,7 +806,7 @@ public class MixedAssignerUtil {
 				windowManager.removeViewImmediate(viewCustomization);
 				windowManager.removeViewImmediate(viewTarget);
 				windowManager.removeViewImmediate(viewLastTimeChoice);
-				ActivitySeekerService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
+				MixedExecutorService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
 				callBack.onQuit(position, mix);
 			});
 

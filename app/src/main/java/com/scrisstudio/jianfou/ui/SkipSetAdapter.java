@@ -1,5 +1,5 @@
 package com.scrisstudio.jianfou.ui;
-import static com.scrisstudio.jianfou.mask.ActivitySeekerService.l;
+import static com.scrisstudio.jianfou.mask.MixedOperatorUtils.l;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;

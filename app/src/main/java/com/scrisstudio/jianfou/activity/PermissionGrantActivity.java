@@ -1,5 +1,7 @@
 package com.scrisstudio.jianfou.activity;
 
+import static com.scrisstudio.jianfou.mask.MixedOperatorUtils.l;
+
 import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -18,14 +20,12 @@ import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.databinding.ActivityPermissionGrantBinding;
 import com.scrisstudio.jianfou.jianfou;
 
-import static com.scrisstudio.jianfou.mask.ActivitySeekerService.l;
-
 public class PermissionGrantActivity extends AppCompatActivity {
 	ActivityPermissionGrantBinding binding;
 
 	public static boolean isAccessibilitySettingsOn(Context mContext) {
 		int accessibilityEnabled = 0;
-		final String service = "com.scrisstudio.jianfou/com.scrisstudio.jianfou.mask.ActivitySeekerService";
+		final String service = "com.scrisstudio.jianfou/com.scrisstudio.jianfou.mask.MixedExecutorService";
 		try {
 			accessibilityEnabled = Settings.Secure.getInt(
 					mContext.getApplicationContext().getContentResolver(),

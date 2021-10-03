@@ -10,7 +10,7 @@ public class BootReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		//software auto start
 		if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED") || intent.getAction().equals("android.intent.action.QUICKBOOT_POWERON")) {
-			Intent serviceIntent = new Intent(context, ActivitySeekerService.class);
+			Intent serviceIntent = new Intent(context, MixedExecutorService.class);
 			context.startService(serviceIntent);
 			Toast.makeText(context, "见否正在自启动...", Toast.LENGTH_LONG).show();
 		}

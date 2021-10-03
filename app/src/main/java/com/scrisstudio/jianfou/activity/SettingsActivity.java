@@ -10,7 +10,7 @@ import androidx.preference.PreferenceManager;
 
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.databinding.ActivitySettingsBinding;
-import com.scrisstudio.jianfou.mask.ActivitySeekerService;
+import com.scrisstudio.jianfou.mask.MixedExecutorService;
 
 import java.util.Objects;
 
@@ -18,7 +18,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 	private final SharedPreferences.OnSharedPreferenceChangeListener mListener = (sharedPreferences, key) -> {
 		if (Objects.equals(key, "master-switch")) {
-			ActivitySeekerService.isServiceRunning = sharedPreferences.getBoolean(key, true);
+			MixedExecutorService.isServiceRunning = sharedPreferences.getBoolean(key, true);
 		}
 	};
 	ActivitySettingsBinding binding;

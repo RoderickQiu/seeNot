@@ -32,8 +32,8 @@ import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.databinding.ActivityMainBinding;
 import com.scrisstudio.jianfou.jianfou;
-import com.scrisstudio.jianfou.mask.ActivitySeekerService;
 import com.scrisstudio.jianfou.mask.MixedAssignerUtil;
+import com.scrisstudio.jianfou.mask.MixedExecutorService;
 import com.scrisstudio.jianfou.mask.MixedRuleInfo;
 import com.scrisstudio.jianfou.ui.MixedInfoAdapter;
 import com.scrisstudio.jianfou.ui.RuleInfoCardDecoration;
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == 200) {
 			if (Settings.System.canWrite(getApplicationContext())) {
-				Intent serviceIntent = new Intent(this, ActivitySeekerService.class);
+				Intent serviceIntent = new Intent(this, MixedExecutorService.class);
 				startService(serviceIntent);
 			}
 		} else if (requestCode == 201) {
@@ -149,10 +149,10 @@ public class MainActivity extends AppCompatActivity {
 		banner.setRightButtonListener(banner2 -> {
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("master-switch", true);
-			ActivitySeekerService.isServiceRunning = true;
+			MixedExecutorService.isServiceRunning = true;
 			editor.apply();
 
-			if (ActivitySeekerService.isStart()) {
+			if (MixedExecutorService.isStart()) {
 				Toast.makeText(this.getApplicationContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
 			}
 			banner.dismiss();
@@ -162,14 +162,14 @@ public class MainActivity extends AppCompatActivity {
 			banner.show();
 		}
 
-		ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), false, sharedPreferences.getBoolean("split", true));
+		MixedExecutorService.setServiceBasicInfo(sharedPreferences.getString("mixed", "{}"), false, sharedPreferences.getBoolean("split", true));
 
-		Intent serviceIntent = new Intent(this, ActivitySeekerService.class);
+		Intent serviceIntent = new Intent(this, MixedExecutorService.class);
 		startService(serviceIntent);
 
 		if (jianfou.isDebugApp() && Settings.System.canWrite(MainActivity.this)) {
 			Settings.Secure.putString(getContentResolver(),
-					Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.mask.ActivitySeekerService");
+					Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.jianfou/.mask.MixedExecutorService");
 			Settings.Secure.putString(getContentResolver(),
 					Settings.Secure.ACCESSIBILITY_ENABLED, "1");
 			banner.dismiss();
@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
 					edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
 					edit.apply();
 					adapter.dataChange(mixed);
-					ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
+					MixedExecutorService.setServiceBasicInfo(sharedPreferences.getString("mixed", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
 				} else
 					Toast.makeText(jianfou.getAppContext(), "还没有完成。", Toast.LENGTH_LONG).show();
 			}).create();
@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
 
 		MixedAssignerUtil.setOnQuitListener((position, list) -> {
 			mixed = list;
-			ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));//TODO rules->mixed
+			MixedExecutorService.setServiceBasicInfo(sharedPreferences.getString("mixed", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));//TODO rules->mixed
 			adapter.dataChange(list);
 		});
 	}
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
 			banner.setMessage(R.string.function_closed);
 			banner.show();
 		} else banner.dismiss();
-		ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-switch", true), sharedPreferences.getBoolean("split", true));
+		MixedExecutorService.setServiceBasicInfo(sharedPreferences.getString("mixed", "{}"), sharedPreferences.getBoolean("master-switch", true), sharedPreferences.getBoolean("split", true));
 
 		viewCustomization = new SoftReference<>(MainActivity.inflater.inflate(R.layout.layout_mixed_mask_assigner, null));
 	}

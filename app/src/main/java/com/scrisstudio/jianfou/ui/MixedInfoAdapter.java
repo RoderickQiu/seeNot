@@ -18,8 +18,8 @@ import com.google.gson.Gson;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
 import com.scrisstudio.jianfou.jianfou;
-import com.scrisstudio.jianfou.mask.ActivitySeekerService;
 import com.scrisstudio.jianfou.mask.MixedAssignerUtil;
+import com.scrisstudio.jianfou.mask.MixedExecutorService;
 import com.scrisstudio.jianfou.mask.MixedRuleInfo;
 
 import java.util.List;
@@ -86,7 +86,7 @@ public class MixedInfoAdapter extends RecyclerView.Adapter<MixedInfoAdapter.MyVi
 				edit.putString("rules", gson.toJson(mList));
 				edit.apply();
 
-				ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
+				MixedExecutorService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
 			});
 
 			holder.moreButton.setOnClickListener(v -> MainActivity.openSimpleDialog("more-info", MainActivity.resources.getString(R.string.rule_version_info) + rule.getVersion()));
@@ -121,7 +121,7 @@ public class MixedInfoAdapter extends RecyclerView.Adapter<MixedInfoAdapter.MyVi
 				edit.putString("rules", gson.toJson(mList));
 				edit.apply();
 
-				ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
+				MixedExecutorService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
 
 				Toast.makeText(jianfou.getAppContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
 			});
