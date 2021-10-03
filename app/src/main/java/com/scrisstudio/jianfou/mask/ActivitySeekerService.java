@@ -43,6 +43,7 @@ import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
 import com.scrisstudio.jianfou.activity.PIPShieldActivity;
 import com.scrisstudio.jianfou.activity.PermissionGrantActivity;
+import com.scrisstudio.jianfou.info.RuleInfo;
 import com.scrisstudio.jianfou.jianfou;
 
 import java.util.ArrayList;

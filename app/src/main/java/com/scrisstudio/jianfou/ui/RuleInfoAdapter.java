@@ -19,9 +19,9 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.gson.Gson;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
+import com.scrisstudio.jianfou.info.RuleInfo;
 import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.mask.ActivitySeekerService;
-import com.scrisstudio.jianfou.mask.RuleInfo;
 
 import java.util.List;
 import java.util.Timer;

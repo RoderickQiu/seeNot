@@ -1,4 +1,4 @@
-package com.scrisstudio.jianfou.mask;
+package com.scrisstudio.jianfou.info;
 
 import android.graphics.Rect;
 

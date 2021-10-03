@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
+import com.scrisstudio.jianfou.info.MixedRuleInfo;
+import com.scrisstudio.jianfou.info.SubRuleInfo;
 import com.scrisstudio.jianfou.mask.MixedAssignerUtil;
-import com.scrisstudio.jianfou.mask.MixedRuleInfo;
-import com.scrisstudio.jianfou.mask.SubRuleInfo;
 
 import java.util.ArrayList;
 import java.util.List;

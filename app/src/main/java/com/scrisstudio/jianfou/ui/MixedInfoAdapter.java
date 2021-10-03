@@ -17,10 +17,10 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.gson.Gson;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
+import com.scrisstudio.jianfou.info.MixedRuleInfo;
 import com.scrisstudio.jianfou.jianfou;
 import com.scrisstudio.jianfou.mask.MixedAssignerUtil;
 import com.scrisstudio.jianfou.mask.MixedExecutorService;
-import com.scrisstudio.jianfou.mask.MixedRuleInfo;
 
 import java.util.List;
 import java.util.Timer;

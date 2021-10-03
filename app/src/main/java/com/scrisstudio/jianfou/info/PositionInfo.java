@@ -1,4 +1,4 @@
-package com.scrisstudio.jianfou.mask;
+package com.scrisstudio.jianfou.info;
 
 public class PositionInfo {
 	public String packageName;

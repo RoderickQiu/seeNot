@@ -37,6 +37,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.jianfou.R;
 import com.scrisstudio.jianfou.activity.MainActivity;
+import com.scrisstudio.jianfou.info.MixedRuleInfo;
+import com.scrisstudio.jianfou.info.RuleInfo;
 import com.scrisstudio.jianfou.jianfou;
 
 import java.util.ArrayList;
