@@ -9,4 +9,6 @@
     <string name="menu_settings">设置</string>
     <string name="menu_about">关于</string>
     <string name="menu_permission">权限</string>
+    <string name="app_full_name">seeNot 不见君</string>
+    <string name="roderick_qiu_app">By Roderick Qiu and other contributors.</string>
 </resources>
