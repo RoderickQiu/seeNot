@@ -38,9 +38,10 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.toString().contains("Home"))
+            if (destination.toString().contains("Home")) {
                 binding.appBarMain.fab.show();
-            else binding.appBarMain.fab.hide();
+                binding.appBarMain.toolbar.setTitle(R.string.app_full_name);
+            } else binding.appBarMain.fab.hide();
         });
     }
 
