@@ -1,0 +1,26 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.SeeNot" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/orange_600</item>
+        <item name="colorPrimaryVariant">@color/orange_700</item>
+        <item name="colorOnPrimary">@color/gray_100</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/orange_800</item>
+        <item name="colorSecondaryVariant">@color/orange_900</item>
+        <item name="colorOnSecondary">@color/gray_50</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->s
+        <item name="android:windowBackground">@color/gray_50</item>
+        <item name="android:drawableTint">?attr/colorControlNormal</item>
+    </style>
+
+    <style name="Theme.SeeNot.Foreground" parent="@style/TextAppearance.AppCompat.Small">
+        <item name="android:textColor">#181818</item>
+    </style>
+
+    <style name="Theme.SeeNot.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.SeeNot.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>
