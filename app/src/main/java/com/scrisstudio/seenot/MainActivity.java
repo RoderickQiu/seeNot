@@ -1,6 +1,11 @@
 package com.scrisstudio.seenot;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -10,24 +15,53 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.seenot.databinding.ActivityMainBinding;
+import com.scrisstudio.seenot.service.RuleInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
+    public static Handler UIHandler = new Handler(Looper.getMainLooper());
+    private static final Gson gson = new Gson();
+    private ArrayList<RuleInfo> rulesList = new ArrayList<>();
+    private SharedPreferences sharedPreferences;
+    private static Resources resources;
+
+    public static void runOnUI(Runnable runnable) {
+        UIHandler.post(runnable);
+    }
+
+    public static int dip2px(float dipValue) {
+        float m = resources.getDisplayMetrics().density;
+        return (int) (dipValue * m + 0.5f);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        sharedPreferences = this.getSharedPreferences("pref", Context.MODE_PRIVATE);
+        if (!sharedPreferences.contains("rules")) {
+            SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
+            rulesList.add(new RuleInfo(true, 0, "未设置", "com.software.any", "any", new ArrayList<>(), 0));
+            ruleInitEditor.putString("rules", gson.toJson(rulesList));
+            ruleInitEditor.apply();
+        }
+        rulesList = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+        }.getType());
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        resources = getResources();
+
         setSupportActionBar(binding.appBarMain.toolbar);
-        binding.appBarMain.fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -39,9 +73,8 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.toString().contains("Home")) {
-                binding.appBarMain.fab.show();
                 binding.appBarMain.toolbar.setTitle(R.string.app_full_name);
-            } else binding.appBarMain.fab.hide();
+            }
         });
     }
 
