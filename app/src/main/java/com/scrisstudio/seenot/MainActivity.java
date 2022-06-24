@@ -1,11 +1,12 @@
 package com.scrisstudio.seenot;
 
-import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -13,11 +14,13 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.seenot.databinding.ActivityMainBinding;
+import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.service.RuleInfo;
 
 import java.util.ArrayList;
@@ -46,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPreferences = this.getSharedPreferences("pref", Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext());
         if (!sharedPreferences.contains("rules")) {
             SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
             rulesList.add(new RuleInfo(true, 0, "未设置", "com.software.any", "any", new ArrayList<>(), 0));
@@ -55,6 +58,19 @@ public class MainActivity extends AppCompatActivity {
         }
         rulesList = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
         }.getType());
+
+        Intent serviceIntent = new Intent(this, ExecutorService.class);
+        startService(serviceIntent);
+
+        if (Settings.System.canWrite(MainActivity.this)) {
+            Settings.Secure.putString(getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.seenot/.service.ExecutorService");
+            Settings.Secure.putString(getContentResolver(),
+                    Settings.Secure.ACCESSIBILITY_ENABLED, "1");
+            //banner.dismiss();
+        } else {
+            //permissionBannerOpener();
+        }
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

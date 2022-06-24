@@ -14,4 +14,8 @@
     <string name="delete_confirm">确认删除</string>
     <string name="empty_view">列表为空。点击\"+\"按钮新建规则。</string>
     <string name="operation_done">操作完成</string>
+    <string name="channel_notification_text">不见君：服务正在运行中</string>
+    <string name="channel_name">服务运行保护</string>
+    <string name="channel_description">如果不允许这个通知一直显示，不见君服务可能会被系统自动结束。</string>
+    <string name="service_start_failed">不见君服务没有成功开启，请前往系统无障碍设置手动开启</string>
 </resources>
