@@ -1,7 +1,7 @@
 package com.scrisstudio.seenot.service;
 
-import static com.scrisstudio.seenot.Utils.l;
-import static com.scrisstudio.seenot.Utils.le;
+import static com.scrisstudio.seenot.SeeNot.l;
+import static com.scrisstudio.seenot.SeeNot.le;
 
 import android.accessibilityservice.AccessibilityService;
 import android.app.NotificationChannel;
@@ -31,9 +31,9 @@ public class ExecutorService extends AccessibilityService {
     public static final String CHANNEL_SERVICE_KEEPER_ID = "ServiceKeeper", CHANNEL_NORMAL_NOTIFICATION_ID = "NormalNotification";
     public static final int KEEPER_NOTIFICATION_ID = 408, NORMAL_NOTIFICATION_ID = 488;
     public static ExecutorService mService;
+    public static Boolean isServiceRunning = false;
     private static ArrayList<RuleInfo> rulesList;
-    private static Boolean isServiceRunning = false, isSplitScreenAcceptable = true,
-            isForegroundServiceRunning = false, isFirstTimeInvokeService = true;
+    private static Boolean isSplitScreenAcceptable = true, isForegroundServiceRunning = false, isFirstTimeInvokeService = true;
     private String currentHomePackage;
     private SharedPreferences sharedPreferences;
     public static NotificationManager normalNotificationManager;
@@ -142,6 +142,11 @@ public class ExecutorService extends AccessibilityService {
     @Override
     public void onDestroy() {
         le("Service destroy");
+        isFirstTimeInvokeService = true;
+        if (isForegroundServiceRunning) {
+            stopForeground(true);
+            isForegroundServiceRunning = false;
+        }
         mService = null;
         super.onDestroy();
     }

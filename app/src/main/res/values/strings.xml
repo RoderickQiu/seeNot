@@ -18,4 +18,29 @@
     <string name="channel_name">服务运行保护</string>
     <string name="channel_description">如果不允许这个通知一直显示，不见君服务可能会被系统自动结束。</string>
     <string name="service_start_failed">不见君服务没有成功开启，请前往系统无障碍设置手动开启</string>
+    <string name="hide_notification">隐藏通知</string>
+    <string name="reopen_function">打开总开关</string>
+    <string name="function_closed">总开关被关闭，服务将不起作用。</string>
+    <string name="service_not_running">部分权限未给予或程序服务不在运行，请现在打开。</string>
+
+    <string name="permission_grant">获取权限</string>
+    <string name="permission_overlay">悬浮窗权限</string>
+    <string name="permission_overlay_msg">用于服务保活，降低被杀几率。</string>
+    <string name="granted">已获取</string>
+    <string name="ungranted">未得到</string>
+    <string name="grant_now">获取</string>
+    <string name="permissions">权限</string>
+    <string name="permission_accessibility">无障碍服务权限</string>
+    <string name="permission_accessibility_msg">一切见否服务都依靠此权限。</string>
+    <string name="now_open_service">进入页面，请往下拉，找到“seeNot 不见君”并打开。</string>
+    <string name="default_notification_channel">常规通知</string>
+    <string name="service_start_failed_title">服务未开启</string>
+    <string name="permission_battery_msg">用于防止系统杀死服务，续航其实并不会被显著影响。</string>
+    <string name="permission_battery">系统省电白名单</string>
+    <string name="how_to_grant">了解获取方式</string>
+    <string name="dunno_granted">无法判断，请自行确保</string>
+    <string name="permission_background_msg">这些设置项作用包括正常开机自启、在后台运行并不因所谓"省电"被强制关闭。它们对不见君的功能正常运行都十分必要。</string>
+    <string name="permission_background">其他的重要权限</string>
+    <string name="permission_notification">通知权限</string>
+    <string name="permission_notification_msg">用于发送必要通知和防止服务被杀死。</string>
 </resources>

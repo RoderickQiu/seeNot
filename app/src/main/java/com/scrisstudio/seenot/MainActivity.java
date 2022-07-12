@@ -1,15 +1,22 @@
 package com.scrisstudio.seenot;
 
+import static com.scrisstudio.seenot.SeeNot.l;
+import static com.scrisstudio.seenot.SeeNot.lastTimeDestination;
+import static com.scrisstudio.seenot.ui.permission.PermissionFragment.isAccessibilitySettingsOn;
+
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.provider.Settings;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -35,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<RuleInfo> rulesList = new ArrayList<>();
     private SharedPreferences sharedPreferences;
     private static Resources resources;
+    public static Boolean isNotificationEnabled = false, isOverlayEnabled = false;
+    public static String packageName = "";
 
     public static void runOnUI(Runnable runnable) {
         UIHandler.post(runnable);
@@ -48,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        l("Now entering main activity...");
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext());
         if (!sharedPreferences.contains("rules")) {
@@ -62,20 +72,29 @@ public class MainActivity extends AppCompatActivity {
         Intent serviceIntent = new Intent(this, ExecutorService.class);
         startService(serviceIntent);
 
-        if (Settings.System.canWrite(MainActivity.this)) {
-            Settings.Secure.putString(getContentResolver(),
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.seenot/.service.ExecutorService");
-            Settings.Secure.putString(getContentResolver(),
-                    Settings.Secure.ACCESSIBILITY_ENABLED, "1");
-            //banner.dismiss();
-        } else {
-            //permissionBannerOpener();
-        }
+        isNotificationEnabled = getSystemService(NotificationManager.class).areNotificationsEnabled();
+        isOverlayEnabled = Settings.canDrawOverlays(this);
+
+        packageName = getPackageName();
+
+        resources = getResources();
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        resources = getResources();
+        try {
+            Settings.Secure.putString(getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.seenot/.service.ExecutorService");
+            Settings.Secure.putString(getContentResolver(),
+                    Settings.Secure.ACCESSIBILITY_ENABLED, "1");
+        } catch (Exception ignored) {
+        }
+
+        if (!sharedPreferences.getBoolean("master-switch", true)) {
+            Intent intent = new Intent("banner_channel");
+            intent.putExtra("banner_message", resources.getString(R.string.function_closed));
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        }
 
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
@@ -91,7 +110,27 @@ public class MainActivity extends AppCompatActivity {
             if (destination.toString().contains("Home")) {
                 binding.appBarMain.toolbar.setTitle(R.string.app_full_name);
             }
+            if ((lastTimeDestination.contains("Permission") && (destination.toString().contains("Home") || destination.toString().contains("Permission"))) || (lastTimeDestination.contains("Settings") && (destination.toString().contains("Home") || destination.toString().contains("Settings")))) {
+                finish();
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(intent);
+                //TODO not elegant: settings and permission
+            }
+            l(lastTimeDestination);
+            l(destination.toString());
+            lastTimeDestination = destination.toString();
         });
+    }
+
+    private void permissionBannerOpener() {
+        //如果不是所有权限都已打开
+        if (!(isAccessibilitySettingsOn(SeeNot.getAppContext()) && Settings.canDrawOverlays(SeeNot.getAppContext()) &&
+                ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()) &&
+                getSystemService(NotificationManager.class).areNotificationsEnabled())) {
+            Intent intent = new Intent("banner_channel");
+            intent.putExtra("banner_message", resources.getString(R.string.service_not_running));
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        }
     }
 
     @Override
