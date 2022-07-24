@@ -3,6 +3,7 @@ package com.scrisstudio.seenot.ui.assigner;
 import static android.content.Context.WINDOW_SERVICE;
 import static com.scrisstudio.seenot.SeeNot.l;
 import static com.scrisstudio.seenot.SeeNot.le;
+import static com.scrisstudio.seenot.service.ExecutorService.currentHomePackage;
 import static com.scrisstudio.seenot.service.ExecutorService.mService;
 
 import android.annotation.SuppressLint;
@@ -134,6 +135,10 @@ public class AssignerUtils {
             viewCustomization.findViewById(R.id.button_save_pre).setOnClickListener(v -> {
                 if (Objects.requireNonNull(((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).getText()).toString().equals("---") || Objects.requireNonNull(((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).getText()).toString().equals("")) {
                     sendToast(viewToast, resources.getString(R.string.fill_the_blanks), LENGTH_SHORT);
+                    return;
+                }
+                if (ExecutorService.foregroundPackageName.contains("seenot") || ExecutorService.foregroundPackageName.equals(currentHomePackage)) {
+                    sendToast(viewToast, resources.getString(R.string.no_seenot_set), LENGTH_LONG);
                     return;
                 }
                 current.setTitle(Objects.requireNonNull(((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).getText()).toString());

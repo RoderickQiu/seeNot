@@ -59,4 +59,5 @@
     <string name="cannot_modify_after_pre">已经完成设定后不能修改对应程序。</string>
     <string name="save_succeed">保存成功</string>
     <string name="fill_the_blanks">有些必要信息还没有设置</string>
+    <string name="no_seenot_set">不能为不见君内部和系统桌面设置规则（负一屏等通常不属于系统桌面，可以设置）</string>
 </resources>

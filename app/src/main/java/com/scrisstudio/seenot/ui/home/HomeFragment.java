@@ -118,7 +118,7 @@ public class HomeFragment extends Fragment {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("rules", gson.toJson(rules));
             editor.apply();
-            ExecutorService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-switch", true));
+            ExecutorService.setServiceBasicInfo(sharedPreferences);
             adapter.dataChange(list);
         });
 

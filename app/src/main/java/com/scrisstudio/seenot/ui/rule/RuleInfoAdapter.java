@@ -104,7 +104,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
                 edit.putString("rules", gson.toJson(mList));
                 edit.apply();
 
-                ExecutorService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-switch", true));
+                ExecutorService.setServiceBasicInfo(sharedPreferences);
 
                 Toast.makeText(context.getApplicationContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
             });

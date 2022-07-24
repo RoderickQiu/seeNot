@@ -67,11 +67,13 @@ public class ExecutorService extends AccessibilityService {
         return mService != null;
     }
 
-    public static void setServiceBasicInfo(String rules, Boolean masterSwitch) {
+    public static void setServiceBasicInfo(SharedPreferences sharedPreferences) {
         Gson gson = new Gson();
-        rulesList = gson.fromJson(rules, new TypeToken<List<RuleInfo>>() {
+        ExecutorService.sharedPreferences = sharedPreferences;
+
+        rulesList = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
         }.getType());
-        isServiceRunning = masterSwitch;
+        isServiceRunning = sharedPreferences.getBoolean("master-switch", true);
 
         le("Set service basic info, " + isServiceRunning);
     }
