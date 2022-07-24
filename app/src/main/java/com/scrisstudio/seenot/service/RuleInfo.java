@@ -4,29 +4,19 @@ import java.util.ArrayList;
 
 public class RuleInfo {
     private final int id;
-    private boolean status;
-    private String ruleTitle;
+    private String title;
     private String ruleFor;
     private String ruleForName;
-    private ArrayList<WidgetInfo> filter;
+    private ArrayList<FilterInfo> filter;
     private int filterLength;
 
-    public RuleInfo(boolean status, int id, String ruleTitle, String ruleFor, String ruleForName, ArrayList<WidgetInfo> filter, int filterLength) {
-        this.status = status;
+    public RuleInfo(int id, String title, String ruleFor, String ruleForName, ArrayList<FilterInfo> filter, int filterLength) {
         this.id = id;
-        this.ruleTitle = ruleTitle;
+        this.title = title;
         this.ruleFor = ruleFor;
         this.ruleForName = ruleForName;
         this.filter = filter;
         this.filterLength = filterLength;
-    }
-
-    public boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
     }
 
     public int getId() {
@@ -34,11 +24,11 @@ public class RuleInfo {
     }
 
     public String getTitle() {
-        return ruleTitle;
+        return title;
     }
 
-    public void setTitle(String ruleTitle) {
-        this.ruleTitle = ruleTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getFor() {
@@ -57,11 +47,11 @@ public class RuleInfo {
         this.ruleForName = ruleForName;
     }
 
-    public ArrayList<WidgetInfo> getFilter() {
+    public ArrayList<FilterInfo> getFilter() {
         return filter;
     }
 
-    public void setFilter(ArrayList<WidgetInfo> filter) {
+    public void setFilter(ArrayList<FilterInfo> filter) {
         this.filter = filter;
     }
 

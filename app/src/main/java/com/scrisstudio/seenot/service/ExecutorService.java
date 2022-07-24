@@ -17,6 +17,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.view.LayoutInflater;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.RemoteViews;
@@ -43,16 +45,18 @@ public class ExecutorService extends AccessibilityService {
             isFirstTimeInvokeService = true, isSoftInputPanelOn = false, hasSoftInputPanelJustFound = false,
             lastTimeClassCapable = false;
     public static int foregroundWindowId = 0;
-    private String currentHomePackage = "", foregroundClassName = "",
+    public static String currentHomePackage = "", foregroundClassName = "",
             foregroundPackageName = "com.scrisstudio.seenot", lastTimePackageName = "",
             lastTimeClassName = "com.scrisstudio.seenot.MainActivity";
     private ComponentName lastTimeComponentName = new ComponentName("com.scrisstudio.seenot",
-            "com.scrisstudio.seenot.MainActivity");
+            "com.scrisstudio.seenot.MainActivity"), cName = lastTimeComponentName;
     private ActivityInfo lastTimeActivityInfo = new ActivityInfo();
-    private SharedPreferences sharedPreferences;
+    public static SharedPreferences sharedPreferences;
     public static NotificationManager normalNotificationManager;
     private final Handler mHandler = new Handler();
     public NotificationChannel normalNotificationChannel;
+    public static LayoutInflater inflater;
+    public static WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
     private static ArrayList<RuleInfo> rulesList, currentRules = new ArrayList<>();
     private final Gson gson = new Gson();
     private Rect nodeSearcherRect = new Rect();
@@ -61,6 +65,15 @@ public class ExecutorService extends AccessibilityService {
 
     public static boolean isStart() {
         return mService != null;
+    }
+
+    public static void setServiceBasicInfo(String rules, Boolean masterSwitch) {
+        Gson gson = new Gson();
+        rulesList = gson.fromJson(rules, new TypeToken<List<RuleInfo>>() {
+        }.getType());
+        isServiceRunning = masterSwitch;
+
+        le("Set service basic info, " + isServiceRunning);
     }
 
     private void createNotificationChannel() {
@@ -74,13 +87,13 @@ public class ExecutorService extends AccessibilityService {
     }
 
     public static void sendSimpleNotification(String title, String content) {
-        ///TODO Intent intent = new Intent(mService, PermissionGrantActivity.class);
-        ///TODO PendingIntent pi = PendingIntent.getActivity(mService, 0, intent, 0);
+        Intent intent = new Intent(mService, MainActivity.class);
+        PendingIntent pi = PendingIntent.getActivity(mService, 0, intent, 0);
         NotificationCompat.Builder nb = new NotificationCompat.Builder(mService, CHANNEL_NORMAL_NOTIFICATION_ID)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(title)
                 .setContentText(content)
-                ///TODO .setContentIntent(pi)
+                .setContentIntent(pi)
                 .setAutoCancel(true)
                 .setShowWhen(true);
         normalNotificationManager.notify(NORMAL_NOTIFICATION_ID, nb.build());
@@ -139,6 +152,8 @@ public class ExecutorService extends AccessibilityService {
     protected void onServiceConnected() {
         super.onServiceConnected();
         mService = this;
+        inflater = LayoutInflater.from(this);
+
 
         if (isFirstTimeInvokeService) {
             isFirstTimeInvokeService = false;
@@ -168,22 +183,18 @@ public class ExecutorService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
-            try {
-                foregroundPackageName = getRootInActiveWindow().getPackageName().toString();
-            } catch (Exception e) {
+            if (isCapableClass(event.getPackageName().toString())) {
                 foregroundPackageName = event.getPackageName().toString();
             }
-            ComponentName cName = new ComponentName(foregroundPackageName, foregroundClassName);
-            le(cName);
 
             if (isServiceRunning) {
                 if (!isSoftInputPanelOn && !foregroundPackageName.equals(lastTimePackageName)) {
                     lastTimePackageName = foregroundPackageName;
                     currentRules.clear();
                     for (int i = 0; i < rulesList.size(); i++) {
-                        if (rulesList.get(i).getFor().equals(lastTimePackageName) && !foregroundPackageName.equals("") && rulesList.get(i).getStatus()) {
-                            currentRules.add(rulesList.get(i));
-                        }
+                        //if (rulesList.get(i).getFor().equals(lastTimePackageName) && !foregroundPackageName.equals("") && rulesList.get(i).getStatus()) { TODO rule.status -> filter.status
+                        currentRules.add(rulesList.get(i));
+                        //}
                     }
                     le("Current rules changed, " + currentRules);
                 }
@@ -206,16 +217,17 @@ public class ExecutorService extends AccessibilityService {
                 }
 
                 //execute rules
-                if (!foregroundPackageName.equals(currentHomePackage) && !foregroundPackageName.equals("com.scrisstudio.seenot") && !foregroundPackageName.equals("")) {
-                    if (hasRealActivity(cName) && isCapableClass(foregroundClassName)) {
-                        //TODO
-                    }
+                if (!foregroundPackageName.equals(currentHomePackage) && !foregroundPackageName.equals("com.scrisstudio.seenot")
+                        && !foregroundPackageName.equals("") && hasRealActivity(cName) && isCapableClass(foregroundClassName)) {
+                    //TODO
                 }
             }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             if (isCapableClass(event.getClassName().toString())) {
                 foregroundClassName = event.getClassName().toString();
                 foregroundWindowId = event.getWindowId();
+                if (hasRealActivity(new ComponentName(foregroundPackageName, foregroundClassName)))
+                    cName = new ComponentName(foregroundPackageName, foregroundClassName);
                 l(event.getClassName().toString() + event.getWindowId());
             }
         }
@@ -227,6 +239,7 @@ public class ExecutorService extends AccessibilityService {
             return lastTimeActivityInfo != null;
         else {
             lastTimeComponentName = componentName;
+            lastTimeActivityInfo = null;
             try {
                 lastTimeActivityInfo = packageManager.getActivityInfo(componentName, 0);
             } catch (Exception e) {
@@ -241,9 +254,10 @@ public class ExecutorService extends AccessibilityService {
             return lastTimeClassCapable;
         else {
             if (className == null) return false;
-            else if (className.contains("Activity")) return true;
+            else if (className.contains("Activity") && !className.contains("seenot")) return true;
             else
-                return !className.startsWith("android.widget.") && !className.startsWith("android.view.") && !className.startsWith("androidx.") && !className.startsWith("com.android.systemui");
+                return !className.startsWith("android.widget.") && !className.startsWith("android.view.")
+                        && !className.startsWith("androidx.") && !className.startsWith("com.android.systemui") && !className.contains("seenot");
         }
     }
 

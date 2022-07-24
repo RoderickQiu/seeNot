@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginStart="5dp"
+    android:layout_marginEnd="5dp"
+    android:gravity="top"
+    android:orientation="vertical"
+    android:paddingTop="0dp"
+    android:paddingBottom="20dp">
+
+    <LinearLayout
+        android:id="@+id/rules_home"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="6dp">
+
+        <LinearLayout
+            android:id="@+id/mixed_rule_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:paddingVertical="8dp"
+            tools:ignore="RtlSymmetry">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rule_title_label"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/rule_name"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:inputType="textShortMessage"
+                app:placeholderText="@string/rule_name_placeholder"
+                app:boxBackgroundMode="filled"
+                app:boxBackgroundColor="#E5BC18"
+                app:boxStrokeColor="@color/gray_700">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/rule_name_textfield"
+                    android:textSize="14sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLength="8"
+                    android:singleLine="true" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/mixed_rule_for"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:paddingVertical="8dp"
+            tools:ignore="RtlSymmetry">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true">
+
+                <TextView
+                    android:id="@+id/rule_for_msg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rule_for_msg"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/pre_rule_for"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:textColor="@color/gray_800"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/rule_for_refresh"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:drawableLeft="@drawable/ic_baseline_refresh_24"
+                android:drawablePadding="4dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:text="@string/refresh"
+                android:textColor="@color/gray_800"
+                tools:ignore="RtlHardcoded" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/assigner_pre_tip"
+            style="@style/TextAppearance.MaterialComponents.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="6dp"
+            android:text="@string/assigner_pre_tip" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -14,11 +14,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.gson.Gson;
 import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
+import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.service.RuleInfo;
+import com.scrisstudio.seenot.ui.assigner.AssignerUtils;
 
 import java.util.List;
 import java.util.Timer;
@@ -71,21 +72,11 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
             holder.ruleId.setContentDescription(String.valueOf(rule.getId()));
             holder.ruleTitle.setText(rule.getTitle());
             holder.ruleFor.setText(rule.getForName());
-            holder.ruleSwitch.setChecked(rule.getStatus());
 
-            holder.ruleSwitch.setOnCheckedChangeListener((v, isChecked) -> {
-                SharedPreferences.Editor edit = sharedPreferences.edit();
-                RuleInfo newRule = mList.get(position);
-                newRule.setStatus(isChecked);
-
-                mList.set(position, newRule);
-                edit.putString("rules", gson.toJson(mList));
-                edit.apply();
-
-                //ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
+            holder.editButton.setOnClickListener(v -> {
+                //SeeNot.activityOpener(context, RuleEditActivity.class);
+                AssignerUtils.initAssigner(0, position);
             });
-
-            //holder.editButton.setOnClickListener(v -> MainActivity.openCardEditDialog(position));
 
             holder.deleteButton.setOnClickListener(v -> {
                 holder.deleteButton.setVisibility(View.GONE);
@@ -113,7 +104,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
                 edit.putString("rules", gson.toJson(mList));
                 edit.apply();
 
-                //ActivitySeekerService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-swtich", true), sharedPreferences.getBoolean("split", true));
+                ExecutorService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-switch", true));
 
                 Toast.makeText(context.getApplicationContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
             });
@@ -137,21 +128,18 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
     }
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView ruleTitle, ruleVersion, ruleFor, ruleId;
+        TextView ruleId, ruleTitle, ruleFor;
         ImageButton editButton, deleteButton;
         Button deleteRecheckButton;
-        SwitchMaterial ruleSwitch;
 
         public MyViewHolder(View view) {
             super(view);
-            ruleId = view.findViewById(R.id.rule_id);
             ruleTitle = view.findViewById(R.id.rule_title);
-            ruleVersion = view.findViewById(R.id.rule_version);
+            ruleId = view.findViewById(R.id.rule_id);
             ruleFor = view.findViewById(R.id.rule_for);
             editButton = view.findViewById(R.id.edit_button);
             deleteButton = view.findViewById(R.id.delete_button);
             deleteRecheckButton = view.findViewById(R.id.delete_button_recheck);
-            ruleSwitch = view.findViewById(R.id.rule_switch);
         }
     }
 }

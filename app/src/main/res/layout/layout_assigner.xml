@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/assigner_body"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#E5BC18"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline_assigner_top"
+        app:layout_constraintGuide_percent=".1"
+        android:orientation="horizontal" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline_assigner_bottom"
+        app:layout_constraintGuide_percent=".8"
+        android:orientation="horizontal" />
+
+    <ScrollView
+        android:id="@+id/assigner_content"
+        app:layout_constraintTop_toBottomOf="@id/guideline_assigner_top"
+        app:layout_constraintBottom_toTopOf="@id/guideline_assigner_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="20dp"
+            android:paddingBottom="36dp">
+
+            <include
+                android:id="@+id/assigner_pre"
+                layout="@layout/layout_assigner_pre" />
+
+            <include
+                android:id="@+id/assigner_home"
+                layout="@layout/layout_assigner_home" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/assigner_bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/guideline_assigner_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="#E5BC18"
+        android:paddingBottom="10dp">
+
+        <ImageButton
+            android:id="@+id/button_assigner_back"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="36dp"
+            android:layout_alignParentStart="true"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/expand_more"
+            android:src="@drawable/ic_baseline_arrow_back_24"
+            app:tint="@color/gray_800"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/button_set_rule"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:drawableLeft="@drawable/ic_baseline_settings_24"
+            android:drawablePadding="4dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:text="@string/set_mask_info"
+            android:textColor="@color/gray_800"
+            tools:ignore="RtlHardcoded" />
+
+        <Button
+            android:id="@+id/button_save_rule"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+            android:drawableLeft="@drawable/ic_baseline_done_24"
+            android:drawablePadding="4dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:text="@string/save"
+            android:textColor="@color/gray_800"
+            app:tint="@color/gray_800"
+            tools:ignore="RtlHardcoded"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/button_save_pre"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+            android:drawableLeft="@drawable/ic_baseline_done_24"
+            android:drawablePadding="4dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:text="@string/continue_pre"
+            android:textColor="@color/gray_800"
+            app:tint="@color/gray_800"
+            tools:ignore="RtlHardcoded"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/button_new_filter"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:drawableLeft="@drawable/ic_baseline_add_24"
+            android:drawablePadding="4dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:text="@string/new_subrule"
+            android:textColor="@color/gray_800"
+            app:tint="@color/gray_800"
+            tools:ignore="RtlHardcoded" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline_assigner_top"
+        android:orientation="horizontal"
+        android:id="@+id/assigner_mover"
+        android:background="#E5BC18">
+
+        <TextView
+            android:id="@+id/press_here_move"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:background="#E5BC18"
+            android:paddingBottom="1dp"
+            android:text="@string/press_here_move"
+            android:textColor="@color/gray_700"
+            android:textSize="14sp"
+            tools:ignore="RelativeOverlap" />
+
+        <ImageButton
+            android:id="@+id/button_quit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:backgroundTint="#00000000"
+            android:contentDescription="@string/exit"
+            android:layout_marginTop="10dp"
+            android:padding="1dp"
+            android:background="#E5BC18"
+            android:src="@drawable/ic_baseline_close_18"
+            app:tint="@color/gray_700" />
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,6 +13,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.view.LayoutInflater;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -30,6 +32,7 @@ import com.scrisstudio.seenot.databinding.ActivityMainBinding;
 import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.service.RuleInfo;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,10 +43,11 @@ public class MainActivity extends AppCompatActivity {
     public static Handler UIHandler = new Handler(Looper.getMainLooper());
     private static final Gson gson = new Gson();
     private ArrayList<RuleInfo> rulesList = new ArrayList<>();
-    private SharedPreferences sharedPreferences;
-    private static Resources resources;
+    public static Resources resources;
+    public static SharedPreferences sharedPreferences;
     public static Boolean isNotificationEnabled = false, isOverlayEnabled = false;
     public static String packageName = "";
+    public static SoftReference<View> viewCustomization = null, viewTarget = null;
 
     public static void runOnUI(Runnable runnable) {
         UIHandler.post(runnable);
@@ -62,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext());
         if (!sharedPreferences.contains("rules")) {
             SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
-            rulesList.add(new RuleInfo(true, 0, "未设置", "com.software.any", "any", new ArrayList<>(), 0));
+            rulesList.add(new RuleInfo(0, "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0));
             ruleInitEditor.putString("rules", gson.toJson(rulesList));
             ruleInitEditor.apply();
         }
@@ -78,6 +82,10 @@ public class MainActivity extends AppCompatActivity {
         packageName = getPackageName();
 
         resources = getResources();
+
+        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+        viewCustomization = new SoftReference<>(inflater.inflate(R.layout.layout_assigner, null));//workaround for static view
+        viewTarget = new SoftReference<>(inflater.inflate(R.layout.layout_view_target, null));
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

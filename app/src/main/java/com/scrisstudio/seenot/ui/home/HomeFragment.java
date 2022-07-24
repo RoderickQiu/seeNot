@@ -1,5 +1,7 @@
 package com.scrisstudio.seenot.ui.home;
 
+import static com.scrisstudio.seenot.MainActivity.sharedPreferences;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +19,6 @@ import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +29,7 @@ import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.databinding.FragmentHomeBinding;
 import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.service.RuleInfo;
+import com.scrisstudio.seenot.ui.assigner.AssignerUtils;
 import com.scrisstudio.seenot.ui.rule.RuleInfoAdapter;
 import com.scrisstudio.seenot.ui.rule.RuleInfoCardDecoration;
 import com.sergivonavi.materialbanner.Banner;
@@ -61,7 +63,6 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext());
         rules = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
         }.getType());
 
@@ -76,7 +77,7 @@ public class HomeFragment extends Fragment {
         binding.fab.show();
         binding.fab.setOnClickListener(v -> {
             SharedPreferences.Editor edit = sharedPreferences.edit();
-            rules.add(new RuleInfo(true, sharedPreferences.getInt("rule-id-max", 0), "未设置", "com.software.any", "any", new ArrayList<>(), 0));
+            rules.add(new RuleInfo(sharedPreferences.getInt("rule-id-max", 0), "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0));
             edit.putString("rules", gson.toJson(rules));
             edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
             edit.apply();
@@ -111,6 +112,15 @@ public class HomeFragment extends Fragment {
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(bannerMessageReceiver,
                 new IntentFilter("banner_channel"));
+
+        AssignerUtils.setOnQuitListener((position, list) -> {
+            rules = (ArrayList<RuleInfo>) list;
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("rules", gson.toJson(rules));
+            editor.apply();
+            ExecutorService.setServiceBasicInfo(sharedPreferences.getString("rules", "{}"), sharedPreferences.getBoolean("master-switch", true));
+            adapter.dataChange(list);
+        });
 
         return root;
     }

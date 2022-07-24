@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">不见君</string>
     <string name="action_menu">还没有完成</string>
-
     <string name="menu_home">首页</string>
     <string name="service_name" translatable="false">👋 seeNot 不见君 👋</string>
     <string name="service_description">为了使用软件的功能，就需要开启此服务。此服务不会访问网络，因此你的数据是完全安全的，我们也不会使用任何方法获取你在做什么。我们需要那些权限仅仅是为了解析应用布局。</string>
@@ -22,7 +21,6 @@
     <string name="reopen_function">打开总开关</string>
     <string name="function_closed">总开关被关闭，服务将不起作用。</string>
     <string name="service_not_running">部分权限未给予或程序服务不在运行，请现在打开。</string>
-
     <string name="permission_grant">获取权限</string>
     <string name="permission_overlay">悬浮窗权限</string>
     <string name="permission_overlay_msg">用于服务保活，降低被杀几率。</string>
@@ -43,4 +41,22 @@
     <string name="permission_background">其他的重要权限</string>
     <string name="permission_notification">通知权限</string>
     <string name="permission_notification_msg">用于发送必要通知和防止服务被杀死。</string>
+    <string name="edit_page">编辑</string>
+    <string name="select">选中</string>
+    <string name="press_here_move">按住此处来拖动</string>
+    <string name="divider">|</string>
+    <string name="exit">退出</string>
+    <string name="rule_for_msg">对于：</string>
+    <string name="expand_more">更多内容</string>
+    <string name="set_mask_info">设置规则信息</string>
+    <string name="save">保存</string>
+    <string name="new_subrule">新建子规则</string>
+    <string name="rule_title_label">规则名：</string>
+    <string name="assigner_pre_tip">请前往要设置的应用并点击\"刷新\"以获得正确的应用包名。</string>
+    <string name="rule_name_placeholder">请在此输入规则名</string>
+    <string name="continue_pre">继续设置</string>
+    <string name="refresh">刷新</string>
+    <string name="cannot_modify_after_pre">已经完成设定后不能修改对应程序。</string>
+    <string name="save_succeed">保存成功</string>
+    <string name="fill_the_blanks">有些必要信息还没有设置</string>
 </resources>
