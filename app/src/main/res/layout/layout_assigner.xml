@@ -47,6 +47,10 @@
                 android:id="@+id/assigner_home"
                 layout="@layout/layout_assigner_home" />
 
+            <include
+                android:id="@+id/assigner_set"
+                layout="@layout/layout_assigner_set" />
+
         </LinearLayout>
 
     </ScrollView>

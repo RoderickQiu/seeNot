@@ -1,5 +1,7 @@
 package com.scrisstudio.seenot.ui.rule;
 
+import static com.scrisstudio.seenot.service.ExecutorService.MODE_ASSIGNER;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -74,8 +76,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
             holder.ruleFor.setText(rule.getForName());
 
             holder.editButton.setOnClickListener(v -> {
-                //SeeNot.activityOpener(context, RuleEditActivity.class);
-                AssignerUtils.initAssigner(0, position);
+                AssignerUtils.initAssigner(rule.getFor().equals("com.software.any") ? 0 : 1, position, 0);
             });
 
             holder.deleteButton.setOnClickListener(v -> {
@@ -104,7 +105,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
                 edit.putString("rules", gson.toJson(mList));
                 edit.apply();
 
-                ExecutorService.setServiceBasicInfo(sharedPreferences);
+                ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_ASSIGNER);
 
                 Toast.makeText(context.getApplicationContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
             });

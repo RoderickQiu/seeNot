@@ -66,4 +66,18 @@ public class SeeNot extends Application {
                 return "other";
         }
     }
+
+    public static int getFilterTypeName(int type) {
+        switch (type) {
+            case 0:
+                return R.string.filter_ban_app;
+            case 1:
+                return R.string.filter_ban_activity;
+            case 2:
+                return R.string.filter_ban_text;
+            case 3:
+                return R.string.filter_auto_click;
+        }
+        return R.string.type_not_found;
+    }
 }

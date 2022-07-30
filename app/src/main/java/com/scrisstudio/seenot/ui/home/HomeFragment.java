@@ -113,12 +113,12 @@ public class HomeFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(bannerMessageReceiver,
                 new IntentFilter("banner_channel"));
 
-        AssignerUtils.setOnQuitListener((position, list) -> {
+        AssignerUtils.setOnQuitListener((position, list, mode) -> {
             rules = (ArrayList<RuleInfo>) list;
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("rules", gson.toJson(rules));
             editor.apply();
-            ExecutorService.setServiceBasicInfo(sharedPreferences);
+            ExecutorService.setServiceBasicInfo(sharedPreferences, mode);
             adapter.dataChange(list);
         });
 

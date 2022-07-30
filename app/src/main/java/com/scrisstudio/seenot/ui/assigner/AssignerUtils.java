@@ -3,7 +3,10 @@ package com.scrisstudio.seenot.ui.assigner;
 import static android.content.Context.WINDOW_SERVICE;
 import static com.scrisstudio.seenot.SeeNot.l;
 import static com.scrisstudio.seenot.SeeNot.le;
+import static com.scrisstudio.seenot.service.ExecutorService.MODE_ASSIGNER;
+import static com.scrisstudio.seenot.service.ExecutorService.MODE_EXECUTOR;
 import static com.scrisstudio.seenot.service.ExecutorService.currentHomePackage;
+import static com.scrisstudio.seenot.service.ExecutorService.inflater;
 import static com.scrisstudio.seenot.service.ExecutorService.mService;
 
 import android.annotation.SuppressLint;
@@ -13,14 +16,21 @@ import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -28,7 +38,9 @@ import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
 import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.service.ExecutorService;
+import com.scrisstudio.seenot.service.FilterInfo;
 import com.scrisstudio.seenot.service.RuleInfo;
+import com.scrisstudio.seenot.ui.rule.FilterInfoAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,37 +51,35 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class AssignerUtils {
 
-    private static final int LENGTH_LONG = 3000;
-    private static int LENGTH_SHORT = 1200;
+    private static final int LENGTH_LONG = 3000, LENGTH_SHORT = 1200;
     private static WindowManager windowManager;
     private static SharedPreferences sharedPreferences;
-    private static AtomicInteger mode = new AtomicInteger();
     private static OnQuitListener callBack;
     private static WindowManager.LayoutParams customizationParams, outlineParams, toastParams;
     private static ArrayList<RuleInfo> rules = new ArrayList<>();
     private static RuleInfo current = null;
-    private static int position;
+    private static int position, filterId;
     private static final Gson gson = new Gson();
     private static DisplayMetrics metrics = new DisplayMetrics();
-    private static Resources resources = MainActivity.resources;
+    public static Resources resources = MainActivity.resources;
 
     public static void setOnQuitListener(OnQuitListener callback) {
         callBack = callback;
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    public static void initAssigner(int modeId, int position) {
+    public static void initAssigner(int modeId, int position, int filterId) {
         windowManager = (WindowManager) mService.getSystemService(WINDOW_SERVICE);
         sharedPreferences = ExecutorService.sharedPreferences;
-        mode.set(modeId);
         AssignerUtils.position = position;
+        AssignerUtils.filterId = filterId;
         ExecutorService.isServiceRunning = false;
         rules = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
         }.getType());
 
         View viewCustomization = MainActivity.viewCustomization.get();
         View viewTarget = MainActivity.viewTarget.get();
-        View viewToast = ExecutorService.inflater.inflate(R.layout.layout_toast_view, null);
+        View viewToast = inflater.inflate(R.layout.layout_toast_view, null);
         FrameLayout layoutOverlayOutline = viewTarget.findViewById(R.id.frame);
 
         initParams();
@@ -91,11 +101,7 @@ public class AssignerUtils {
         }
 
         current = rules.get(position);
-        if (current.getFor().equals("com.software.any")) {
-            setMode(viewCustomization, viewToast, 0);
-        } else {
-            setMode(viewCustomization, viewToast, 1);
-        }
+        setMode(viewCustomization, viewToast, modeId);
     }
 
     private static void setMode(View viewCustomization, View viewToast, int mode) {
@@ -103,12 +109,28 @@ public class AssignerUtils {
 
         viewCustomization.findViewById(R.id.assigner_pre).setVisibility(mode == 0 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.assigner_home).setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
+        viewCustomization.findViewById(R.id.assigner_set).setVisibility(mode == 2 ? View.VISIBLE : View.GONE);
 
         viewCustomization.findViewById(R.id.button_assigner_back).setVisibility(View.GONE);
         viewCustomization.findViewById(R.id.button_new_filter).setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.button_save_pre).setVisibility(mode == 0 ? View.VISIBLE : View.GONE);
-        viewCustomization.findViewById(R.id.button_save_rule).setVisibility(View.GONE);
+        viewCustomization.findViewById(R.id.button_save_rule).setVisibility(mode == 2 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.button_set_rule).setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
+
+        if (mode == 0)
+            try { //allow input
+                customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                windowManager.updateViewLayout(viewCustomization, customizationParams);
+            } catch (Exception e) {
+                le(e.getLocalizedMessage());
+            }
+        else
+            try {
+                customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                windowManager.updateViewLayout(viewCustomization, customizationParams);
+            } catch (Exception e) {
+                le(e.getLocalizedMessage());
+            }
     }
 
     private static void initMode(View viewCustomization, View viewToast, int mode) {
@@ -119,12 +141,119 @@ public class AssignerUtils {
             case 1:
                 initHome(viewCustomization, viewToast);
                 break;
+            case 2:
+                initSet(viewCustomization, viewToast);
+                break;
         }
+    }
+
+    private static void initSet(View viewCustomization, View viewToast) {
+        FilterInfo filter = current.getFilter().get(filterId);
+        ((TextView) viewCustomization.findViewById(R.id.filter_set_type)).setText(SeeNot.getFilterTypeName(filter.getType()));
+
+        final SwitchMaterial filterSwitch = viewCustomization.findViewById(R.id.filter_status_switch);
+        filterSwitch.setChecked(filter.getStatus());
+        filterSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            filter.setStatus(isChecked);
+        });
+
+        final Button btSave = viewCustomization.findViewById(R.id.button_save_rule);
+        btSave.setOnClickListener(v -> {
+            filter.setParam1(((TextView) viewCustomization.findViewById(R.id.set_filter_trigger_value)).getText().toString());
+
+            ArrayList<FilterInfo> filters = current.getFilter();
+            filters.set(filterId, filter);
+            current.setFilter(filters);
+
+            ruleSave(MODE_ASSIGNER);
+            setMode(viewCustomization, viewToast, 1);
+        });
+
+        refreshSet(filter, viewCustomization);
+        viewCustomization.findViewById(R.id.set_filter_refresh).setOnClickListener(v -> refreshSet(filter, viewCustomization));
+    }
+
+    private static void refreshSet(FilterInfo filter, View viewCustomization) {
+        String triggerValue = "", triggerLabel = resources.getString(R.string.filter_trigger), tip = "";
+        viewCustomization.findViewById(R.id.filter_set).setVisibility(View.VISIBLE);
+        switch (filter.getType()) {
+            case 0:
+                viewCustomization.findViewById(R.id.filter_set).setVisibility(View.GONE);
+                tip = resources.getString(R.string.filter_ban_app_tip);
+                break;
+            case 1:
+                triggerValue = ExecutorService.foregroundClassName;
+                tip = resources.getString(R.string.filter_ban_activity_tip);
+                break;
+        }
+        final String finalTriggerValue = triggerValue, finalTriggerLabel = triggerLabel, finalTip = tip;
+        ((TextView) viewCustomization.findViewById(R.id.set_filter_trigger_value)).setText(finalTriggerValue);
+        ((TextView) viewCustomization.findViewById(R.id.set_filter_trigger_label)).setText(finalTriggerLabel);
+        ((TextView) viewCustomization.findViewById(R.id.assigner_set_tip)).setText(finalTip);
     }
 
     private static void initHome(View viewCustomization, View viewToast) {
         viewCustomization.findViewById(R.id.button_set_rule).setOnClickListener(v -> setMode(viewCustomization, viewToast, 0));
         ((TextView) viewCustomization.findViewById(R.id.home_rule_for)).setText(current.getForName());
+
+        RecyclerView recyclerView = viewCustomization.findViewById(R.id.filters_list);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(SeeNot.getAppContext());
+        if (recyclerView.getLayoutManager() == null)
+            recyclerView.setLayoutManager(linearLayoutManager);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        FilterInfoAdapter adapter = new FilterInfoAdapter(inflater, rules, position, sharedPreferences);
+        recyclerView.setAdapter(adapter);
+
+        final Button btAdd = viewCustomization.findViewById(R.id.button_new_filter);
+        btAdd.setOnClickListener(v -> {
+            if (hasQuitAppFilter(current.getFilter())) { // ban other request after filter_ban_app was set
+                sendToast(viewToast, resources.getString(R.string.alreay_quit_app_filter), LENGTH_LONG);
+                return;
+            }
+
+            AtomicInteger type = new AtomicInteger();
+            String packageName = ExecutorService.foregroundPackageName;
+            PopupMenu popup = new PopupMenu(SeeNot.getAppContext(), viewCustomization);
+            MenuInflater menuInflater = new MenuInflater(SeeNot.getAppContext());
+            menuInflater.inflate(R.menu.menu_filter_type, popup.getMenu());
+            popup.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.type_0) type.set(0);
+                else if (item.getItemId() == R.id.type_1) type.set(1);
+                else if (item.getItemId() == R.id.type_2) type.set(2);
+                else if (item.getItemId() == R.id.type_3) type.set(3);
+
+                ArrayList<FilterInfo> filterInfos = current.getFilter();
+
+                FilterInfo filter = new FilterInfo(true, type.get(), current.getId(), "---", "---");
+                filterInfos.add(filter);
+                current.setFilter(filterInfos);
+                current.setFilterLength(current.getFilterLength() + 1);
+                ruleSave(MODE_ASSIGNER);
+
+                adapter.dataChange(filterInfos);
+
+                return false;
+            });
+
+            if (current.getFor().equals(packageName))
+                popup.show();
+            else
+                sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
+                        + "的，只能在那个程序打开时编辑", LENGTH_LONG);
+        });
+
+        FilterInfoAdapter.setSaveListener((rule) -> {
+            current = rule;
+            adapter.dataChange(current.getFilter());
+        });
+    }
+
+    private static boolean hasQuitAppFilter(ArrayList<FilterInfo> array) {
+        for (int i = 0; i < array.size(); i++) {
+            if (array.get(i).getType() == 0) return true;
+        }
+        return false;
     }
 
     private static void initPre(View viewCustomization, View viewToast) {
@@ -144,6 +273,7 @@ public class AssignerUtils {
                 current.setTitle(Objects.requireNonNull(((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).getText()).toString());
                 current.setFor(ExecutorService.foregroundPackageName);
                 current.setForName(getAppRealName(ExecutorService.foregroundPackageName));
+                ruleSave(MODE_ASSIGNER);
                 sendToast(viewToast, resources.getString(R.string.save_succeed), LENGTH_SHORT);
                 setMode(viewCustomization, viewToast, 1);
             });
@@ -157,6 +287,7 @@ public class AssignerUtils {
                     return;
                 }
                 current.setTitle(Objects.requireNonNull(((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).getText()).toString());
+                ruleSave(MODE_ASSIGNER);
                 sendToast(viewToast, resources.getString(R.string.save_succeed), LENGTH_SHORT);
                 setMode(viewCustomization, viewToast, 1);
             });
@@ -272,10 +403,15 @@ public class AssignerUtils {
         btQuit.setOnClickListener(v -> {
             windowManager.removeViewImmediate(viewCustomization);
             windowManager.removeViewImmediate(viewTarget);
-            ExecutorService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
-            rules.set(position, current);
-            callBack.onQuit(position, rules);
+            ruleSave(MODE_EXECUTOR);
         });
+    }
+
+    private static void ruleSave(int mode) {
+
+        ExecutorService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
+        rules.set(position, current);
+        callBack.onQuit(position, rules, mode);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -319,6 +455,6 @@ public class AssignerUtils {
     }
 
     public interface OnQuitListener {
-        void onQuit(int position, List<RuleInfo> list);
+        void onQuit(int position, List<RuleInfo> list, int mode);
     }
 }

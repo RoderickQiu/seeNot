@@ -17,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
@@ -38,6 +39,7 @@ import java.util.List;
 
 public class ExecutorService extends AccessibilityService {
     public static final String TAG = "SeeNot-AccessibilityService";
+    public static final int MODE_ASSIGNER = 0, MODE_EXECUTOR = 1;
     public static final String CHANNEL_SERVICE_KEEPER_ID = "ServiceKeeper", CHANNEL_NORMAL_NOTIFICATION_ID = "NormalNotification";
     public static final int KEEPER_NOTIFICATION_ID = 408, NORMAL_NOTIFICATION_ID = 488;
     public static ExecutorService mService;
@@ -57,23 +59,26 @@ public class ExecutorService extends AccessibilityService {
     public NotificationChannel normalNotificationChannel;
     public static LayoutInflater inflater;
     public static WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-    private static ArrayList<RuleInfo> rulesList, currentRules = new ArrayList<>();
+    private static ArrayList<RuleInfo> rulesList = new ArrayList<>();
+    private static ArrayList<FilterInfo> currentFilters = new ArrayList<>(), tempFilters;
+    private static FilterInfo tempFilter;
     private final Gson gson = new Gson();
     private Rect nodeSearcherRect = new Rect();
     private PackageManager packageManager;
+    private long lastContentChangedTime = 0, lastHandlerRunningTime = 0, contentChangeTime = 0, handlerTime = 0;
 
 
     public static boolean isStart() {
         return mService != null;
     }
 
-    public static void setServiceBasicInfo(SharedPreferences sharedPreferences) {
+    public static void setServiceBasicInfo(SharedPreferences sharedPreferences, int mode) {
         Gson gson = new Gson();
         ExecutorService.sharedPreferences = sharedPreferences;
 
         rulesList = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
         }.getType());
-        isServiceRunning = sharedPreferences.getBoolean("master-switch", true);
+        isServiceRunning = mode == MODE_EXECUTOR && sharedPreferences.getBoolean("master-switch", true);
 
         le("Set service basic info, " + isServiceRunning);
     }
@@ -192,36 +197,57 @@ public class ExecutorService extends AccessibilityService {
             if (isServiceRunning) {
                 if (!isSoftInputPanelOn && !foregroundPackageName.equals(lastTimePackageName)) {
                     lastTimePackageName = foregroundPackageName;
-                    currentRules.clear();
+                    currentFilters.clear();
                     for (int i = 0; i < rulesList.size(); i++) {
-                        //if (rulesList.get(i).getFor().equals(lastTimePackageName) && !foregroundPackageName.equals("") && rulesList.get(i).getStatus()) { TODO rule.status -> filter.status
-                        currentRules.add(rulesList.get(i));
-                        //}
-                    }
-                    le("Current rules changed, " + currentRules);
-                }
-
-                hasSoftInputPanelJustFound = false;
-                for (int i = 0; i < getWindows().size(); i++) {
-                    if (currentRules.size() > 0) {
-                        try {
-                            //查找输入法是否打开：TYPE_INPUT_METHOD = 2
-                            if (getWindows().get(i).getType() == 2) {
-                                hasSoftInputPanelJustFound = true;
-                                if (!isSoftInputPanelOn) {
-                                    isSoftInputPanelOn = true;
-                                    l("Input method is enabled.");
-                                }
+                        if (rulesList.get(i).getFor().equals(lastTimePackageName) && !foregroundPackageName.equals("")) {
+                            tempFilters = rulesList.get(i).getFilter();
+                            for (int j = 0; j < rulesList.get(i).getFilterLength(); j++) {
+                                if (!tempFilters.get(j).getStatus()) continue;
+                                currentFilters.add(tempFilters.get(j));
                             }
-                        } catch (Exception ignored) {
                         }
                     }
+                    le("Current filters changed, " + currentFilters);
                 }
 
                 //execute rules
                 if (!foregroundPackageName.equals(currentHomePackage) && !foregroundPackageName.equals("com.scrisstudio.seenot")
                         && !foregroundPackageName.equals("") && hasRealActivity(cName) && isCapableClass(foregroundClassName)) {
-                    //TODO
+
+                    handlerTime = SystemClock.uptimeMillis();
+                    if (handlerTime - lastHandlerRunningTime >= 256) { // have a little pause
+                        lastHandlerRunningTime = handlerTime;
+
+                        for (int i = 0; i < getWindows().size(); i++) {
+                            try {
+                                // find if input method open：TYPE_INPUT_METHOD = 2
+                                if (getWindows().get(i).getType() == 2) {
+                                    hasSoftInputPanelJustFound = true;
+                                    if (!isSoftInputPanelOn) {
+                                        isSoftInputPanelOn = true;
+                                        l("Input method is enabled.");
+                                    }
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        }
+
+                        for (int i = 0; i < currentFilters.size(); i++) {
+                            tempFilter = currentFilters.get(i);
+                            switch (tempFilter.getType()) {
+                                case 0:
+                                    performGlobalAction(GLOBAL_ACTION_HOME);
+                                    Toast.makeText(SeeNot.getAppContext(), SeeNot.getFilterTypeName(tempFilter.getType()), Toast.LENGTH_SHORT).show();
+                                    break;
+                                case 1:
+                                    if (foregroundClassName.equals(tempFilter.getParam1())) {
+                                        performGlobalAction(GLOBAL_ACTION_BACK);
+                                        Toast.makeText(SeeNot.getAppContext(), SeeNot.getFilterTypeName(tempFilter.getType()), Toast.LENGTH_SHORT).show();
+                                    }
+                                    break;
+                            }
+                        }
+                    }
                 }
             }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
@@ -230,7 +256,7 @@ public class ExecutorService extends AccessibilityService {
                 foregroundWindowId = event.getWindowId();
                 if (hasRealActivity(new ComponentName(foregroundPackageName, foregroundClassName)))
                     cName = new ComponentName(foregroundPackageName, foregroundClassName);
-                l(event.getClassName().toString() + event.getWindowId());
+                l(foregroundClassName + foregroundWindowId);
             }
         }
     }
@@ -256,10 +282,12 @@ public class ExecutorService extends AccessibilityService {
             return lastTimeClassCapable;
         else {
             if (className == null) return false;
-            else if (className.contains("Activity") && !className.contains("seenot")) return true;
+            else if (className.contains("Activity") && !className.contains("seenot"))
+                return true;
             else
                 return !className.startsWith("android.widget.") && !className.startsWith("android.view.")
-                        && !className.startsWith("androidx.") && !className.startsWith("com.android.systemui") && !className.contains("seenot");
+                        && !className.startsWith("androidx.") && !className.startsWith("com.android.systemui")
+                        && !className.startsWith("android.app") && !className.contains("seenot");
         }
     }
 
