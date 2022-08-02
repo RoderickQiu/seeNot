@@ -58,7 +58,7 @@
     <string name="refresh">刷新</string>
     <string name="cannot_modify_after_pre">已经完成设定后不能修改对应程序。</string>
     <string name="save_succeed">保存成功</string>
-    <string name="fill_the_blanks">有些必要信息还没有设置</string>
+    <string name="fill_the_blanks">有些必要信息还未设置，或输入信息不符合规范</string>
     <string name="no_seenot_set">不能为不见君内部和系统桌面设置规则（负一屏等通常不属于系统桌面，可以设置）</string>
     <string name="filter_ban_app">禁止进入此程序</string>
     <string name="filter_ban_activity">禁止进入此页面</string>
@@ -71,4 +71,7 @@
     <string name="filter_ban_app_tip">当开关打开后，一进入这个应用，就会直接退出。</string>
     <string name="filter_ban_activity_tip">在此设定要强制跳出时所在的 Activity，按\"刷新\"以获取最新结果。注：部分软件会有将多个页面合成一个 Activity 的情况，此时可以考虑使用\"找到文字后退出\"类规则。</string>
     <string name="filter_trigger">触发：</string>
+    <string name="done">确认</string>
+    <string name="select_target">选择</string>
+    <string name="filter_ban_text_tip">点击\"选择\"打开元素选择模式，并选中需要的文字，并点击\"确认\"保存。注：少数应用的部分文字无法解析。</string>
 </resources>

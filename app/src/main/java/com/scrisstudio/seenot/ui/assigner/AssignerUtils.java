@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.MenuInflater;
@@ -24,6 +25,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -43,6 +46,7 @@ import com.scrisstudio.seenot.service.RuleInfo;
 import com.scrisstudio.seenot.ui.rule.FilterInfoAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -58,7 +62,7 @@ public class AssignerUtils {
     private static WindowManager.LayoutParams customizationParams, outlineParams, toastParams;
     private static ArrayList<RuleInfo> rules = new ArrayList<>();
     private static RuleInfo current = null;
-    private static int position, filterId;
+    private static int position, filterId, triggerValueMaxWidth = 0;
     private static final Gson gson = new Gson();
     private static DisplayMetrics metrics = new DisplayMetrics();
     public static Resources resources = MainActivity.resources;
@@ -101,11 +105,11 @@ public class AssignerUtils {
         }
 
         current = rules.get(position);
-        setMode(viewCustomization, viewToast, modeId);
+        setMode(viewCustomization, viewToast, viewTarget, modeId, layoutOverlayOutline);
     }
 
-    private static void setMode(View viewCustomization, View viewToast, int mode) {
-        initMode(viewCustomization, viewToast, mode);
+    private static void setMode(View viewCustomization, View viewToast, View viewTarget, int mode, FrameLayout layoutOverlayOutline) {
+        initMode(viewCustomization, viewToast, viewTarget, mode, layoutOverlayOutline);
 
         viewCustomization.findViewById(R.id.assigner_pre).setVisibility(mode == 0 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.assigner_home).setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
@@ -133,21 +137,21 @@ public class AssignerUtils {
             }
     }
 
-    private static void initMode(View viewCustomization, View viewToast, int mode) {
+    private static void initMode(View viewCustomization, View viewToast, View viewTarget, int mode, FrameLayout layoutOverlayOutline) {
         switch (mode) {
             case 0:
-                initPre(viewCustomization, viewToast);
+                initPre(viewCustomization, viewToast, viewTarget, layoutOverlayOutline);
                 break;
             case 1:
-                initHome(viewCustomization, viewToast);
+                initHome(viewCustomization, viewToast, viewTarget, layoutOverlayOutline);
                 break;
             case 2:
-                initSet(viewCustomization, viewToast);
+                initSet(viewCustomization, viewToast, viewTarget, layoutOverlayOutline);
                 break;
         }
     }
 
-    private static void initSet(View viewCustomization, View viewToast) {
+    private static void initSet(View viewCustomization, View viewToast, View viewTarget, FrameLayout layoutOverlayOutline) {
         FilterInfo filter = current.getFilter().get(filterId);
         ((TextView) viewCustomization.findViewById(R.id.filter_set_type)).setText(SeeNot.getFilterTypeName(filter.getType()));
 
@@ -157,16 +161,48 @@ public class AssignerUtils {
             filter.setStatus(isChecked);
         });
 
-        final Button btSave = viewCustomization.findViewById(R.id.button_save_rule);
+        final LinearLayout layoutTextFindForm = viewCustomization.findViewById(R.id.set_filter_text_find_form);
+        final TextView triggerValue = viewCustomization.findViewById(R.id.set_filter_trigger_value);
+        final Button btSave = viewCustomization.findViewById(R.id.button_save_rule),
+                btTargetSelect = viewCustomization.findViewById(R.id.set_filter_target_select),
+                btTargetSelectExit = viewCustomization.findViewById(R.id.set_filter_target_select_exit),
+                btTargetDone = viewCustomization.findViewById(R.id.set_filter_target_done),
+                btRefresh = viewCustomization.findViewById(R.id.set_filter_refresh);
+
+        btTargetSelectExit.setVisibility(View.GONE);
+        btTargetDone.setVisibility(View.GONE);
+        btRefresh.setVisibility(filter.getType() == 1 ? View.VISIBLE : View.GONE);
+        layoutTextFindForm.setVisibility(filter.getType() == 2 ? View.VISIBLE : View.GONE);
+
+        if (triggerValueMaxWidth == 0) triggerValueMaxWidth = triggerValue.getMaxWidth();
+        triggerValue.setMaxWidth(filter.getType() == 2 ? (int) (triggerValueMaxWidth * 0.6) : triggerValueMaxWidth);
+
         btSave.setOnClickListener(v -> {
-            filter.setParam1(((TextView) viewCustomization.findViewById(R.id.set_filter_trigger_value)).getText().toString());
+            String param = triggerValue.getText().toString();
+            if (param.equals("") || param.equals("---") || param.equals("无法获取当前文字")) {
+                sendToast(viewToast, resources.getString(R.string.fill_the_blanks), LENGTH_LONG);
+            } else {
+                filter.setParam1(param);
+                if (outlineParams.alpha != 0)
+                    toggleOutline(layoutOverlayOutline, viewCustomization, viewTarget, viewToast);
 
-            ArrayList<FilterInfo> filters = current.getFilter();
-            filters.set(filterId, filter);
-            current.setFilter(filters);
+                ArrayList<FilterInfo> filters = current.getFilter();
+                filters.set(filterId, filter);
+                current.setFilter(filters);
 
-            ruleSave(MODE_ASSIGNER);
-            setMode(viewCustomization, viewToast, 1);
+                ruleSave(MODE_ASSIGNER);
+                setMode(viewCustomization, viewToast, viewTarget, 1, layoutOverlayOutline);
+
+                sendToast(viewToast, resources.getString(R.string.save_succeed), LENGTH_SHORT);
+            }
+        });
+        btTargetSelect.setOnClickListener(v -> toggleOutline(layoutOverlayOutline, viewCustomization, viewTarget, viewToast));
+        btTargetSelectExit.setOnClickListener(v -> toggleOutline(layoutOverlayOutline, viewCustomization, viewTarget, viewToast));
+        btTargetDone.setOnClickListener(v -> {
+            filter.setParam1(triggerValue.getText().toString());
+            if (outlineParams.alpha != 0)
+                toggleOutline(layoutOverlayOutline, viewCustomization, viewTarget, viewToast);
+            sendToast(viewToast, resources.getString(R.string.save_succeed), LENGTH_SHORT);
         });
 
         refreshSet(filter, viewCustomization);
@@ -185,6 +221,10 @@ public class AssignerUtils {
                 triggerValue = ExecutorService.foregroundClassName;
                 tip = resources.getString(R.string.filter_ban_activity_tip);
                 break;
+            case 2:
+                triggerValue = filter.getParam1();
+                tip = resources.getString(R.string.filter_ban_text_tip);
+                break;
         }
         final String finalTriggerValue = triggerValue, finalTriggerLabel = triggerLabel, finalTip = tip;
         ((TextView) viewCustomization.findViewById(R.id.set_filter_trigger_value)).setText(finalTriggerValue);
@@ -192,8 +232,9 @@ public class AssignerUtils {
         ((TextView) viewCustomization.findViewById(R.id.assigner_set_tip)).setText(finalTip);
     }
 
-    private static void initHome(View viewCustomization, View viewToast) {
-        viewCustomization.findViewById(R.id.button_set_rule).setOnClickListener(v -> setMode(viewCustomization, viewToast, 0));
+    private static void initHome(View viewCustomization, View viewToast, View viewTarget, FrameLayout layoutOverlayOutline) {
+        viewCustomization.findViewById(R.id.button_set_rule).setOnClickListener(v ->
+                setMode(viewCustomization, viewToast, viewTarget, 0, layoutOverlayOutline));
         ((TextView) viewCustomization.findViewById(R.id.home_rule_for)).setText(current.getForName());
 
         RecyclerView recyclerView = viewCustomization.findViewById(R.id.filters_list);
@@ -256,14 +297,14 @@ public class AssignerUtils {
         return false;
     }
 
-    private static void initPre(View viewCustomization, View viewToast) {
+    private static void initPre(View viewCustomization, View viewToast, View viewTarget, FrameLayout layoutOverlayOutline) {
         ((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).setText(current.getTitle());
         ((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).setText("---");
         if (current.getFor().equals("com.software.any")) {
             viewCustomization.findViewById(R.id.rule_for_refresh).setOnClickListener(v -> ((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).setText(getAppRealName(ExecutorService.foregroundPackageName)));
             viewCustomization.findViewById(R.id.button_save_pre).setOnClickListener(v -> {
                 if (Objects.requireNonNull(((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).getText()).toString().equals("---") || Objects.requireNonNull(((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).getText()).toString().equals("")) {
-                    sendToast(viewToast, resources.getString(R.string.fill_the_blanks), LENGTH_SHORT);
+                    sendToast(viewToast, resources.getString(R.string.fill_the_blanks), LENGTH_LONG);
                     return;
                 }
                 if (ExecutorService.foregroundPackageName.contains("seenot") || ExecutorService.foregroundPackageName.equals(currentHomePackage)) {
@@ -275,7 +316,7 @@ public class AssignerUtils {
                 current.setForName(getAppRealName(ExecutorService.foregroundPackageName));
                 ruleSave(MODE_ASSIGNER);
                 sendToast(viewToast, resources.getString(R.string.save_succeed), LENGTH_SHORT);
-                setMode(viewCustomization, viewToast, 1);
+                setMode(viewCustomization, viewToast, viewTarget, 1, layoutOverlayOutline);
             });
         } else {
             ((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).setText(current.getForName());
@@ -283,13 +324,13 @@ public class AssignerUtils {
             ((TextView) viewCustomization.findViewById(R.id.assigner_pre_tip)).setText(R.string.cannot_modify_after_pre);
             viewCustomization.findViewById(R.id.button_save_pre).setOnClickListener(v -> {
                 if (Objects.requireNonNull(((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).getText()).toString().equals("")) {
-                    sendToast(viewToast, resources.getString(R.string.fill_the_blanks), LENGTH_SHORT);
+                    sendToast(viewToast, resources.getString(R.string.fill_the_blanks), LENGTH_LONG);
                     return;
                 }
                 current.setTitle(Objects.requireNonNull(((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).getText()).toString());
                 ruleSave(MODE_ASSIGNER);
                 sendToast(viewToast, resources.getString(R.string.save_succeed), LENGTH_SHORT);
-                setMode(viewCustomization, viewToast, 1);
+                setMode(viewCustomization, viewToast, viewTarget, 1, layoutOverlayOutline);
             });
         }
     }
@@ -305,7 +346,7 @@ public class AssignerUtils {
         return name;
     }
 
-    private static void sendToast(View viewToast, Object input, int length) {
+    private static void sendToast(View viewToast, String input, int length) {
         AtomicInteger contentWidth = new AtomicInteger();
         TextView content = viewToast.findViewById(R.id.tv_toast_content);
         content.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
@@ -440,7 +481,93 @@ public class AssignerUtils {
         });
     }
 
-    private static void findAllNode(ArrayList<AccessibilityNodeInfo> roots, ArrayList<AccessibilityNodeInfo> list) {
+    private static void toggleOutline(FrameLayout layoutOverlayOutline, View viewCustomization, View viewTarget, View viewToast) {
+        FilterInfo filter = current.getFilter().get(filterId);
+        final TextView triggerValue = viewCustomization.findViewById(R.id.set_filter_trigger_value);
+        final Button btTargetSelect = viewCustomization.findViewById(R.id.set_filter_target_select),
+                btTargetSelectExit = viewCustomization.findViewById(R.id.set_filter_target_select_exit),
+                btTargetDone = viewCustomization.findViewById(R.id.set_filter_target_done);
+
+        if (outlineParams.alpha == 0) {
+            if (!ExecutorService.foregroundPackageName.equals(ExecutorService.currentHomePackage) &&
+                    !ExecutorService.foregroundPackageName.equals("com.scrisstudio.seenot")) {
+                btTargetSelect.setVisibility(View.GONE);
+                btTargetSelectExit.setVisibility(View.VISIBLE);
+                btTargetDone.setVisibility(View.GONE);
+                AccessibilityNodeInfo root = mService.getRootInActiveWindow();
+                if (root == null) return;
+                layoutOverlayOutline.removeAllViews();
+                ArrayList<AccessibilityNodeInfo> roots = new ArrayList<>();
+                roots.add(root);
+                ArrayList<AccessibilityNodeInfo> nodeList = new ArrayList<>();
+                findAllNode(roots, nodeList);
+                nodeList.sort((a, b1) -> {
+                    Rect rectA = new Rect();
+                    Rect rectB = new Rect();
+                    a.getBoundsInScreen(rectA);
+                    b1.getBoundsInScreen(rectB);
+                    return rectB.width() * rectB.height() - rectA.width() * rectA.height();
+                });
+                for (final AccessibilityNodeInfo e : nodeList) {
+                    final Rect temRect = new Rect();
+                    e.getBoundsInScreen(temRect);
+                    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(temRect.width(), temRect.height());
+                    params.leftMargin = temRect.left;
+                    params.topMargin = temRect.top;
+                    final ImageView img = new ImageView(mService);
+                    img.setBackgroundResource(R.drawable.node);
+                    img.setFocusableInTouchMode(true);
+                    img.setOnClickListener(View::requestFocus);
+                    img.setOnFocusChangeListener((v1, hasFocus) -> {
+                        btTargetDone.setVisibility(View.VISIBLE);
+                        if (hasFocus) {
+                            AccessibilityNodeInfo tempNode = e;
+                            ArrayList<Integer> indicesList = new ArrayList<>();
+                            while (true) {
+                                for (int i = 0; i < tempNode.getParent().getChildCount(); i++) {
+                                    if (tempNode.getParent().getChild(i).equals(tempNode)) {
+                                        indicesList.add(i);
+                                        break;
+                                    }
+                                }
+                                tempNode = tempNode.getParent();
+
+                                if (tempNode.equals(root)) {
+                                    Collections.reverse(indicesList);
+                                    break;
+                                }
+                            }
+
+                            CharSequence tempDescription = e.getContentDescription();
+                            CharSequence tempText = (e.getText() != null) ? ("" + e.getText()) : tempDescription;
+                            tempText = (tempText == null) ? "" : tempText;
+                            triggerValue.setText(tempText.equals("") ? "无法获取当前文字" : tempText);
+
+                            v1.setBackgroundResource(R.drawable.node_focus);
+                        } else {
+                            v1.setBackgroundResource(R.drawable.node);
+                        }
+                    });
+                    layoutOverlayOutline.addView(img, params);
+                }
+                outlineParams.alpha = 0.5f;
+                outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+                windowManager.updateViewLayout(viewTarget, outlineParams);
+            } else
+                sendToast(viewToast, "不允许在此处设置规则", LENGTH_SHORT);
+        } else {
+            outlineParams.alpha = 0f;
+            outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+            windowManager.updateViewLayout(viewTarget, outlineParams);
+
+            btTargetSelect.setVisibility(View.VISIBLE);
+            btTargetSelectExit.setVisibility(View.GONE);
+            btTargetDone.setVisibility(View.GONE);
+        }
+    }
+
+    private static void findAllNode
+            (ArrayList<AccessibilityNodeInfo> roots, ArrayList<AccessibilityNodeInfo> list) {
         ArrayList<AccessibilityNodeInfo> childrenList = new ArrayList<>();
         for (AccessibilityNodeInfo e : roots) {
             if (e == null) continue;
