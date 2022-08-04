@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext());
         if (!sharedPreferences.contains("rules")) {
             SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
-            rulesList.add(new RuleInfo(0, "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0));
             ruleInitEditor.putString("rules", gson.toJson(rulesList));
             ruleInitEditor.apply();
         }
@@ -128,13 +127,18 @@ public class MainActivity extends AppCompatActivity {
             if (destination.toString().contains("Home")) {
                 binding.appBarMain.toolbar.setTitle(R.string.app_full_name);
             }
-            if ((lastTimeDestination.contains("Permission") && (destination.toString().contains("Home") || destination.toString().contains("Permission"))) || (lastTimeDestination.contains("Settings") && (destination.toString().contains("Home") || destination.toString().contains("Settings")))) {
+            if (SeeNot.shouldNavigateTo == 0 && ((lastTimeDestination.contains("Permission") && (destination.toString().contains("Home") || destination.toString().contains("Permission"))) || (lastTimeDestination.contains("Settings") && (destination.toString().contains("Home") || destination.toString().contains("Settings"))))) {
                 finish();
                 Intent intent = new Intent(MainActivity.this, MainActivity.class);
                 startActivity(intent);
             }
             lastTimeDestination = destination.toString();
         });
+
+        if (SeeNot.shouldNavigateTo != 0) {
+            navController.navigate(SeeNot.shouldNavigateTo);
+            SeeNot.shouldNavigateTo = 0;
+        }
     }
 
     @Override

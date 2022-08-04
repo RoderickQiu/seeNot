@@ -8,10 +8,10 @@ import android.util.Log;
 
 public class SeeNot extends Application {
 
-    public static final Void voided = null;
     @SuppressLint("StaticFieldLeak")
     private static Context context;
     public static String lastTimeDestination = "";
+    public static int shouldNavigateTo = 0;
 
     public static Context getAppContext() {
         return SeeNot.context;

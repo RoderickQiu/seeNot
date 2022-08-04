@@ -1,7 +1,6 @@
 package com.scrisstudio.seenot.ui.permission;
 
 import static com.scrisstudio.seenot.SeeNot.l;
-import static com.scrisstudio.seenot.SeeNot.le;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.scrisstudio.seenot.MainActivity;
+import com.scrisstudio.seenot.R;
 import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.databinding.FragmentPermissionBinding;
 
@@ -42,10 +42,6 @@ public class PermissionFragment extends Fragment {
                     android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
 
             TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
-
-            le(Settings.Secure.getString(
-                    mContext.getApplicationContext().getContentResolver(),
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES));
 
             if (accessibilityEnabled == 1) {
                 String settingValue = Settings.Secure.getString(
@@ -143,5 +139,16 @@ public class PermissionFragment extends Fragment {
     public void onResume() {
         super.onResume();
         init();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 111) {
+            SeeNot.shouldNavigateTo = R.id.nav_permission;
+
+            Intent intentRestart = new Intent(getContext(), MainActivity.class);
+            startActivity(intentRestart);
+        }
     }
 }
