@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
 import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.databinding.FragmentHomeBinding;
@@ -44,6 +45,7 @@ public class HomeFragment extends Fragment {
     private ArrayList<RuleInfo> rules = new ArrayList<>();
     private Banner banner;
     private String bannerMessage;
+    private Resources resources;
 
     private final BroadcastReceiver bannerMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -52,6 +54,28 @@ public class HomeFragment extends Fragment {
                 banner.setMessage(intent.getStringExtra("banner_message"));
                 binding.banner.show();
                 bannerMessage = intent.getStringExtra("banner_message");
+
+                banner.setRightButton(getRightButtonText(), banner2 -> {
+                    if (bannerMessage.equals(resources.getString(R.string.function_closed))) {
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putBoolean("master-switch", true);
+                        ExecutorService.isServiceRunning = true;
+                        editor.apply();
+
+                        if (ExecutorService.isStart()) {
+                            Toast.makeText(SeeNot.getAppContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
+                        }
+                        banner.dismiss();
+                    } else if (bannerMessage.equals(resources.getString(R.string.service_not_running))) {
+                        try {
+                            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
+                            navController.navigate(R.id.nav_permission);
+                        } catch (Exception ignored) {
+                        }
+                        binding.fab.hide();
+                        banner.dismiss();
+                    }
+                });
             } else {
                 binding.banner.dismiss();
             }
@@ -84,31 +108,11 @@ public class HomeFragment extends Fragment {
             adapter.dataChange(rules);
         });
 
-        Resources resources = getResources();
+        resources = MainActivity.resources;
 
         banner = binding.banner;
         banner.setLeftButtonListener(banner1 -> banner.dismiss());
-        banner.setRightButtonListener(banner2 -> {
-            if (bannerMessage.equals(resources.getString(R.string.function_closed))) {
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("master-switch", true);
-                ExecutorService.isServiceRunning = true;
-                editor.apply();
-
-                if (ExecutorService.isStart()) {
-                    Toast.makeText(SeeNot.getAppContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
-                }
-                banner.dismiss();
-            } else if (bannerMessage.equals(resources.getString(R.string.service_not_running))) {
-                try {
-                    NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
-                    navController.navigate(R.id.nav_permission);
-                } catch (Exception ignored) {
-                }
-                binding.fab.hide();
-                banner.dismiss();
-            }
-        });
+        banner.setRightButtonListener(banner1 -> banner.dismiss());
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(bannerMessageReceiver,
                 new IntentFilter("banner_channel"));
@@ -123,6 +127,13 @@ public class HomeFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private int getRightButtonText() {
+        if (bannerMessage.equals(resources.getString(R.string.function_closed)))
+            return R.string.reopen_function;
+        else
+            return R.string.permission_grant;
     }
 
     @Override

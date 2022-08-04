@@ -63,6 +63,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         l("Now entering main activity...");
 
+        packageName = getPackageName();
+
+        resources = getResources();
+
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext());
         if (!sharedPreferences.contains("rules")) {
             SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
@@ -79,10 +83,6 @@ public class MainActivity extends AppCompatActivity {
         isNotificationEnabled = getSystemService(NotificationManager.class).areNotificationsEnabled();
         isOverlayEnabled = Settings.canDrawOverlays(this);
 
-        packageName = getPackageName();
-
-        resources = getResources();
-
         LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
         viewCustomization = new SoftReference<>(inflater.inflate(R.layout.layout_assigner, null));//workaround for static view
         viewTarget = new SoftReference<>(inflater.inflate(R.layout.layout_view_target, null));
@@ -98,9 +98,19 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception ignored) {
         }
 
+        // master switch check
         if (!sharedPreferences.getBoolean("master-switch", true)) {
             Intent intent = new Intent("banner_channel");
             intent.putExtra("banner_message", resources.getString(R.string.function_closed));
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        }
+
+        // permission check
+        if (!(isAccessibilitySettingsOn(SeeNot.getAppContext()) && Settings.canDrawOverlays(SeeNot.getAppContext()) &&
+                ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()) &&
+                getSystemService(NotificationManager.class).areNotificationsEnabled())) {
+            Intent intent = new Intent("banner_channel");
+            intent.putExtra("banner_message", resources.getString(R.string.service_not_running));
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
 
@@ -122,23 +132,9 @@ public class MainActivity extends AppCompatActivity {
                 finish();
                 Intent intent = new Intent(MainActivity.this, MainActivity.class);
                 startActivity(intent);
-                //TODO not elegant: settings and permission
             }
-            l(lastTimeDestination);
-            l(destination.toString());
             lastTimeDestination = destination.toString();
         });
-    }
-
-    private void permissionBannerOpener() {
-        //如果不是所有权限都已打开
-        if (!(isAccessibilitySettingsOn(SeeNot.getAppContext()) && Settings.canDrawOverlays(SeeNot.getAppContext()) &&
-                ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()) &&
-                getSystemService(NotificationManager.class).areNotificationsEnabled())) {
-            Intent intent = new Intent("banner_channel");
-            intent.putExtra("banner_message", resources.getString(R.string.service_not_running));
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        }
     }
 
     @Override

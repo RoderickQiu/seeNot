@@ -14,8 +14,7 @@
     <fragment
         android:id="@+id/nav_settings"
         android:name="com.scrisstudio.seenot.ui.settings.SettingsFragment"
-        android:label="@string/menu_settings"
-        tools:layout="@layout/fragment_settings" />
+        android:label="@string/menu_settings" />
 
     <fragment
         android:id="@+id/nav_permission"

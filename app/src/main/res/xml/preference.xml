@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:key="notifications_category"
+        app:title="@string/settings_general">
+
+        <SwitchPreferenceCompat
+            app:key="master-switch"
+            app:title="@string/master_switch"
+            app:defaultValue="true" />
+
+        <Preference
+            app:key="export"
+            app:summary="@string/settings_export_tip"
+            app:title="@string/settings_export" />
+
+        <EditTextPreference
+            app:key="import"
+            app:summary="@string/settings_import_tip"
+            app:title="@string/settings_import"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

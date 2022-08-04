@@ -74,4 +74,13 @@
     <string name="done">确认</string>
     <string name="select_target">选择</string>
     <string name="filter_ban_text_tip">点击\"选择\"打开元素选择模式，并选中需要的文字，并点击\"确认\"保存。注：少数应用的部分文字无法解析。</string>
+    <string name="master_switch">不见君总开关</string>
+    <string name="settings_general">基本设置</string>
+    <string name="settings_export">数据备份</string>
+    <string name="settings_export_tip">点此备份应用的全部设置和规则</string>
+    <string name="settings_import">数据导入</string>
+    <string name="settings_import_tip">点此导入应用数据</string>
+    <string name="copied_to_clipboard">已经复制到剪贴板</string>
+    <string name="import_succeed">数据导入成功</string>
+    <string name="import_failed">导入失败</string>
 </resources>
