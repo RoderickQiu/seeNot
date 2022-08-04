@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -66,6 +67,7 @@ public class ExecutorService extends AccessibilityService {
     private Rect nodeSearcherRect = new Rect();
     private PackageManager packageManager;
     private long lastContentChangedTime = 0, lastHandlerRunningTime = 0, contentChangeTime = 0, handlerTime = 0;
+    public static Resources resources;
 
 
     public static boolean isStart() {
@@ -167,6 +169,8 @@ public class ExecutorService extends AccessibilityService {
 
             l("Service invoking...");
 
+            resources = MainActivity.resources;
+
             if (sharedPreferences != null) {
                 isServiceRunning = sharedPreferences.getBoolean("master-switch", true);
                 sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext());
@@ -237,13 +241,16 @@ public class ExecutorService extends AccessibilityService {
                             switch (tempFilter.getType()) {
                                 case 0:
                                     performGlobalAction(GLOBAL_ACTION_HOME);
-                                    Toast.makeText(SeeNot.getAppContext(), SeeNot.getFilterTypeName(tempFilter.getType()), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType())), Toast.LENGTH_SHORT).show();
                                     break;
                                 case 1:
                                     if (foregroundClassName.equals(tempFilter.getParam1())) {
                                         performGlobalAction(GLOBAL_ACTION_BACK);
-                                        Toast.makeText(SeeNot.getAppContext(), SeeNot.getFilterTypeName(tempFilter.getType()), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType())) + "：\"" + tempFilter.getParam1() + "\"", Toast.LENGTH_SHORT).show();
                                     }
+                                    break;
+                                case 2:
+                                    wordFinder(getRootInActiveWindow(), true, tempFilter.getParam1());
                                     break;
                             }
                         }
@@ -301,18 +308,37 @@ public class ExecutorService extends AccessibilityService {
         return getRootInActiveWindow();
     }
 
-    private Rect nodeSearcher(ArrayList<Integer> indices) {
-        try {
-            AccessibilityNodeInfo node = getRightWindowNode();
-            for (int i = 0; i < indices.size(); i++) {
-                node = node.getChild(indices.get(i));
-            }
+    public void wordFinder(AccessibilityNodeInfo root, boolean isOnlyVisible, String word) {
+        if (!isServiceRunning || root == null) return;
 
-            node.getBoundsInScreen(nodeSearcherRect);
-            return nodeSearcherRect;
-        } catch (Exception e) {
-            le("Node search really went wrong: " + e);
-            return null;
+        ArrayList<AccessibilityNodeInfo> queue = new ArrayList<>();
+        queue.add(root);
+
+        while (queue.size() > 0) {
+            AccessibilityNodeInfo info = queue.remove(0);
+            if (!isOnlyVisible || info.isVisibleToUser()) {
+                if (info.getChildCount() != 0) {
+                    for (int i = 0; i < info.getChildCount(); i++) {
+                        if (info.getChild(i) != null) {
+                            queue.add(info.getChild(i));
+                        }
+                    }
+                }
+
+                String text = null;
+                if (info.getText() != null) text = info.getText().toString();
+                else if (info.getContentDescription() != null)
+                    text = info.getContentDescription().toString();
+
+                if (text != null) {
+                    if (text.equals(word)) {
+                        performGlobalAction(GLOBAL_ACTION_BACK);
+                        Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
+                                + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+            }
         }
     }
 
