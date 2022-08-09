@@ -1,5 +1,6 @@
 package com.scrisstudio.seenot.ui.rule;
 
+import static com.scrisstudio.seenot.SeeNot.le;
 import static com.scrisstudio.seenot.service.ExecutorService.MODE_ASSIGNER;
 
 import android.annotation.SuppressLint;
@@ -76,7 +77,12 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
             holder.ruleFor.setText(rule.getForName());
 
             holder.editButton.setOnClickListener(v -> {
-                AssignerUtils.initAssigner(rule.getFor().equals("com.software.any") ? 0 : 1, position, 0);
+                try {
+                    AssignerUtils.initAssigner(rule.getFor().equals("com.software.any") ? 0 : 1, position, 0);
+                } catch (Exception e) {
+                    le(e.getLocalizedMessage());
+                    Toast.makeText(context, R.string.open_assigner_failed, Toast.LENGTH_LONG).show();
+                }
             });
 
             holder.deleteButton.setOnClickListener(v -> {
@@ -106,6 +112,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
                 edit.apply();
 
                 ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_ASSIGNER);
+                AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
 
                 Toast.makeText(context.getApplicationContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
             });

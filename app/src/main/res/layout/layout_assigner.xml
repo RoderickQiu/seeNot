@@ -154,7 +154,8 @@
         app:layout_constraintBottom_toTopOf="@id/guideline_assigner_top"
         android:orientation="horizontal"
         android:id="@+id/assigner_mover"
-        android:background="#E5BC18">
+        android:background="#E5BC18"
+        android:paddingTop="4dp">
 
         <TextView
             android:id="@+id/press_here_move"
@@ -164,24 +165,51 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
             android:background="#E5BC18"
+            android:paddingTop="13dp"
             android:paddingBottom="1dp"
             android:text="@string/press_here_move"
             android:textColor="@color/gray_700"
             android:textSize="14sp"
+            android:layout_centerVertical="true"
             tools:ignore="RelativeOverlap" />
 
-        <ImageButton
-            android:id="@+id/button_quit"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:backgroundTint="#00000000"
-            android:contentDescription="@string/exit"
             android:layout_marginTop="10dp"
-            android:padding="1dp"
-            android:background="#E5BC18"
-            android:src="@drawable/ic_baseline_close_18"
-            app:tint="@color/gray_700" />
+            android:paddingHorizontal="1dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="1dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:orientation="horizontal"
+            android:id="@+id/button_quit"
+            tools:ignore="RelativeOverlap">
+
+            <TextView
+                android:id="@+id/press_here_move1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:background="#E5BC18"
+                android:text="@string/click_to_apply"
+                android:textColor="@color/gray_700"
+                android:textSize="14sp"
+                tools:ignore="RelativeOverlap" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="#00000000"
+                android:contentDescription="@string/exit"
+                android:background="#E5BC18"
+                android:src="@drawable/ic_baseline_close_21"
+                app:tint="@color/gray_700" />
+
+        </LinearLayout>
 
     </RelativeLayout>
 

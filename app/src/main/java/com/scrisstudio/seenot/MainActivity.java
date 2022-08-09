@@ -11,7 +11,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -103,10 +102,8 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("banner_message", resources.getString(R.string.function_closed));
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
-
         // permission check
         if (!(isAccessibilitySettingsOn(SeeNot.getAppContext()) && Settings.canDrawOverlays(SeeNot.getAppContext()) &&
-                ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()) &&
                 getSystemService(NotificationManager.class).areNotificationsEnabled())) {
             Intent intent = new Intent("banner_channel");
             intent.putExtra("banner_message", resources.getString(R.string.service_not_running));

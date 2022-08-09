@@ -24,10 +24,10 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -71,6 +71,12 @@ public class AssignerUtils {
         callBack = callback;
     }
 
+    public static void setAssignerSharedPreferences(SharedPreferences sharedPreferences) {
+        AssignerUtils.sharedPreferences = sharedPreferences;
+        rules = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+        }.getType());
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     public static void initAssigner(int modeId, int position, int filterId) {
         windowManager = (WindowManager) mService.getSystemService(WINDOW_SERVICE);
@@ -102,6 +108,16 @@ public class AssignerUtils {
             windowManager.addView(viewCustomization, customizationParams);
         } catch (Exception e) {
             le(e.getLocalizedMessage());
+            try {
+                windowManager.removeViewImmediate(viewTarget);
+                windowManager.removeViewImmediate(viewCustomization);
+
+                windowManager.addView(viewTarget, outlineParams);
+                windowManager.addView(viewCustomization, customizationParams);
+            } catch (Exception e1) {
+                le(e1.getLocalizedMessage());
+                sendToast(viewToast, resources.getString(R.string.open_assigner_failed), LENGTH_LONG);
+            }
         }
 
         current = rules.get(position);
@@ -179,7 +195,8 @@ public class AssignerUtils {
 
         btSave.setOnClickListener(v -> {
             String param = triggerValue.getText().toString();
-            if (param.equals("") || param.equals("---") || param.equals("无法获取当前文字")) {
+            if (param.equals("") || param.equals("---") ||
+                    param.equals("无法获取当前文字") || param.equals(resources.getString(R.string.click_right_to_set))) {
                 sendToast(viewToast, resources.getString(R.string.fill_the_blanks), LENGTH_LONG);
             } else {
                 filter.setParam1(param);
@@ -226,9 +243,10 @@ public class AssignerUtils {
                 tip = resources.getString(R.string.filter_ban_text_tip);
                 break;
         }
-        final String finalTriggerValue = triggerValue, finalTriggerLabel = triggerLabel, finalTip = tip;
+        final String finalTriggerValue = triggerValue.equals("---") ? resources.getString(R.string.click_right_to_set) : triggerValue;
+        final String finalTip = tip;
         ((TextView) viewCustomization.findViewById(R.id.set_filter_trigger_value)).setText(finalTriggerValue);
-        ((TextView) viewCustomization.findViewById(R.id.set_filter_trigger_label)).setText(finalTriggerLabel);
+        ((TextView) viewCustomization.findViewById(R.id.set_filter_trigger_label)).setText(triggerLabel);
         ((TextView) viewCustomization.findViewById(R.id.assigner_set_tip)).setText(finalTip);
     }
 
@@ -299,11 +317,11 @@ public class AssignerUtils {
 
     private static void initPre(View viewCustomization, View viewToast, View viewTarget, FrameLayout layoutOverlayOutline) {
         ((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).setText(current.getTitle());
-        ((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).setText("---");
+        ((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).setText(resources.getString(R.string.click_right_to_set));
         if (current.getFor().equals("com.software.any")) {
             viewCustomization.findViewById(R.id.rule_for_refresh).setOnClickListener(v -> ((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).setText(getAppRealName(ExecutorService.foregroundPackageName)));
             viewCustomization.findViewById(R.id.button_save_pre).setOnClickListener(v -> {
-                if (Objects.requireNonNull(((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).getText()).toString().equals("---") || Objects.requireNonNull(((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).getText()).toString().equals("")) {
+                if (Objects.requireNonNull(((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).getText()).toString().equals(resources.getString(R.string.click_right_to_set)) || Objects.requireNonNull(((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).getText()).toString().equals("")) {
                     sendToast(viewToast, resources.getString(R.string.fill_the_blanks), LENGTH_LONG);
                     return;
                 }
@@ -440,7 +458,7 @@ public class AssignerUtils {
     }
 
     private static void initQuit(View viewCustomization, View viewTarget) {
-        final ImageButton btQuit = viewCustomization.findViewById(R.id.button_quit);
+        final LinearLayout btQuit = viewCustomization.findViewById(R.id.button_quit);
         btQuit.setOnClickListener(v -> {
             windowManager.removeViewImmediate(viewCustomization);
             windowManager.removeViewImmediate(viewTarget);
@@ -449,7 +467,6 @@ public class AssignerUtils {
     }
 
     private static void ruleSave(int mode) {
-
         ExecutorService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
         rules.set(position, current);
         callBack.onQuit(position, rules, mode);
@@ -457,7 +474,7 @@ public class AssignerUtils {
 
     @SuppressLint("ClickableViewAccessibility")
     private static void initMover(View viewCustomization) {
-        final TextView tvPressToMove = viewCustomization.findViewById(R.id.press_here_move);
+        final ScrollView tvPressToMove = viewCustomization.findViewById(R.id.assigner_content);
         tvPressToMove.setOnTouchListener(new View.OnTouchListener() {
             int x = 0, y = 0;
 

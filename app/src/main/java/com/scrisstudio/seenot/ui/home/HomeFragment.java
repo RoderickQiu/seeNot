@@ -105,6 +105,8 @@ public class HomeFragment extends Fragment {
             edit.putString("rules", gson.toJson(rules));
             edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
             edit.apply();
+            ExecutorService.setServiceBasicInfo(sharedPreferences, 0);
+            AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
             adapter.dataChange(rules);
         });
 

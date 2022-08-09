@@ -100,7 +100,8 @@
                     android:textColor="@color/gray_800"
                     android:textSize="12sp"
                     android:maxLines="2"
-                    android:maxWidth="192dp" />
+                    android:maxWidth="192dp"
+                    android:text="@string/click_right_to_set" />
 
             </LinearLayout>
 

@@ -87,7 +87,7 @@ public class ExecutorService extends AccessibilityService {
 
     private void createNotificationChannel() {
         CharSequence name = getString(R.string.default_notification_channel);
-        int importance = NotificationManager.IMPORTANCE_LOW;
+        int importance = NotificationManager.IMPORTANCE_HIGH;
         normalNotificationChannel = new NotificationChannel(CHANNEL_NORMAL_NOTIFICATION_ID, name, importance);
         normalNotificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         normalNotificationChannel.setBypassDnd(true);
@@ -104,14 +104,16 @@ public class ExecutorService extends AccessibilityService {
                 .setContentText(content)
                 .setContentIntent(pi)
                 .setAutoCancel(true)
-                .setShowWhen(true);
+                .setShowWhen(true)
+                .setCategory(Notification.CATEGORY_STATUS)
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
         normalNotificationManager.notify(NORMAL_NOTIFICATION_ID, nb.build());
     }
 
     public void setForegroundService() {
         RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.layout_foreground_notification);
         String channelName = getString(R.string.channel_name);
-        int importance = NotificationManager.IMPORTANCE_LOW;
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
         NotificationChannel channel = new NotificationChannel(CHANNEL_SERVICE_KEEPER_ID, channelName, importance);
         channel.setDescription(getString(R.string.channel_description));
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_SERVICE_KEEPER_ID);
@@ -119,7 +121,7 @@ public class ExecutorService extends AccessibilityService {
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true);
         Intent resultIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pendingIntent);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.createNotificationChannel(channel);
@@ -250,7 +252,8 @@ public class ExecutorService extends AccessibilityService {
                                     }
                                     break;
                                 case 2:
-                                    wordFinder(getRootInActiveWindow(), true, tempFilter.getParam1());
+                                    if (!tempFilter.getParam1().equals("---"))
+                                        wordFinder(getRootInActiveWindow(), true, tempFilter.getParam1());
                                     break;
                             }
                         }

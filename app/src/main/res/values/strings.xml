@@ -43,7 +43,7 @@
     <string name="permission_notification_msg">用于发送必要通知和防止服务被杀死。</string>
     <string name="edit_page">编辑</string>
     <string name="select">选中</string>
-    <string name="press_here_move">按住此处来拖动</string>
+    <string name="press_here_move">按住空白处拖动</string>
     <string name="divider">|</string>
     <string name="exit">退出</string>
     <string name="rule_for_msg">对于：</string>
@@ -52,7 +52,7 @@
     <string name="save">保存</string>
     <string name="new_subrule">新建子规则</string>
     <string name="rule_title_label">规则名：</string>
-    <string name="assigner_pre_tip">请前往要设置的应用并点击\"刷新\"以获得正确的应用包名。</string>
+    <string name="assigner_pre_tip">请勿在不见君应用内或系统桌面进行设置。前往要设置的应用并点击\"刷新\"以获得正确的应用包名。</string>
     <string name="rule_name_placeholder">请在此输入规则名</string>
     <string name="continue_pre">继续设置</string>
     <string name="refresh">刷新</string>
@@ -83,4 +83,7 @@
     <string name="copied_to_clipboard">已经复制到剪贴板</string>
     <string name="import_succeed">数据导入成功</string>
     <string name="import_failed">导入失败</string>
+    <string name="click_right_to_set">请点击右侧按钮设置</string>
+    <string name="click_to_apply">关闭窗口以应用</string>
+    <string name="open_assigner_failed">打开设置面板失败，请检查无障碍服务是否已经打开</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.scrisstudio.seenot.ui.permission;
 
+import static com.scrisstudio.seenot.MainActivity.packageName;
 import static com.scrisstudio.seenot.SeeNot.l;
 
 import android.content.BroadcastReceiver;
@@ -51,7 +52,7 @@ public class PermissionFragment extends Fragment {
                     mStringColonSplitter.setString(settingValue);
                     while (mStringColonSplitter.hasNext()) {
                         String accessibilityService = mStringColonSplitter.next();
-                        if (accessibilityService.contains(MainActivity.packageName)) {
+                        if (accessibilityService.contains(packageName)) {
                             return true;
                         }
                     }
@@ -76,7 +77,7 @@ public class PermissionFragment extends Fragment {
         binding.permissionNotification.setOnClickListener(v -> {
             Intent intent = new Intent();
             intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
-            intent.putExtra("android.provider.extra.APP_PACKAGE", MainActivity.packageName);
+            intent.putExtra("android.provider.extra.APP_PACKAGE", packageName);
             startActivityForResult(intent, 111);
         });
 
@@ -88,7 +89,7 @@ public class PermissionFragment extends Fragment {
         }
         binding.permissionOverlay.setOnClickListener(v -> {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + MainActivity.packageName));
+                    Uri.parse("package:" + packageName));
             startActivityForResult(intent, 111);
         });
 
