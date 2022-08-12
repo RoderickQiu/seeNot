@@ -248,7 +248,7 @@ public class ExecutorService extends AccessibilityService {
                                 case 1:
                                     if (foregroundClassName.equals(tempFilter.getParam1())) {
                                         performGlobalAction(GLOBAL_ACTION_BACK);
-                                        Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType())) + "：\"" + tempFilter.getParam1() + "\"", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType())) + "：\"" + tempFilter.getParam1().replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
                                     }
                                     break;
                                 case 2:

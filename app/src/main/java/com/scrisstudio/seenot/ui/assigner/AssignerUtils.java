@@ -6,6 +6,7 @@ import static com.scrisstudio.seenot.SeeNot.le;
 import static com.scrisstudio.seenot.service.ExecutorService.MODE_ASSIGNER;
 import static com.scrisstudio.seenot.service.ExecutorService.MODE_EXECUTOR;
 import static com.scrisstudio.seenot.service.ExecutorService.currentHomePackage;
+import static com.scrisstudio.seenot.service.ExecutorService.foregroundPackageName;
 import static com.scrisstudio.seenot.service.ExecutorService.inflater;
 import static com.scrisstudio.seenot.service.ExecutorService.mService;
 
@@ -188,7 +189,7 @@ public class AssignerUtils {
         btTargetSelectExit.setVisibility(View.GONE);
         btTargetDone.setVisibility(View.GONE);
         btRefresh.setVisibility(filter.getType() == 1 ? View.VISIBLE : View.GONE);
-        layoutTextFindForm.setVisibility(filter.getType() == 2 ? View.VISIBLE : View.GONE);
+        layoutTextFindForm.setVisibility((filter.getType() == 2 || filter.getType() == 3) ? View.VISIBLE : View.GONE);
 
         if (triggerValueMaxWidth == 0) triggerValueMaxWidth = triggerValue.getMaxWidth();
         triggerValue.setMaxWidth(filter.getType() == 2 ? (int) (triggerValueMaxWidth * 0.6) : triggerValueMaxWidth);
@@ -196,7 +197,9 @@ public class AssignerUtils {
         btSave.setOnClickListener(v -> {
             String param = triggerValue.getText().toString();
             if (param.equals("") || param.equals("---") ||
-                    param.equals("无法获取当前文字") || param.equals(resources.getString(R.string.click_right_to_set))) {
+                    param.equals(resources.getString(R.string.cannot_get_current_text)) ||
+                    param.equals(resources.getString(R.string.cannot_get_current_id)) ||
+                    param.equals(resources.getString(R.string.click_right_to_set))) {
                 sendToast(viewToast, resources.getString(R.string.fill_the_blanks), LENGTH_LONG);
             } else {
                 filter.setParam1(param);
@@ -241,6 +244,10 @@ public class AssignerUtils {
             case 2:
                 triggerValue = filter.getParam1();
                 tip = resources.getString(R.string.filter_ban_text_tip);
+                break;
+            case 3:
+                triggerValue = filter.getParam1();
+                tip = resources.getString(R.string.filter_ban_id_tip);
                 break;
         }
         final String finalTriggerValue = triggerValue.equals("---") ? resources.getString(R.string.click_right_to_set) : triggerValue;
@@ -375,7 +382,7 @@ public class AssignerUtils {
                 contentWidth.set(content.getWidth());
             }
         });
-        content.setText(input == null ? "发生错误" : input.toString());
+        content.setText(input == null ? "发生错误" : input);
 
         MainActivity.runOnUI(() -> {
             try {
@@ -500,6 +507,7 @@ public class AssignerUtils {
 
     private static void toggleOutline(FrameLayout layoutOverlayOutline, View viewCustomization, View viewTarget, View viewToast) {
         FilterInfo filter = current.getFilter().get(filterId);
+        int type = filter.getType();
         final TextView triggerValue = viewCustomization.findViewById(R.id.set_filter_trigger_value);
         final Button btTargetSelect = viewCustomization.findViewById(R.id.set_filter_target_select),
                 btTargetSelectExit = viewCustomization.findViewById(R.id.set_filter_target_select_exit),
@@ -526,6 +534,15 @@ public class AssignerUtils {
                     return rectB.width() * rectB.height() - rectA.width() * rectA.height();
                 });
                 for (final AccessibilityNodeInfo e : nodeList) {
+                    // if cannot get, don't even allow click it
+                    String tempId = e.getViewIdResourceName();
+                    if (tempId == null & type == 3) continue;
+                    if (tempId != null) if (!tempId.contains(foregroundPackageName)) continue;
+                    CharSequence tempDescription = e.getContentDescription();
+                    CharSequence tempText = (e.getText() != null) ? ("" + e.getText()) : tempDescription;
+                    tempText = (tempText == null) ? "" : tempText;
+                    if (tempText.equals("") && type == 2) continue;
+
                     final Rect temRect = new Rect();
                     e.getBoundsInScreen(temRect);
                     FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(temRect.width(), temRect.height());
@@ -535,6 +552,7 @@ public class AssignerUtils {
                     img.setBackgroundResource(R.drawable.node);
                     img.setFocusableInTouchMode(true);
                     img.setOnClickListener(View::requestFocus);
+                    CharSequence finalTempText = tempText;
                     img.setOnFocusChangeListener((v1, hasFocus) -> {
                         btTargetDone.setVisibility(View.VISIBLE);
                         if (hasFocus) {
@@ -555,10 +573,13 @@ public class AssignerUtils {
                                 }
                             }
 
-                            CharSequence tempDescription = e.getContentDescription();
-                            CharSequence tempText = (e.getText() != null) ? ("" + e.getText()) : tempDescription;
-                            tempText = (tempText == null) ? "" : tempText;
-                            triggerValue.setText(tempText.equals("") ? "无法获取当前文字" : tempText);
+                            if (type == 2) {
+                                triggerValue.setText(finalTempText);
+                            } else if (type == 3) {
+                                triggerValue.setText(tempId);
+                            } else {
+                                triggerValue.setText(resources.getString(R.string.strange_error));
+                            }
 
                             v1.setBackgroundResource(R.drawable.node_focus);
                         } else {

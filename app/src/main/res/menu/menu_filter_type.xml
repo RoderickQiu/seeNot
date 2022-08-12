@@ -11,5 +11,8 @@
         android:title="@string/filter_ban_text" />
     <item
         android:id="@+id/type_3"
+        android:title="@string/filter_ban_id"/>
+    <item
+        android:id="@+id/type_4"
         android:title="@string/filter_auto_click" />
 </menu>

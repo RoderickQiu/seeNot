@@ -52,7 +52,9 @@ public class FilterInfo {
      * <p>
      * case 2: return R.string.filter_ban_text;
      * <p>
-     * case 3: return R.string.filter_auto_click;
+     * case 3: return R.string.filter_ban_id;
+     * <p>
+     * case 4: return R.string.filter_auto_click;
      */
     public int getType() {
         return type;

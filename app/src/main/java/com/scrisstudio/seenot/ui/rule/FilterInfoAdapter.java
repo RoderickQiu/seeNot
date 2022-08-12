@@ -79,7 +79,7 @@ public class FilterInfoAdapter extends RecyclerView.Adapter<FilterInfoAdapter.My
         int viewType = getItemViewType(filterId);
         if (viewType == VIEW_TYPE_CARD) {
             if (current.getFilter().get(filterId).getType() != 0)
-                holder.filterValue.setText(current.getFilter().get(filterId).getParam1());
+                holder.filterValue.setText(current.getFilter().get(filterId).getParam1().replace(current.getFor(), ""));
             else holder.filterValue.setVisibility(View.GONE);
             holder.filterType.setText(AssignerUtils.resources.getString(SeeNot.getFilterTypeName(current.getFilter().get(filterId).getType())));
             holder.setButton.setOnClickListener(v -> AssignerUtils.initAssigner(2, position, filterId));

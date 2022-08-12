@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     public static Handler UIHandler = new Handler(Looper.getMainLooper());
     private static final Gson gson = new Gson();
-    private ArrayList<RuleInfo> rulesList = new ArrayList<>();
+    private static ArrayList<RuleInfo> rulesList = new ArrayList<>();
     public static Resources resources;
     public static SharedPreferences sharedPreferences;
     public static Boolean isNotificationEnabled = false, isOverlayEnabled = false;
@@ -55,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
     public static int dip2px(float dipValue) {
         float m = resources.getDisplayMetrics().density;
         return (int) (dipValue * m + 0.5f);
+    }
+
+    public static void setSharedPreferences(SharedPreferences sharedPreferences) {
+        MainActivity.sharedPreferences = sharedPreferences;
+        rulesList = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+        }.getType());
     }
 
     @Override

@@ -107,6 +107,7 @@ public class HomeFragment extends Fragment {
             edit.apply();
             ExecutorService.setServiceBasicInfo(sharedPreferences, 0);
             AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
+            MainActivity.setSharedPreferences(sharedPreferences);
             adapter.dataChange(rules);
         });
 

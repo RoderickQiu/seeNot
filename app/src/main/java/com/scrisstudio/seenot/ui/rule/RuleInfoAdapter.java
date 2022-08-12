@@ -113,6 +113,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 
                 ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_ASSIGNER);
                 AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
+                MainActivity.setSharedPreferences(sharedPreferences);
 
                 Toast.makeText(context.getApplicationContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
             });

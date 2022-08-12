@@ -69,7 +69,7 @@
     <string name="type_not_found">未知规则</string>
     <string name="alreay_quit_app_filter">已有一条\"禁止进入程序\"的规则，不能增加新规则</string>
     <string name="filter_ban_app_tip">当开关打开后，一进入这个应用，就会直接退出。</string>
-    <string name="filter_ban_activity_tip">在此设定要强制跳出时所在的 Activity，按\"刷新\"以获取最新结果。注：部分软件会有将多个页面合成一个 Activity 的情况，此时可以考虑使用\"找到文字后退出\"类规则。</string>
+    <string name="filter_ban_activity_tip">在此设定要强制跳出时所在的 Activity，按\"刷新\"以获取最新结果。注：部分软件会有将多个页面合成一个 Activity 的情况，此时可以考虑使用\"找到文字\"或\"找到元素\"类规则，凭借页面上的独有特征触发退出。</string>
     <string name="filter_trigger">触发：</string>
     <string name="done">确认</string>
     <string name="select_target">选择</string>
@@ -86,4 +86,9 @@
     <string name="click_right_to_set">请点击右侧按钮设置</string>
     <string name="click_to_apply">关闭窗口以应用</string>
     <string name="open_assigner_failed">打开设置面板失败，请检查无障碍服务是否已经打开</string>
+    <string name="filter_ban_id">找到元素后退出</string>
+    <string name="filter_ban_id_tip">点击\"选择\"打开元素选择模式，并选择需要的元素，点击\"确认\"保存。适合一些无法找到合适触发文字的页面。</string>
+    <string name="cannot_get_current_id">无法获取当前元素</string>
+    <string name="cannot_get_current_text">无法获得当前文字</string>
+    <string name="strange_error">未知错误</string>
 </resources>
