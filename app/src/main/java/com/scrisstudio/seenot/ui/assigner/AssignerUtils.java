@@ -137,6 +137,7 @@ public class AssignerUtils {
         viewCustomization.findViewById(R.id.button_save_pre).setVisibility(mode == 0 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.button_save_rule).setVisibility(mode == 2 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.button_set_rule).setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
+        viewCustomization.findViewById(R.id.button_assigner_back).setVisibility(mode == 2 ? View.VISIBLE : View.GONE);
 
         if (mode == 0)
             try { //allow input
@@ -184,7 +185,8 @@ public class AssignerUtils {
                 btTargetSelect = viewCustomization.findViewById(R.id.set_filter_target_select),
                 btTargetSelectExit = viewCustomization.findViewById(R.id.set_filter_target_select_exit),
                 btTargetDone = viewCustomization.findViewById(R.id.set_filter_target_done),
-                btRefresh = viewCustomization.findViewById(R.id.set_filter_refresh);
+                btRefresh = viewCustomization.findViewById(R.id.set_filter_refresh),
+                btBack = viewCustomization.findViewById(R.id.button_assigner_back);
 
         btTargetSelectExit.setVisibility(View.GONE);
         btTargetDone.setVisibility(View.GONE);
@@ -194,7 +196,14 @@ public class AssignerUtils {
         if (triggerValueMaxWidth == 0) triggerValueMaxWidth = triggerValue.getMaxWidth();
         triggerValue.setMaxWidth(filter.getType() == 2 ? (int) (triggerValueMaxWidth * 0.6) : triggerValueMaxWidth);
 
+        btBack.setOnClickListener(v -> setMode(viewCustomization, viewToast, viewTarget, 1, layoutOverlayOutline));
+
         btSave.setOnClickListener(v -> {
+            if (!foregroundPackageName.equals(current.getFor())) {
+                sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
+                        + "的，只能在那个程序打开时编辑", LENGTH_LONG);
+                return;
+            }
             String param = triggerValue.getText().toString();
             if (param.equals("") || param.equals("---") ||
                     param.equals(resources.getString(R.string.cannot_get_current_text)) ||
@@ -225,11 +234,17 @@ public class AssignerUtils {
             sendToast(viewToast, resources.getString(R.string.save_succeed), LENGTH_SHORT);
         });
 
-        refreshSet(filter, viewCustomization);
-        viewCustomization.findViewById(R.id.set_filter_refresh).setOnClickListener(v -> refreshSet(filter, viewCustomization));
+        refreshSet(filter, viewCustomization, viewToast, 0);
+        btRefresh.setOnClickListener(v -> refreshSet(filter, viewCustomization, viewToast, 1));
     }
 
-    private static void refreshSet(FilterInfo filter, View viewCustomization) {
+    private static void refreshSet(FilterInfo filter, View viewCustomization, View viewToast, int refreshMode) {
+        if (!foregroundPackageName.equals(current.getFor()) && refreshMode == 1) {
+            sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
+                    + "的，只能在那个程序打开时编辑", LENGTH_LONG);
+            return;
+        }
+
         String triggerValue = "", triggerLabel = resources.getString(R.string.filter_trigger), tip = "";
         viewCustomization.findViewById(R.id.filter_set).setVisibility(View.VISIBLE);
         switch (filter.getType()) {
@@ -371,7 +386,7 @@ public class AssignerUtils {
         return name;
     }
 
-    private static void sendToast(View viewToast, String input, int length) {
+    public static void sendToast(View viewToast, String input, int length) {
         AtomicInteger contentWidth = new AtomicInteger();
         TextView content = viewToast.findViewById(R.id.tv_toast_content);
         content.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
@@ -506,6 +521,12 @@ public class AssignerUtils {
     }
 
     private static void toggleOutline(FrameLayout layoutOverlayOutline, View viewCustomization, View viewTarget, View viewToast) {
+        if (!foregroundPackageName.equals(current.getFor())) {
+            sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
+                    + "的，只能在那个程序打开时编辑", LENGTH_LONG);
+            return;
+        }
+
         FilterInfo filter = current.getFilter().get(filterId);
         int type = filter.getType();
         final TextView triggerValue = viewCustomization.findViewById(R.id.set_filter_trigger_value);

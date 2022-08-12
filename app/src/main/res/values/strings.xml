@@ -91,4 +91,5 @@
     <string name="cannot_get_current_id">无法获取当前元素</string>
     <string name="cannot_get_current_text">无法获得当前文字</string>
     <string name="strange_error">未知错误</string>
+    <string name="back_without_save">不保存返回</string>
 </resources>
