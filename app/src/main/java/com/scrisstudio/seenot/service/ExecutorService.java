@@ -253,7 +253,11 @@ public class ExecutorService extends AccessibilityService {
                                     break;
                                 case 2:
                                     if (!tempFilter.getParam1().equals("---"))
-                                        wordFinder(getRootInActiveWindow(), true, tempFilter.getParam1());
+                                        wordFinder(getRootInActiveWindow(), true, tempFilter.getParam1(), 2);
+                                    break;
+                                case 3:
+                                    if (!tempFilter.getParam1().equals("---"))
+                                        wordFinder(getRootInActiveWindow(), true, tempFilter.getParam1(), 3);
                                     break;
                             }
                         }
@@ -311,7 +315,7 @@ public class ExecutorService extends AccessibilityService {
         return getRootInActiveWindow();
     }
 
-    public void wordFinder(AccessibilityNodeInfo root, boolean isOnlyVisible, String word) {
+    public void wordFinder(AccessibilityNodeInfo root, boolean isOnlyVisible, String word, int type) {
         if (!isServiceRunning || root == null) return;
 
         ArrayList<AccessibilityNodeInfo> queue = new ArrayList<>();
@@ -328,17 +332,29 @@ public class ExecutorService extends AccessibilityService {
                     }
                 }
 
-                String text = null;
-                if (info.getText() != null) text = info.getText().toString();
-                else if (info.getContentDescription() != null)
-                    text = info.getContentDescription().toString();
+                if (type == 2) {
+                    String text = null;
+                    if (info.getText() != null) text = info.getText().toString();
+                    else if (info.getContentDescription() != null)
+                        text = info.getContentDescription().toString();
 
-                if (text != null) {
-                    if (text.equals(word)) {
-                        performGlobalAction(GLOBAL_ACTION_BACK);
-                        Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
-                                + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
-                        return;
+                    if (text != null) {
+                        if (text.equals(word)) {
+                            performGlobalAction(GLOBAL_ACTION_BACK);
+                            Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
+                                    + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+                } else if (type == 3) {
+                    String tempId = info.getViewIdResourceName();
+                    if (tempId != null) {
+                        if (tempId.equals(word)) {
+                            performGlobalAction(GLOBAL_ACTION_BACK);
+                            Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
+                                    + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
                 }
             }
