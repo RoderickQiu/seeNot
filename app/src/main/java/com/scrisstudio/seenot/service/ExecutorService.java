@@ -206,6 +206,7 @@ public class ExecutorService extends AccessibilityService {
                     currentFilters.clear();
                     for (int i = 0; i < rulesList.size(); i++) {
                         if (rulesList.get(i).getFor().equals(lastTimePackageName) && !foregroundPackageName.equals("")) {
+                            if (!rulesList.get(i).getStatus()) continue;
                             tempFilters = rulesList.get(i).getFilter();
                             for (int j = 0; j < rulesList.get(i).getFilterLength(); j++) {
                                 if (!tempFilters.get(j).getStatus()) continue;

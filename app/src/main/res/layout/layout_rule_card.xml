@@ -92,12 +92,18 @@
                         android:gravity="center_vertical|end"
                         android:layout_marginStart="8dp">
 
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/rule_status_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp" />
+
                         <ImageButton
                             android:id="@+id/edit_button"
                             style="@style/Widget.MaterialComponents.Button"
                             android:layout_width="36dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="6dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:src="@drawable/ic_baseline_edit_24"
                             app:tint="?attr/colorPrimary" />
@@ -107,7 +113,7 @@
                             style="@style/Widget.MaterialComponents.Button"
                             android:layout_width="36dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="6dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:src="@drawable/ic_baseline_delete_outline_24"
                             app:tint="?attr/colorPrimary" />

@@ -4,14 +4,16 @@ import java.util.ArrayList;
 
 public class RuleInfo {
     private final int id;
+    private boolean status;
     private String title;
     private String ruleFor;
     private String ruleForName;
     private ArrayList<FilterInfo> filter;
     private int filterLength;
 
-    public RuleInfo(int id, String title, String ruleFor, String ruleForName, ArrayList<FilterInfo> filter, int filterLength) {
+    public RuleInfo(int id, boolean status, String title, String ruleFor, String ruleForName, ArrayList<FilterInfo> filter, int filterLength) {
         this.id = id;
+        this.status = status;
         this.title = title;
         this.ruleFor = ruleFor;
         this.ruleForName = ruleForName;
@@ -21,6 +23,14 @@ public class RuleInfo {
 
     public int getId() {
         return id;
+    }
+
+    public boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 
     public String getTitle() {

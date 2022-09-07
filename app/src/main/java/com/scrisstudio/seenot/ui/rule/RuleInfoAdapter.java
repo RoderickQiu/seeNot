@@ -1,7 +1,7 @@
 package com.scrisstudio.seenot.ui.rule;
 
 import static com.scrisstudio.seenot.SeeNot.le;
-import static com.scrisstudio.seenot.service.ExecutorService.MODE_ASSIGNER;
+import static com.scrisstudio.seenot.service.ExecutorService.MODE_EXECUTOR;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.gson.Gson;
 import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
@@ -42,6 +43,16 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
         this.sharedPreferences = sharedPreferences;
         mList = list;
         gson = new Gson();
+    }
+
+    private static OnEditListener callBack;
+
+    public static void setOnEditListener(OnEditListener callback) {
+        callBack = callback;
+    }
+
+    public interface OnEditListener {
+        void onEdit(int position, List<RuleInfo> list, int mode);
     }
 
     @NonNull
@@ -75,6 +86,21 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
             holder.ruleId.setContentDescription(String.valueOf(rule.getId()));
             holder.ruleTitle.setText(rule.getTitle());
             holder.ruleFor.setText(rule.getForName());
+
+            holder.statusSwitch.setChecked(rule.getStatus());
+            holder.statusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                SharedPreferences.Editor edit = sharedPreferences.edit();
+
+                rule.setStatus(isChecked);
+                mList.set(position, rule);
+                edit.putString("rules", gson.toJson(mList));
+                edit.apply();
+
+                ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
+                AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
+                MainActivity.setSharedPreferences(sharedPreferences);
+                callBack.onEdit(position, mList, MODE_EXECUTOR);
+            });
 
             holder.editButton.setOnClickListener(v -> {
                 try {
@@ -111,9 +137,10 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
                 edit.putString("rules", gson.toJson(mList));
                 edit.apply();
 
-                ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_ASSIGNER);
+                ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
                 AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
                 MainActivity.setSharedPreferences(sharedPreferences);
+                callBack.onEdit(position, mList, MODE_EXECUTOR);
 
                 Toast.makeText(context.getApplicationContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
             });
@@ -140,6 +167,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
         TextView ruleId, ruleTitle, ruleFor;
         ImageButton editButton, deleteButton;
         Button deleteRecheckButton;
+        SwitchMaterial statusSwitch;
 
         public MyViewHolder(View view) {
             super(view);
@@ -149,6 +177,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
             editButton = view.findViewById(R.id.edit_button);
             deleteButton = view.findViewById(R.id.delete_button);
             deleteRecheckButton = view.findViewById(R.id.delete_button_recheck);
+            statusSwitch = view.findViewById(R.id.rule_status_switch);
         }
     }
 }

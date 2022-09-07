@@ -101,7 +101,7 @@ public class HomeFragment extends Fragment {
         binding.fab.show();
         binding.fab.setOnClickListener(v -> {
             SharedPreferences.Editor edit = sharedPreferences.edit();
-            rules.add(new RuleInfo(sharedPreferences.getInt("rule-id-max", 0), "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0));
+            rules.add(new RuleInfo(sharedPreferences.getInt("rule-id-max", 0), true, "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0));
             edit.putString("rules", gson.toJson(rules));
             edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
             edit.apply();
@@ -121,6 +121,14 @@ public class HomeFragment extends Fragment {
                 new IntentFilter("banner_channel"));
 
         AssignerUtils.setOnQuitListener((position, list, mode) -> {
+            rules = (ArrayList<RuleInfo>) list;
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("rules", gson.toJson(rules));
+            editor.apply();
+            ExecutorService.setServiceBasicInfo(sharedPreferences, mode);
+            adapter.dataChange(list);
+        });
+        RuleInfoAdapter.setOnEditListener((position, list, mode) -> {
             rules = (ArrayList<RuleInfo>) list;
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("rules", gson.toJson(rules));
