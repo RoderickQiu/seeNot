@@ -4,7 +4,7 @@
     <string name="menu_home">首页</string>
     <string name="service_name" translatable="false">👋 seeNot 不见君 👋</string>
     <string name="service_description">为了使用软件的功能，就需要开启此服务。此服务不会访问网络，因此你的数据是完全安全的，我们也不会使用任何方法获取你在做什么。我们需要那些权限仅仅是为了解析应用布局。</string>
-    <string name="version" translatable="false">alpha</string>
+    <string name="version" translatable="false">v1.0</string>
     <string name="menu_settings">设置</string>
     <string name="menu_about">关于</string>
     <string name="menu_permission">权限</string>

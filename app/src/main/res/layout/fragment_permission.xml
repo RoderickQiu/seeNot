@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.permission.PermissionFragment"
-    android:background="@android:color/background_light">
+    android:background="?attr/colorOnSecondary">
 
     <LinearLayout
         android:layout_width="match_parent"

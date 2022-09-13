@@ -9,11 +9,33 @@
         <item name="colorSecondary">@color/orange_500</item>
         <item name="colorSecondaryVariant">@color/orange_700</item>
         <item name="colorOnSecondary">@color/gray_900</item>
+        <!-- Tertiary brand color. -->
+        <item name="colorTertiary">@color/gray_100</item>
+        <item name="colorOnTertiary">@color/gray_700</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimary</item>
         <item name="android:windowLightStatusBar">true</item>
         <!-- Customize your theme here. -->
         <item name="android:windowBackground">@color/gray_900</item>
+        <item name="android:drawableTint">?attr/colorControlNormal</item>
+    </style>
+
+    <style name="Theme.SeeNot.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/orange_600</item>
+        <item name="colorPrimaryVariant">@color/orange_700</item>
+        <item name="colorOnPrimary">@color/gray_100</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/orange_800</item>
+        <item name="colorSecondaryVariant">@color/orange_900</item>
+        <item name="colorOnSecondary">@color/gray_50</item>
+        <!-- Tertiary brand color. -->
+        <item name="colorTertiary">@color/gray_700</item>
+        <item name="colorOnTertiary">@color/gray_50</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->s
+        <item name="android:windowBackground">@color/gray_50</item>
         <item name="android:drawableTint">?attr/colorControlNormal</item>
     </style>
 

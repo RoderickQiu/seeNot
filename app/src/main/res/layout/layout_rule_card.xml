@@ -70,7 +70,7 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:includeFontPadding="false"
-                        android:textColor="@color/gray_600"
+                        android:textColor="?attr/colorTertiary"
                         android:textAppearance="?attr/textAppearanceCaption" />
 
                 </LinearLayout>
@@ -96,14 +96,14 @@
                             android:id="@+id/rule_status_switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="6dp" />
+                            android:layout_marginEnd="8dp" />
 
                         <ImageButton
                             android:id="@+id/edit_button"
                             style="@style/Widget.MaterialComponents.Button"
                             android:layout_width="36dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="6dp"
+                            android:layout_marginEnd="4dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:src="@drawable/ic_baseline_edit_24"
                             app:tint="?attr/colorPrimary" />
