@@ -30,6 +30,9 @@
         android:theme="@style/Theme.SeeNot"
         tools:targetApi="32">
         <activity
+            android:name=".PasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.SeeNot">

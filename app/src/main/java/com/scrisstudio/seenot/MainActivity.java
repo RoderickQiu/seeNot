@@ -2,6 +2,7 @@ package com.scrisstudio.seenot;
 
 import static com.scrisstudio.seenot.SeeNot.l;
 import static com.scrisstudio.seenot.SeeNot.lastTimeDestination;
+import static com.scrisstudio.seenot.SeeNot.le;
 import static com.scrisstudio.seenot.ui.permission.PermissionFragment.isAccessibilitySettingsOn;
 
 import android.app.NotificationManager;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     public static Handler UIHandler = new Handler(Looper.getMainLooper());
     private static final Gson gson = new Gson();
     private static ArrayList<RuleInfo> rulesList = new ArrayList<>();
+    private static String password, extra;
     public static Resources resources;
     public static SharedPreferences sharedPreferences;
     public static Boolean isNotificationEnabled = false, isOverlayEnabled = false;
@@ -133,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
             if (SeeNot.shouldNavigateTo == 0 && ((lastTimeDestination.contains("Permission") && (destination.toString().contains("Home") || destination.toString().contains("Permission"))) || (lastTimeDestination.contains("Settings") && (destination.toString().contains("Home") || destination.toString().contains("Settings"))))) {
                 finish();
                 Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                intent.putExtra("password", "success");
                 startActivity(intent);
             }
             lastTimeDestination = destination.toString();
@@ -141,6 +144,34 @@ public class MainActivity extends AppCompatActivity {
         if (SeeNot.shouldNavigateTo != 0) {
             navController.navigate(SeeNot.shouldNavigateTo);
             SeeNot.shouldNavigateTo = 0;
+        }
+
+        // password
+        if (savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+            if (extras == null) {
+                extra = "";
+            } else {
+                extra = extras.getString("password");
+            }
+        } else {
+            extra = (String) savedInstanceState.getSerializable("password");
+        }
+        if (extra == null) extra = "";
+        if (!extra.equals("success")) passwordInit();
+    }
+
+    public static void passwordInit() {
+        try {
+            password = sharedPreferences.getString("password", "");
+            if (!password.equals("")) {
+                Intent intent = new Intent();
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setClass(SeeNot.getAppContext(), PasswordActivity.class);
+                SeeNot.getAppContext().startActivity(intent);
+            }
+        } catch (Exception e) {
+            le("Password init failed with message: " + e);
         }
     }
 

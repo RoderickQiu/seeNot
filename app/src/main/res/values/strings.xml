@@ -92,4 +92,11 @@
     <string name="cannot_get_current_text">无法获得当前文字</string>
     <string name="strange_error">未知错误</string>
     <string name="back_without_save">不保存返回</string>
+    <string name="settings_password_tip">启用后，在每次进入不见君软件时，都需要输入密码才能继续</string>
+    <string name="settings_password">家长控制</string>
+    <string name="settings_password_dialog_msg">密码框留空即为不启用家长控制</string>
+    <string name="password_need">家长控制模式开</string>
+    <string name="password_need_msg">需要输入密码才能继续</string>
+    <string name="password_wrong">密码错误，请重试</string>
+    <string name="password_right">密码正确</string>
 </resources>

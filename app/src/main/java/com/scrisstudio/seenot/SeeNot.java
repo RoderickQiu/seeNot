@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.util.Log;
 
+import androidx.lifecycle.ProcessLifecycleOwner;
+
+import com.scrisstudio.seenot.service.ApplicationObserver;
+
 public class SeeNot extends Application {
 
     @SuppressLint("StaticFieldLeak")
@@ -29,6 +33,7 @@ public class SeeNot extends Application {
     public void onCreate() {
         super.onCreate();
         SeeNot.context = getApplicationContext();
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(new ApplicationObserver());
     }
 
     public static final String TAG = "SeeNot-AccessibilityService";

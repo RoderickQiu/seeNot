@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputType;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -117,6 +118,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 return false;
             });
         }
+
+        // make it looks like a password
+        EditTextPreference numberPreference = findPreference("password");
+        if (numberPreference != null)
+            numberPreference.setOnBindEditTextListener(editText -> editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
+
     }
 
     @Override
