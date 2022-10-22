@@ -199,16 +199,17 @@ public class AssignerUtils {
         btBack.setOnClickListener(v -> setMode(viewCustomization, viewToast, viewTarget, 1, layoutOverlayOutline));
 
         btSave.setOnClickListener(v -> {
-            if (!foregroundPackageName.equals(current.getFor())) {
+            if (!foregroundPackageName.equals(current.getFor()) && !foregroundPackageName.equals("com.scrisstudio.seenot")) {
                 sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
                         + "的，只能在那个程序打开时编辑", LENGTH_LONG);
                 return;
             }
             String param = triggerValue.getText().toString();
-            if (param.equals("") || param.equals("---") ||
+            if ((param.equals("") || param.equals("---") ||
                     param.equals(resources.getString(R.string.cannot_get_current_text)) ||
                     param.equals(resources.getString(R.string.cannot_get_current_id)) ||
-                    param.equals(resources.getString(R.string.click_right_to_set))) {
+                    param.equals(resources.getString(R.string.click_right_to_set))
+            ) && filter.getType() != 0) {
                 sendToast(viewToast, resources.getString(R.string.fill_the_blanks), LENGTH_LONG);
             } else {
                 filter.setParam1(param);
@@ -239,7 +240,7 @@ public class AssignerUtils {
     }
 
     private static void refreshSet(FilterInfo filter, View viewCustomization, View viewToast, int refreshMode) {
-        if (!foregroundPackageName.equals(current.getFor()) && refreshMode == 1) {
+        if (!foregroundPackageName.equals(current.getFor()) && refreshMode == 1 && !foregroundPackageName.equals("com.scrisstudio.seenot")) {
             sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
                     + "的，只能在那个程序打开时编辑", LENGTH_LONG);
             return;
@@ -490,6 +491,7 @@ public class AssignerUtils {
 
     private static void ruleSave(int mode) {
         ExecutorService.isServiceRunning = MainActivity.sharedPreferences.getBoolean("master-switch", true);
+        ExecutorService.setServiceBasicInfo(sharedPreferences, mode);
         rules.set(position, current);
         callBack.onQuit(position, rules, mode);
     }
