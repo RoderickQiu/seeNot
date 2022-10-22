@@ -31,6 +31,14 @@ public class AboutFragment extends Fragment {
             startActivity(intent);
         });
 
+        binding.licensePage.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+        binding.licensePage.getPaint().setAntiAlias(true);
+        binding.licensePage.setOnClickListener((v) -> {
+            Uri uri = Uri.parse("https://seenot.r-q.name/license-report");
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        });
+
         return root;
     }
 
