@@ -188,10 +188,12 @@ public class AssignerUtils {
                 btRefresh = viewCustomization.findViewById(R.id.set_filter_refresh),
                 btBack = viewCustomization.findViewById(R.id.button_assigner_back);
 
+        btTargetSelect.setVisibility(View.VISIBLE);
         btTargetSelectExit.setVisibility(View.GONE);
         btTargetDone.setVisibility(View.GONE);
         btRefresh.setVisibility(filter.getType() == 1 ? View.VISIBLE : View.GONE);
-        layoutTextFindForm.setVisibility((filter.getType() == 2 || filter.getType() == 3) ? View.VISIBLE : View.GONE);
+        layoutTextFindForm.setVisibility((filter.getType() == 2 || filter.getType() == 3 || filter.getType() == 4)
+                ? View.VISIBLE : View.GONE);
 
         if (triggerValueMaxWidth == 0) triggerValueMaxWidth = triggerValue.getMaxWidth();
         triggerValue.setMaxWidth(filter.getType() == 2 ? (int) (triggerValueMaxWidth * 0.6) : triggerValueMaxWidth);
@@ -265,6 +267,10 @@ public class AssignerUtils {
                 triggerValue = filter.getParam1();
                 tip = resources.getString(R.string.filter_ban_id_tip);
                 break;
+            case 4:
+                triggerValue = filter.getParam1();
+                tip = resources.getString(R.string.filter_auto_click_tip);
+                break;
         }
         final String finalTriggerValue = triggerValue.equals("---") ? resources.getString(R.string.click_right_to_set) : triggerValue;
         final String finalTip = tip;
@@ -304,6 +310,7 @@ public class AssignerUtils {
                 else if (item.getItemId() == R.id.type_1) type.set(1);
                 else if (item.getItemId() == R.id.type_2) type.set(2);
                 else if (item.getItemId() == R.id.type_3) type.set(3);
+                else if (item.getItemId() == R.id.type_4) type.set(4);
 
                 ArrayList<FilterInfo> filterInfos = current.getFilter();
 
@@ -559,12 +566,13 @@ public class AssignerUtils {
                 for (final AccessibilityNodeInfo e : nodeList) {
                     // if cannot get, don't even allow click it
                     String tempId = e.getViewIdResourceName();
-                    if (tempId == null & type == 3) continue;
+                    if (tempId == null && (type == 3 || type == 4)) continue;
                     if (tempId != null) if (!tempId.contains(foregroundPackageName)) continue;
                     CharSequence tempDescription = e.getContentDescription();
                     CharSequence tempText = (e.getText() != null) ? ("" + e.getText()) : tempDescription;
                     tempText = (tempText == null) ? "" : tempText;
                     if (tempText.equals("") && type == 2) continue;
+                    if (!isParentClickable(e) && type == 4) continue;
 
                     final Rect temRect = new Rect();
                     e.getBoundsInScreen(temRect);
@@ -598,7 +606,7 @@ public class AssignerUtils {
 
                             if (type == 2) {
                                 triggerValue.setText(finalTempText);
-                            } else if (type == 3) {
+                            } else if (type == 3 || type == 4) {
                                 triggerValue.setText(tempId);
                             } else {
                                 triggerValue.setText(resources.getString(R.string.strange_error));
@@ -624,6 +632,15 @@ public class AssignerUtils {
             btTargetSelect.setVisibility(View.VISIBLE);
             btTargetSelectExit.setVisibility(View.GONE);
             btTargetDone.setVisibility(View.GONE);
+        }
+    }
+
+    private static boolean isParentClickable(AccessibilityNodeInfo info) {
+        if (info.isClickable()) {
+            return true;
+        } else {
+            if (info.getParent() == null) return false;
+            else return isParentClickable(info.getParent());
         }
     }
 

@@ -88,6 +88,7 @@
     <string name="open_assigner_failed">打开设置面板失败，请检查无障碍服务是否已经打开</string>
     <string name="filter_ban_id">找到元素后退出</string>
     <string name="filter_ban_id_tip">点击\"选择\"打开元素选择模式，并选择需要的元素，点击\"确认\"保存。适合一些无法找到合适触发文字的页面。</string>
+    <string name="filter_auto_click_tip">点击\"选择\"打开元素选择模式，并选择需要自动点击的元素以获取其元素 ID，点击\"确认\"保存。</string>
     <string name="cannot_get_current_id">无法获取当前元素</string>
     <string name="cannot_get_current_text">无法获得当前文字</string>
     <string name="strange_error">未知错误</string>

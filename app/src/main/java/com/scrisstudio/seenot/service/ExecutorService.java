@@ -260,6 +260,10 @@ public class ExecutorService extends AccessibilityService {
                                     if (!tempFilter.getParam1().equals("---"))
                                         wordFinder(getRootInActiveWindow(), true, tempFilter.getParam1(), 3);
                                     break;
+                                case 4:
+                                    if (!tempFilter.getParam1().equals("---"))
+                                        wordFinder(getRootInActiveWindow(), true, tempFilter.getParam1(), 4);
+                                    break;
                             }
                         }
                     }
@@ -333,32 +337,55 @@ public class ExecutorService extends AccessibilityService {
                     }
                 }
 
-                if (type == 2) {
-                    String text = null;
-                    if (info.getText() != null) text = info.getText().toString();
-                    else if (info.getContentDescription() != null)
-                        text = info.getContentDescription().toString();
+                switch (type) {
+                    case 2: // text force-back
+                        String text = null;
+                        if (info.getText() != null) text = info.getText().toString();
+                        else if (info.getContentDescription() != null)
+                            text = info.getContentDescription().toString();
 
-                    if (text != null) {
-                        if (text.equals(word)) {
-                            performGlobalAction(GLOBAL_ACTION_BACK);
-                            Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
-                                    + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
-                            return;
+                        if (text != null) {
+                            if (text.equals(word)) {
+                                performGlobalAction(GLOBAL_ACTION_BACK);
+                                Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
+                                        + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                         }
-                    }
-                } else if (type == 3) {
-                    String tempId = info.getViewIdResourceName();
-                    if (tempId != null) {
-                        if (tempId.equals(word)) {
-                            performGlobalAction(GLOBAL_ACTION_BACK);
-                            Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
-                                    + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
-                            return;
+                        break;
+                    case 3: // id force-back
+                        String tempId = info.getViewIdResourceName();
+                        if (tempId != null) {
+                            if (tempId.equals(word)) {
+                                performGlobalAction(GLOBAL_ACTION_BACK);
+                                Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
+                                        + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                         }
-                    }
+                        break;
+                    case 4: // id auto-click
+                        String tempId4 = info.getViewIdResourceName();
+                        if (tempId4 != null) {
+                            if (tempId4.equals(word)) {
+                                getClickable(info).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
+                                        + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+                        break;
                 }
             }
+        }
+    }
+
+    private AccessibilityNodeInfo getClickable(AccessibilityNodeInfo info) {
+        if (info.isClickable()) {
+            return info;
+        } else {
+            if (info.getParent() == null) return info;
+            else return getClickable(info.getParent());
         }
     }
 
