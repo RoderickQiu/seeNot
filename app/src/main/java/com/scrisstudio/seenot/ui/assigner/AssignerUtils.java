@@ -48,6 +48,7 @@ import com.scrisstudio.seenot.ui.rule.FilterInfoAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -555,6 +556,7 @@ public class AssignerUtils {
                 ArrayList<AccessibilityNodeInfo> roots = new ArrayList<>();
                 roots.add(root);
                 ArrayList<AccessibilityNodeInfo> nodeList = new ArrayList<>();
+                HashMap<String, Integer> idMap = new HashMap<>();
                 findAllNode(roots, nodeList);
                 nodeList.sort((a, b1) -> {
                     Rect rectA = new Rect();
@@ -567,12 +569,17 @@ public class AssignerUtils {
                     // if cannot get, don't even allow click it
                     String tempId = e.getViewIdResourceName();
                     if (tempId == null && (type == 3 || type == 4)) continue;
-                    if (tempId != null) if (!tempId.contains(foregroundPackageName)) continue;
+                    if (tempId == null) tempId = "---";
+                    if (!tempId.contains(foregroundPackageName)) continue;
                     CharSequence tempDescription = e.getContentDescription();
                     CharSequence tempText = (e.getText() != null) ? ("" + e.getText()) : tempDescription;
                     tempText = (tempText == null) ? "" : tempText;
                     if (tempText.equals("") && type == 2) continue;
                     if (!isParentClickable(e) && type == 4) continue;
+
+                    if (idMap.containsKey(tempId))
+                        idMap.put(tempId, idMap.getOrDefault(tempId, 0) + 1);
+                    else idMap.put(tempId, 1);
 
                     final Rect temRect = new Rect();
                     e.getBoundsInScreen(temRect);
@@ -584,6 +591,7 @@ public class AssignerUtils {
                     img.setFocusableInTouchMode(true);
                     img.setOnClickListener(View::requestFocus);
                     CharSequence finalTempText = tempText;
+                    String finalTempId = tempId;
                     img.setOnFocusChangeListener((v1, hasFocus) -> {
                         btTargetDone.setVisibility(View.VISIBLE);
                         if (hasFocus) {
@@ -607,7 +615,14 @@ public class AssignerUtils {
                             if (type == 2) {
                                 triggerValue.setText(finalTempText);
                             } else if (type == 3 || type == 4) {
-                                triggerValue.setText(tempId);
+                                triggerValue.setText(finalTempId);
+                                if (type == 3) {
+                                    if (idMap.getOrDefault(finalTempId, 0) > 2)
+                                        sendToast(viewToast, "此 id 在页面中多次使用，可能不适合当作判定条件", LENGTH_LONG);
+                                } else { // type 4
+                                    if (idMap.getOrDefault(finalTempId, 0) > 1)
+                                        sendToast(viewToast, "此 id 在页面不止一次使用，可能无法正确判断应当点击哪一个", LENGTH_LONG);
+                                }
                             } else {
                                 triggerValue.setText(resources.getString(R.string.strange_error));
                             }
