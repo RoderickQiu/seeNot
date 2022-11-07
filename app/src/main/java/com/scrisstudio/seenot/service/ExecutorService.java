@@ -97,7 +97,7 @@ public class ExecutorService extends AccessibilityService {
 
     public static void sendSimpleNotification(String title, String content) {
         Intent intent = new Intent(mService, MainActivity.class);
-        PendingIntent pi = PendingIntent.getActivity(mService, 0, intent, 0);
+        PendingIntent pi = PendingIntent.getActivity(mService, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder nb = new NotificationCompat.Builder(mService, CHANNEL_NORMAL_NOTIFICATION_ID)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(title)
@@ -396,8 +396,22 @@ public class ExecutorService extends AccessibilityService {
     }
 
     @Override
+    public boolean onUnbind(Intent intent) {
+        le("Service unbind");
+        try {
+            sendSimpleNotification("不见君服务可能被系统错误退出了", "请前往系统无障碍设置重新打开它！");
+        } catch (Exception ignored) {
+        }
+        return super.onUnbind(intent);
+    }
+
+    @Override
     public void onDestroy() {
         le("Service destroy");
+        try {
+            sendSimpleNotification("不见君服务可能被系统错误退出了", "请前往系统无障碍设置重新打开它！");
+        } catch (Exception ignored) {
+        }
         isFirstTimeInvokeService = true;
         if (isForegroundServiceRunning) {
             stopForeground(true);
