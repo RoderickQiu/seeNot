@@ -306,7 +306,8 @@ public class ExecutorService extends AccessibilityService {
             else
                 return !className.startsWith("android.widget.") && !className.startsWith("android.view.")
                         && !className.startsWith("androidx.") && !className.startsWith("com.android.systemui")
-                        && !className.startsWith("android.app") && !className.contains("seenot");
+                        && !className.startsWith("android.app") && !className.contains("seenot")
+                        && !className.startsWith("android.inputmethodservice");
         }
     }
 
@@ -398,6 +399,7 @@ public class ExecutorService extends AccessibilityService {
     @Override
     public boolean onUnbind(Intent intent) {
         le("Service unbind");
+        mService = null;
         try {
             sendSimpleNotification("不见君服务可能被系统错误退出了", "请前往系统无障碍设置重新打开它！");
         } catch (Exception ignored) {
