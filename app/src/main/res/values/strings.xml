@@ -30,7 +30,7 @@
     <string name="permissions">权限</string>
     <string name="permission_accessibility">无障碍服务权限</string>
     <string name="permission_accessibility_msg">一切见否服务都依靠此权限。</string>
-    <string name="now_open_service">进入页面，请往下拉，找到“seeNot 不见君”并打开。</string>
+    <string name="now_open_service">进入页面，请往下拉，找到“seeNot 不见君”并打开。若找不到，请点击“已下载的应用”。</string>
     <string name="default_notification_channel">常规通知</string>
     <string name="service_start_failed_title">服务未开启</string>
     <string name="permission_battery_msg">用于防止系统杀死服务，续航其实并不会被显著影响。</string>

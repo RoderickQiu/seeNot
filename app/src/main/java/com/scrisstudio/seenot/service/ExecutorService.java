@@ -290,7 +290,8 @@ public class ExecutorService extends AccessibilityService {
             try {
                 lastTimeActivityInfo = packageManager.getActivityInfo(componentName, 0);
             } catch (Exception e) {
-                le("ActivityInfo not found.");
+                lastTimeComponentName = new ComponentName("", ""); // clear bad component name
+                le("ActivityInfo not found. " + e.getMessage());
             }
             return lastTimeActivityInfo != null;
         }
@@ -347,9 +348,13 @@ public class ExecutorService extends AccessibilityService {
 
                         if (text != null) {
                             if (text.equals(word)) {
-                                performGlobalAction(GLOBAL_ACTION_BACK);
-                                Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
-                                        + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                                if (performGlobalAction(GLOBAL_ACTION_BACK)) {
+                                    Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
+                                            + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    performGlobalAction(GLOBAL_ACTION_HOME);
+                                    Toast.makeText(SeeNot.getAppContext(), "返回上一页失败，直接退出程序：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                                }
                                 return;
                             }
                         }
@@ -358,9 +363,13 @@ public class ExecutorService extends AccessibilityService {
                         String tempId = info.getViewIdResourceName();
                         if (tempId != null) {
                             if (tempId.equals(word)) {
-                                performGlobalAction(GLOBAL_ACTION_BACK);
-                                Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
-                                        + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                if (performGlobalAction(GLOBAL_ACTION_BACK)) {
+                                    Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
+                                            + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    performGlobalAction(GLOBAL_ACTION_HOME);
+                                    Toast.makeText(SeeNot.getAppContext(), "返回上一页失败，直接退出程序：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                }
                                 return;
                             }
                         }
