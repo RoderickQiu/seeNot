@@ -80,10 +80,12 @@ public class SeeNot extends Application {
                 return R.string.filter_ban_activity;
             case 2:
                 return R.string.filter_ban_text;
+            case 5:
+                return R.string.filter_auto_click_text;
             case 3:
                 return R.string.filter_ban_id;
             case 4:
-                return R.string.filter_auto_click;
+                return R.string.filter_auto_click_id;
         }
         return R.string.type_not_found;
     }

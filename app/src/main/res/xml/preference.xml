@@ -21,11 +21,22 @@
             app:summary="@string/settings_import_tip"
             app:title="@string/settings_import" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="advanced_settings"
+        app:title="@string/settings_advanced">
+
         <EditTextPreference
             app:key="password"
             app:summary="@string/settings_password_tip"
             app:title="@string/settings_password"
             app:dialogMessage="@string/settings_password_dialog_msg" />
+
+        <Preference
+            app:key="timed-settings"
+            app:summary="@string/timed_settings_tip"
+            app:title="@string/timed_settings" />
 
     </PreferenceCategory>
 

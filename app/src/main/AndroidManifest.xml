@@ -17,6 +17,7 @@
     <uses-permission
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
         android:name=".SeeNot"
@@ -28,6 +29,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SeeNot"
         tools:targetApi="32">
+        <activity
+            android:name=".RuleTimedActivity"
+            android:exported="false" />
         <activity
             android:name=".PasswordActivity"
             android:exported="false" />
@@ -59,7 +63,8 @@
             android:enabled="true"
             android:exported="true"
             android:label="@string/service_name"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:foregroundServiceType="dataSync">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>

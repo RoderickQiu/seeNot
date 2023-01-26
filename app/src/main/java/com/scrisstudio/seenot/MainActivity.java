@@ -12,6 +12,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,7 @@ import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.seenot.databinding.ActivityMainBinding;
 import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.service.RuleInfo;
+import com.scrisstudio.seenot.service.TimedInfo;
 
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
@@ -43,10 +45,11 @@ public class MainActivity extends AppCompatActivity {
     public static Handler UIHandler = new Handler(Looper.getMainLooper());
     private static final Gson gson = new Gson();
     private static ArrayList<RuleInfo> rulesList = new ArrayList<>();
+    private static ArrayList<TimedInfo> timedList = new ArrayList<>();
     private static String password, extra;
     public static Resources resources;
     public static SharedPreferences sharedPreferences;
-    public static Boolean isNotificationEnabled = false, isOverlayEnabled = false;
+    public static Boolean isNotificationEnabled = false, isOverlayEnabled = false, isBatteryOptimIgnored = false;
     public static String packageName = "";
     public static SoftReference<View> viewCustomization = null, viewTarget = null;
 
@@ -80,7 +83,14 @@ public class MainActivity extends AppCompatActivity {
             ruleInitEditor.putString("rules", gson.toJson(rulesList));
             ruleInitEditor.apply();
         }
-        rulesList = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
+        rulesList = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<ArrayList<RuleInfo>>() {
+        }.getType());
+        if (!sharedPreferences.contains("timed")) {
+            SharedPreferences.Editor timedInitEditor = sharedPreferences.edit();
+            timedInitEditor.putString("timed", gson.toJson(timedList));
+            timedInitEditor.apply();
+        }
+        timedList = gson.fromJson(sharedPreferences.getString("timed", "{}"), new TypeToken<ArrayList<TimedInfo>>() {
         }.getType());
 
         Intent serviceIntent = new Intent(this, ExecutorService.class);
@@ -88,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
         isNotificationEnabled = getSystemService(NotificationManager.class).areNotificationsEnabled();
         isOverlayEnabled = Settings.canDrawOverlays(this);
+        isBatteryOptimIgnored = ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName());
 
         LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
         viewCustomization = new SoftReference<>(inflater.inflate(R.layout.layout_assigner, null));//workaround for static view
@@ -112,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
         }
         // permission check
         if (!(isAccessibilitySettingsOn(SeeNot.getAppContext()) && Settings.canDrawOverlays(SeeNot.getAppContext()) &&
-                getSystemService(NotificationManager.class).areNotificationsEnabled())) {
+                getSystemService(NotificationManager.class).areNotificationsEnabled() &&
+                ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()))) {
             Intent intent = new Intent("banner_channel");
             intent.putExtra("banner_message", resources.getString(R.string.service_not_running));
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);

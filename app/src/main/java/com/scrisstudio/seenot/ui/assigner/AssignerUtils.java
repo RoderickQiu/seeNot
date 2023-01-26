@@ -193,11 +193,11 @@ public class AssignerUtils {
         btTargetSelectExit.setVisibility(View.GONE);
         btTargetDone.setVisibility(View.GONE);
         btRefresh.setVisibility(filter.getType() == 1 ? View.VISIBLE : View.GONE);
-        layoutTextFindForm.setVisibility((filter.getType() == 2 || filter.getType() == 3 || filter.getType() == 4)
+        layoutTextFindForm.setVisibility((filter.getType() == 2 || filter.getType() == 3 || filter.getType() == 4 || filter.getType() == 5)
                 ? View.VISIBLE : View.GONE);
 
         if (triggerValueMaxWidth == 0) triggerValueMaxWidth = triggerValue.getMaxWidth();
-        triggerValue.setMaxWidth(filter.getType() == 2 ? (int) (triggerValueMaxWidth * 0.6) : triggerValueMaxWidth);
+        triggerValue.setMaxWidth((filter.getType() == 2 || filter.getType() == 5) ? (int) (triggerValueMaxWidth * 0.6) : triggerValueMaxWidth);
 
         btBack.setOnClickListener(v -> setMode(viewCustomization, viewToast, viewTarget, 1, layoutOverlayOutline));
 
@@ -270,7 +270,11 @@ public class AssignerUtils {
                 break;
             case 4:
                 triggerValue = filter.getParam1();
-                tip = resources.getString(R.string.filter_auto_click_tip);
+                tip = resources.getString(R.string.filter_auto_click_id_tip);
+                break;
+            case 5:
+                triggerValue = filter.getParam1();
+                tip = resources.getString(R.string.filter_auto_click_text_tip);
                 break;
         }
         final String finalTriggerValue = triggerValue.equals("---") ? resources.getString(R.string.click_right_to_set) : triggerValue;
@@ -312,6 +316,7 @@ public class AssignerUtils {
                 else if (item.getItemId() == R.id.type_2) type.set(2);
                 else if (item.getItemId() == R.id.type_3) type.set(3);
                 else if (item.getItemId() == R.id.type_4) type.set(4);
+                else if (item.getItemId() == R.id.type_5) type.set(5);
 
                 ArrayList<FilterInfo> filterInfos = current.getFilter();
 
@@ -574,8 +579,8 @@ public class AssignerUtils {
                     CharSequence tempDescription = e.getContentDescription();
                     CharSequence tempText = (e.getText() != null) ? ("" + e.getText()) : tempDescription;
                     tempText = (tempText == null) ? "" : tempText;
-                    if (tempText.equals("") && type == 2) continue;
-                    if (!isParentClickable(e) && type == 4) continue;
+                    if (tempText.equals("") && (type == 2 || type == 5)) continue;
+                    if (!isParentClickable(e) && (type == 4 || type == 5)) continue;
 
                     if (idMap.containsKey(tempId))
                         idMap.put(tempId, idMap.getOrDefault(tempId, 0) + 1);
@@ -612,7 +617,7 @@ public class AssignerUtils {
                                 }
                             }
 
-                            if (type == 2) {
+                            if (type == 2 || type == 5) {
                                 triggerValue.setText(finalTempText);
                             } else if (type == 3 || type == 4) {
                                 triggerValue.setText(finalTempId);

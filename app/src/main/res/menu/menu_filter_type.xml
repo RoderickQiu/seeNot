@@ -10,9 +10,12 @@
         android:id="@+id/type_2"
         android:title="@string/filter_ban_text" />
     <item
+        android:id="@+id/type_5"
+        android:title="@string/filter_auto_click_text" />
+    <item
         android:id="@+id/type_3"
-        android:title="@string/filter_ban_id"/>
+        android:title="@string/filter_ban_id" />
     <item
         android:id="@+id/type_4"
-        android:title="@string/filter_auto_click" />
+        android:title="@string/filter_auto_click_id" />
 </menu>

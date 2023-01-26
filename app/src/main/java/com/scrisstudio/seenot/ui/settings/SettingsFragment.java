@@ -22,6 +22,8 @@ import com.google.gson.reflect.TypeToken;
 import com.scottyab.aescrypt.AESCrypt;
 import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
+import com.scrisstudio.seenot.RuleTimedActivity;
+import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.service.ExecutorService;
 
 import java.security.GeneralSecurityException;
@@ -94,6 +96,18 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         setPreferencesFromResource(R.xml.preference, rootKey);
+
+        Preference timedSettings = findPreference("timed-settings");
+        if (timedSettings != null) {
+            timedSettings.setOnPreferenceClickListener(preference -> {
+                Intent intent = new Intent();
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setClass(SeeNot.getAppContext(), RuleTimedActivity.class);
+                SeeNot.getAppContext().startActivity(intent);
+                return false;
+            });
+        }
+
         Preference preferenceExport = findPreference("export");
         if (preferenceExport != null) {
             preferenceExport.setOnPreferenceClickListener(preference -> {
@@ -123,7 +137,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         EditTextPreference numberPreference = findPreference("password");
         if (numberPreference != null)
             numberPreference.setOnBindEditTextListener(editText -> editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
-
     }
 
     @Override

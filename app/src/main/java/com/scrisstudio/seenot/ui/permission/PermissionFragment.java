@@ -3,6 +3,7 @@ package com.scrisstudio.seenot.ui.permission;
 import static com.scrisstudio.seenot.MainActivity.packageName;
 import static com.scrisstudio.seenot.SeeNot.l;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -91,6 +93,21 @@ public class PermissionFragment extends Fragment {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + packageName));
             startActivityForResult(intent, 111);
+        });
+
+        //省电
+        if (!MainActivity.isBatteryOptimIgnored) {
+            binding.permissionBatteryUngranted.setVisibility(View.VISIBLE);
+        } else {
+            binding.permissionBatteryGranted.setVisibility(View.VISIBLE);
+        }
+        binding.permissionBattery.setOnClickListener(v -> {
+            if (!MainActivity.isBatteryOptimIgnored) {
+                @SuppressLint("BatteryLife") Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                intent.setData(Uri.parse("package:" + packageName));
+                startActivityForResult(intent, 111);
+            } else
+                Toast.makeText(SeeNot.getAppContext(), "已经获取权限，无需设置", Toast.LENGTH_SHORT).show();
         });
 
         //无障碍权限
