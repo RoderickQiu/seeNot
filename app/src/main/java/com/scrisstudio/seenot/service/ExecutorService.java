@@ -19,7 +19,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -63,8 +62,7 @@ public class ExecutorService extends AccessibilityService {
     public static final int KEEPER_NOTIFICATION_ID = 408;
     public static ExecutorService mService;
     public static Boolean isServiceRunning = false, isForegroundServiceRunning = false,
-            isFirstTimeInvokeService = true, isSoftInputPanelOn = false, hasSoftInputPanelJustFound = false,
-            lastTimeClassCapable = false, isDarkModeOn = false;
+            isFirstTimeInvokeService = true, lastTimeClassCapable = false, isDarkModeOn = false;
     public static int foregroundWindowId = 0;
     public static String currentHomePackage = "", foregroundClassName = "",
             foregroundPackageName = "com.scrisstudio.seenot", lastTimePackageName = "",
@@ -87,10 +85,9 @@ public class ExecutorService extends AccessibilityService {
     private static ArrayList<FilterInfo> currentFilters = new ArrayList<>(), tempFilters;
     private static FilterInfo tempFilter;
     private final Gson gson = new Gson();
-    private Rect nodeSearcherRect = new Rect();
     private PackageManager packageManager;
     private long lastContentChangedTime = 0, lastHandlerRunningTime = 0,
-            contentChangeTime = 0, handlerTime = 0, stackStartTime = 0;
+            contentChangeTime = 0, handlerTime = 0;
     private static PeriodicWorkRequest stayRequest;
     private static Random random = new Random();
     public static Resources resources;
@@ -339,16 +336,13 @@ public class ExecutorService extends AccessibilityService {
                 .build();
 
         WorkManager.getInstance(SeeNot.getAppContext()).enqueueUniquePeriodicWork("stay", ExistingPeriodicWorkPolicy.REPLACE, stayRequest);
-
-        stackStartTime = SystemClock.uptimeMillis();
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
             if (isServiceRunning) {
-
-                if (!isSoftInputPanelOn && !foregroundPackageName.equals(lastTimePackageName)) {
+                if (!foregroundPackageName.equals(lastTimePackageName)) {
                     lastTimePackageName = foregroundPackageName;
                     currentFilters.clear();
                     int effect;
@@ -380,20 +374,6 @@ public class ExecutorService extends AccessibilityService {
                     handlerTime = SystemClock.uptimeMillis();
                     if (handlerTime - lastHandlerRunningTime >= 256) { // have a little pause
                         lastHandlerRunningTime = handlerTime;
-
-                        for (int i = 0; i < getWindows().size(); i++) {
-                            try {
-                                // find if input method open：TYPE_INPUT_METHOD = 2
-                                if (getWindows().get(i).getType() == 2) {
-                                    hasSoftInputPanelJustFound = true;
-                                    if (!isSoftInputPanelOn) {
-                                        isSoftInputPanelOn = true;
-                                        l("Input method is enabled.");
-                                    }
-                                }
-                            } catch (Exception ignored) {
-                            }
-                        }
 
                         for (int i = 0; i < currentFilters.size(); i++) {
                             tempFilter = currentFilters.get(i);
