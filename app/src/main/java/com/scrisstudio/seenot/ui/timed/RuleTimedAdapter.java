@@ -111,7 +111,7 @@ public class RuleTimedAdapter extends RecyclerView.Adapter<RuleTimedAdapter.MyVi
         StringBuilder builder = new StringBuilder("");
         String[] week = {"一", "二", "三", "四", "五", "六", "日"};
         if (list.size() == 0) {
-            builder.append("仅一次");
+            builder.append("仅当天");
         } else if (list.size() == 7) {
             builder.append("每天");
         } else {
@@ -147,6 +147,7 @@ public class RuleTimedAdapter extends RecyclerView.Adapter<RuleTimedAdapter.MyVi
                 SharedPreferences.Editor edit = sharedPreferences.edit();
 
                 rule.setStatus(isChecked);
+                rule.setFirstLaunchTime(new Date().getTime());
                 mList.set(position, rule);
                 edit.putString("timed", gson.toJson(mList));
                 edit.apply();

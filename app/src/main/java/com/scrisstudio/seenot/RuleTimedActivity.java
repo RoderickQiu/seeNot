@@ -75,7 +75,7 @@ public class RuleTimedActivity extends AppCompatActivity {
         binding.fab.show();
         binding.fab.setOnClickListener(v -> {
             SharedPreferences.Editor edit = sharedPreferences.edit();
-            timed.add(new TimedInfo(sharedPreferences.getInt("timed-id-max", 0), "未命名", true, true, -1, 0, new Date().getTime(), new Date().getTime()));
+            timed.add(new TimedInfo(sharedPreferences.getInt("timed-id-max", 0), "未命名", true, true, -1, 0, new Date().getTime(), new Date().getTime(), new Date().getTime()));
             edit.putString("timed", gson.toJson(timed));
             edit.putInt("timed-id-max", sharedPreferences.getInt("timed-id-max", 0) + 1);
             edit.apply();

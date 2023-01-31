@@ -36,6 +36,7 @@ import com.scrisstudio.seenot.service.TimedInfo;
 
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -89,9 +90,20 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor timedInitEditor = sharedPreferences.edit();
             timedInitEditor.putString("timed", gson.toJson(timedList));
             timedInitEditor.apply();
+        } else {
+            timedList = gson.fromJson(sharedPreferences.getString("timed", "{}"), new TypeToken<ArrayList<TimedInfo>>() {
+            }.getType());
+            for (TimedInfo timed : timedList) {
+                if (timed.getScope() == 0) {
+                    if (new Date().getDate() != new Date(timed.getFirstLaunchTime()).getDate()) {
+                        timed.setStatus(false);
+                    }
+                } // clear obsolete only-once rules
+            }
+            SharedPreferences.Editor timedInitEditor = sharedPreferences.edit();
+            timedInitEditor.putString("timed", gson.toJson(timedList));
+            timedInitEditor.apply();
         }
-        timedList = gson.fromJson(sharedPreferences.getString("timed", "{}"), new TypeToken<ArrayList<TimedInfo>>() {
-        }.getType());
 
         Intent serviceIntent = new Intent(this, ExecutorService.class);
         startService(serviceIntent);

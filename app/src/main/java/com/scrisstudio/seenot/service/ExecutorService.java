@@ -125,10 +125,15 @@ public class ExecutorService extends AccessibilityService {
     }
 
     private static boolean isTodayCovered(TimedInfo timed) {
-        Calendar calendar = Calendar.getInstance();
-        int weekday = calendar.get(Calendar.DAY_OF_WEEK);
-        weekday = (weekday == 1) ? 7 : weekday - 1;
-        return RuleTimedAdapter.getRealScope(timed.getScope()).contains(weekday);
+        if (timed.getScope() != 0) {
+            Calendar calendar = Calendar.getInstance();
+            int weekday = calendar.get(Calendar.DAY_OF_WEEK);
+            weekday = (weekday == 1) ? 7 : weekday - 1;
+            return RuleTimedAdapter.getRealScope(timed.getScope()).contains(weekday);
+        } else {
+            return (new Date().getDate() == new Date(timed.getFirstLaunchTime()).getDate())
+                    && (new Date().getMonth() == new Date(timed.getFirstLaunchTime()).getMonth());
+        }
     }
 
     private static int isTimedHavingEffect(int ruleId) {

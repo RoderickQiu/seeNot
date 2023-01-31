@@ -8,8 +8,9 @@ public class TimedInfo {
     private int idFor;
     private int scope;
     private long startTime, endTime;
+    private long firstLaunchTime;
 
-    public TimedInfo(int id, String name, boolean status, boolean mode, int idFor, int scope, long startTime, long endTime) {
+    public TimedInfo(int id, String name, boolean status, boolean mode, int idFor, int scope, long startTime, long endTime, long firstLaunchTime) {
         this.id = id;
         this.name = name;
         this.status = status;
@@ -18,6 +19,15 @@ public class TimedInfo {
         this.scope = scope;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.firstLaunchTime = firstLaunchTime;
+    }
+
+    public long getFirstLaunchTime() {
+        return firstLaunchTime;
+    }
+
+    public void setFirstLaunchTime(long firstLaunchTime) {
+        this.firstLaunchTime = firstLaunchTime;
     }
 
     public boolean getMode() {
