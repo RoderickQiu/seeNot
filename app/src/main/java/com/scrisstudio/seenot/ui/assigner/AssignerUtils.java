@@ -193,11 +193,11 @@ public class AssignerUtils {
         btTargetSelectExit.setVisibility(View.GONE);
         btTargetDone.setVisibility(View.GONE);
         btRefresh.setVisibility(filter.getType() == 1 ? View.VISIBLE : View.GONE);
-        layoutTextFindForm.setVisibility((filter.getType() == 2 || filter.getType() == 3 || filter.getType() == 4 || filter.getType() == 5)
+        layoutTextFindForm.setVisibility((filter.getType() >= 2 && filter.getType() <= 7)
                 ? View.VISIBLE : View.GONE);
 
         if (triggerValueMaxWidth == 0) triggerValueMaxWidth = triggerValue.getMaxWidth();
-        triggerValue.setMaxWidth((filter.getType() == 2 || filter.getType() == 5) ? (int) (triggerValueMaxWidth * 0.6) : triggerValueMaxWidth);
+        triggerValue.setMaxWidth((filter.getType() == 2 || filter.getType() == 5 || filter.getType() == 6) ? (int) (triggerValueMaxWidth * 0.6) : triggerValueMaxWidth);
 
         btBack.setOnClickListener(v -> setMode(viewCustomization, viewToast, viewTarget, 1, layoutOverlayOutline));
 
@@ -276,6 +276,14 @@ public class AssignerUtils {
                 triggerValue = filter.getParam1();
                 tip = resources.getString(R.string.filter_auto_click_text_tip);
                 break;
+            case 6:
+                triggerValue = filter.getParam1();
+                tip = resources.getString(R.string.filter_swipe_text_tip);
+                break;
+            case 7:
+                triggerValue = filter.getParam1();
+                tip = resources.getString(R.string.filter_swipe_id_tip);
+                break;
         }
         final String finalTriggerValue = triggerValue.equals("---") ? resources.getString(R.string.click_right_to_set) : triggerValue;
         final String finalTip = tip;
@@ -317,6 +325,8 @@ public class AssignerUtils {
                 else if (item.getItemId() == R.id.type_3) type.set(3);
                 else if (item.getItemId() == R.id.type_4) type.set(4);
                 else if (item.getItemId() == R.id.type_5) type.set(5);
+                else if (item.getItemId() == R.id.type_6) type.set(6);
+                else if (item.getItemId() == R.id.type_7) type.set(7);
 
                 ArrayList<FilterInfo> filterInfos = current.getFilter();
 
@@ -617,16 +627,19 @@ public class AssignerUtils {
                                 }
                             }
 
-                            if (type == 2 || type == 5) {
+                            if (type == 2 || type == 5 || type == 6) {
                                 triggerValue.setText(finalTempText);
-                            } else if (type == 3 || type == 4) {
+                            } else if (type == 3 || type == 4 || type == 7) {
                                 triggerValue.setText(finalTempId);
                                 if (type == 3) {
                                     if (idMap.getOrDefault(finalTempId, 0) > 2)
                                         sendToast(viewToast, "此 id 在页面中多次使用，可能不适合当作判定条件", LENGTH_LONG);
-                                } else { // type 4
+                                } else if (type == 4) { // type 4
                                     if (idMap.getOrDefault(finalTempId, 0) > 1)
                                         sendToast(viewToast, "此 id 在页面不止一次使用，可能无法正确判断应当点击哪一个", LENGTH_LONG);
+                                } else {
+                                    if (idMap.getOrDefault(finalTempId, 0) > 2)
+                                        sendToast(viewToast, "此 id 在页面不止一次使用，可能造成误判", LENGTH_LONG);
                                 }
                             } else {
                                 triggerValue.setText(resources.getString(R.string.strange_error));

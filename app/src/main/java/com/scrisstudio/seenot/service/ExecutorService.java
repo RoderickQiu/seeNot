@@ -5,6 +5,7 @@ import static com.scrisstudio.seenot.SeeNot.le;
 import static com.scrisstudio.seenot.service.FloatingOperatorUtil.changeForDarkMode;
 
 import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.GestureDescription;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -19,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Path;
 import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -548,9 +550,45 @@ public class ExecutorService extends AccessibilityService {
                             }
                         }
                         break;
+                    case 6: // text swipe
+                        temp = null;
+                        if (info.getText() != null) temp = info.getText().toString();
+                        else if (info.getContentDescription() != null)
+                            temp = info.getContentDescription().toString();
+
+                        if (temp != null) {
+                            if (temp.equals(word)) {
+                                doGesture(0);
+                                //doGesture(1);
+                            }
+                        }
+                        break;
+                    case 7: // id swipe
+                        temp = info.getViewIdResourceName();
+                        if (temp != null) {
+                            if (temp.equals(word)) {
+                                doGesture(0);
+                                //doGesture(1);
+                            }
+                        }
+                        break;
                 }
             }
         }
+    }
+
+    private void doGesture(int mode) {
+        Path path = new Path();
+        if (mode == 0) {
+            path.moveTo(1000, 1000);//滑动起点
+            path.lineTo(1000, 2000);//滑动终点
+        } else {
+            path.moveTo(1000, 2000);//滑动起点
+            path.lineTo(1500, 2000);//滑动终点
+        }
+        GestureDescription.Builder builder = new GestureDescription.Builder();
+        GestureDescription description = builder.addStroke(new GestureDescription.StrokeDescription(path, 100L, 100L)).build();
+        dispatchGesture(description, new GestureCallBack(), null);
     }
 
     private AccessibilityNodeInfo getClickable(AccessibilityNodeInfo info) {
@@ -594,4 +632,23 @@ public class ExecutorService extends AccessibilityService {
         mService = null;
         super.onDestroy();
     }
+
+    private class GestureCallBack extends GestureResultCallback {
+        public GestureCallBack() {
+            super();
+        }
+
+        @Override
+        public void onCompleted(GestureDescription gestureDescription) {
+            super.onCompleted(gestureDescription);
+
+        }
+
+        @Override
+        public void onCancelled(GestureDescription gestureDescription) {
+            super.onCancelled(gestureDescription);
+
+        }
+    }
 }
+

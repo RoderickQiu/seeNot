@@ -13,9 +13,15 @@
         android:id="@+id/type_5"
         android:title="@string/filter_auto_click_text" />
     <item
+        android:id="@+id/type_6"
+        android:title="@string/filter_swipe_text"/>
+    <item
         android:id="@+id/type_3"
         android:title="@string/filter_ban_id" />
     <item
         android:id="@+id/type_4"
         android:title="@string/filter_auto_click_id" />
+    <item
+        android:id="@+id/type_7"
+        android:title="@string/filter_swipe_id"/>
 </menu>

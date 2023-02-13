@@ -65,13 +65,13 @@
     <string name="filter_ban_activity">禁止进入此页面</string>
     <string name="filter_ban_activity_tip">在此设定要强制跳出时所在的 Activity，按\"刷新\"以获取最新结果。注：部分软件会有将多个页面合成一个 Activity 的情况，此时可以考虑使用\"找到文字\"或\"找到元素\"类规则，凭借页面上的独有特征触发退出。</string>
     <string name="filter_ban_text">找到文字后退出</string>
-    <string name="filter_ban_text_tip">点击\"选择\"打开元素选择模式，并选中需要的文字，并点击\"确认\"保存。注：少数应用的部分文字无法解析。</string>
+    <string name="filter_ban_text_tip">点击\"选择\"打开文字选择模式，并选中需要的文字，并点击\"确认\"保存。注：少数应用的部分文字无法解析。</string>
     <string name="filter_ban_id">找到元素后退出</string>
     <string name="filter_ban_id_tip">点击\"选择\"打开元素选择模式，并选择需要的元素，点击\"确认\"保存。适合一些无法找到合适触发文字的页面。</string>
     <string name="filter_auto_click_id">找到元素后自动点击</string>
     <string name="filter_auto_click_id_tip">点击\"选择\"打开元素选择模式，并选择需要自动点击的元素以获取其元素 ID，点击\"确认\"保存。</string>
     <string name="filter_auto_click_text">找到文字后自动点击</string>
-    <string name="filter_auto_click_text_tip">点击\"选择\"打开元素选择模式，并选择需要自动点击的文字，点击\"确认\"保存。注：少数应用的部分文字无法解析。</string>
+    <string name="filter_auto_click_text_tip">点击\"选择\"打开文字选择模式，并选择需要自动点击的文字，点击\"确认\"保存。注：少数应用的部分文字无法解析。</string>
     <string name="delete">删除</string>
     <string name="settings">设置</string>
     <string name="type_not_found">未知规则</string>
@@ -127,4 +127,8 @@
     <string name="timed_off">时段内关闭</string>
     <string name="timed_on_or_off">在这段时间内关闭或打开此规则</string>
     <string name="timed_on_or_off_tip">若仅要在这段时间内启用，请在首页选择禁用规则；同理，若仅在这段时间内关闭，则需在首页选择启用规则以生效。</string>
+    <string name="filter_swipe_text">找到文字后反向划动</string>
+    <string name="filter_swipe_id">找到元素后反向划动</string>
+    <string name="filter_swipe_text_tip">点击\"选择\"打开文字选择模式，并选择一遇到就上滑返回的文字，并点击\"确认\"保存。注：少数应用的部分文字无法解析。</string>
+    <string name="filter_swipe_id_tip">点击\"选择\"打开元素选择模式，并选择一遇到就上滑返回的相关元素以获取其元素 ID，并点击\"确认\"保存。</string>
 </resources>
