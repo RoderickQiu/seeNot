@@ -23,6 +23,7 @@ import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
 import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.service.RuleInfo;
+import com.scrisstudio.seenot.service.TimedInfo;
 import com.scrisstudio.seenot.ui.assigner.AssignerUtils;
 
 import java.util.List;
@@ -34,14 +35,17 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
     private static final int VIEW_TYPE_EMPTY = 0;
     private static final int VIEW_TYPE_CARD = 1;
     private static List<RuleInfo> mList = null;
+    private static List<TimedInfo> timedList = null;
     private final SharedPreferences sharedPreferences;
     private final Context context;
     private final Gson gson;
 
-    public RuleInfoAdapter(Context context, List<RuleInfo> list, SharedPreferences sharedPreferences) {
+    public RuleInfoAdapter(Context context, List<RuleInfo> mList,
+                           List<TimedInfo> timedList, SharedPreferences sharedPreferences) {
         this.context = context;
         this.sharedPreferences = sharedPreferences;
-        mList = list;
+        this.timedList = timedList;
+        this.mList = mList;
         gson = new Gson();
     }
 
@@ -76,6 +80,13 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
         }
     }
 
+    private boolean hasTimedInfo(int id) {
+        for (TimedInfo timed : timedList) {
+            if (timed.getIdFor() == id && timed.getStatus()) return true;
+        }
+        return false;
+    }
+
     @SuppressLint({"SetTextI18n", "NotifyDataSetChanged"})
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
@@ -86,6 +97,11 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
             holder.ruleId.setContentDescription(String.valueOf(rule.getId()));
             holder.ruleTitle.setText(rule.getTitle());
             holder.ruleFor.setText(rule.getForName());
+
+            if (hasTimedInfo(rule.getId())) {
+                holder.ruleTimed.setText("有定时任务启用");
+            } else
+                holder.ruleTimed.setVisibility(View.GONE);
 
             holder.statusSwitch.setChecked(rule.getStatus());
             holder.statusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -164,7 +180,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
     }
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView ruleId, ruleTitle, ruleFor;
+        TextView ruleId, ruleTitle, ruleFor, ruleTimed;
         ImageButton editButton, deleteButton;
         Button deleteRecheckButton;
         SwitchMaterial statusSwitch;
@@ -174,6 +190,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
             ruleTitle = view.findViewById(R.id.rule_title);
             ruleId = view.findViewById(R.id.rule_id);
             ruleFor = view.findViewById(R.id.rule_for);
+            ruleTimed = view.findViewById(R.id.rule_timed);
             editButton = view.findViewById(R.id.edit_button);
             deleteButton = view.findViewById(R.id.delete_button);
             deleteRecheckButton = view.findViewById(R.id.delete_button_recheck);

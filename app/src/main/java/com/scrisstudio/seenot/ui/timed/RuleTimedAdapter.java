@@ -140,7 +140,7 @@ public class RuleTimedAdapter extends RecyclerView.Adapter<RuleTimedAdapter.MyVi
             holder.ruleId.setContentDescription(String.valueOf(rule.getId()));
             holder.ruleTitle.setText(rule.getName() + " (" + corresp.getForName() + ")");
             holder.ruleDescription.setText(realScopeParser(getRealScope(rule.getScope())) + " " +
-                    timeParser(rule.getStartTime()) + "~" + timeParser(rule.getEndTime()));
+                    timeParser(rule.getStartTime()) + "~" + timeParser(rule.getEndTime()) + " | " + (rule.getMode() ? "开" : "关"));
 
             holder.statusSwitch.setChecked(rule.getStatus());
             holder.statusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {

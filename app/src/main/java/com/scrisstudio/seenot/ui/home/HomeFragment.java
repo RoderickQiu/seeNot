@@ -30,6 +30,7 @@ import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.databinding.FragmentHomeBinding;
 import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.service.RuleInfo;
+import com.scrisstudio.seenot.service.TimedInfo;
 import com.scrisstudio.seenot.ui.assigner.AssignerUtils;
 import com.scrisstudio.seenot.ui.rule.RuleInfoAdapter;
 import com.scrisstudio.seenot.ui.rule.RuleInfoCardDecoration;
@@ -43,6 +44,7 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private static final Gson gson = new Gson();
     private ArrayList<RuleInfo> rules = new ArrayList<>();
+    private ArrayList<TimedInfo> timed = new ArrayList<>();
     private Banner banner;
     private String bannerMessage;
     private Resources resources;
@@ -89,12 +91,14 @@ public class HomeFragment extends Fragment {
 
         rules = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
         }.getType());
+        timed = gson.fromJson(sharedPreferences.getString("timed", "{}"), new TypeToken<ArrayList<TimedInfo>>() {
+        }.getType());
 
         RecyclerView recyclerView = binding.ruleList;
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        RuleInfoAdapter adapter = new RuleInfoAdapter(getActivity(), rules, sharedPreferences);
+        RuleInfoAdapter adapter = new RuleInfoAdapter(getActivity(), rules, timed, sharedPreferences);
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new RuleInfoCardDecoration());
 

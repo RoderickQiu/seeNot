@@ -48,7 +48,7 @@
     <string name="exit">退出</string>
     <string name="rule_for_msg">对于：</string>
     <string name="expand_more">更多内容</string>
-    <string name="set_mask_info">设置规则信息</string>
+    <string name="set_mask_info">设置规则信息和定时</string>
     <string name="save">保存</string>
     <string name="new_subrule">新建子规则</string>
     <string name="rule_title_label">规则名：</string>
@@ -131,4 +131,5 @@
     <string name="filter_swipe_id">找到元素后反向划动</string>
     <string name="filter_swipe_text_tip">点击\"选择\"打开文字选择模式，并选择一遇到就上滑返回的文字，并点击\"确认\"保存。注：少数应用的部分文字无法解析。</string>
     <string name="filter_swipe_id_tip">点击\"选择\"打开元素选择模式，并选择一遇到就上滑返回的相关元素以获取其元素 ID，并点击\"确认\"保存。</string>
+    <string name="set_rule_timed">设置定时</string>
 </resources>

@@ -96,6 +96,21 @@
             tools:ignore="RtlHardcoded" />
 
         <Button
+            android:id="@+id/button_set_timed"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:drawableLeft="@drawable/ic_baseline_settings_24"
+            android:drawablePadding="4dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:text="@string/set_rule_timed"
+            android:textColor="@color/gray_800"
+            tools:ignore="RtlHardcoded" />
+
+        <Button
             android:id="@+id/button_save_rule"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"

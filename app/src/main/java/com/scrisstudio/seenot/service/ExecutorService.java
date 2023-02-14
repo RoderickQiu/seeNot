@@ -138,9 +138,9 @@ public class ExecutorService extends AccessibilityService {
         }
     }
 
-    private static int isTimedHavingEffect(int ruleId) {
+    public static int isTimedHavingEffect(int ruleId, boolean isInstant) {
         try {
-            if (SystemClock.uptimeMillis() - timedLastCheckedList.get(ruleId) > 60000) {
+            if (SystemClock.uptimeMillis() - timedLastCheckedList.get(ruleId) > 60000 || isInstant) {
                 timedLastCheckedList.put(ruleId, SystemClock.uptimeMillis());
                 ArrayList<Integer> list = timedCorrespList.get(ruleId);
                 if (list == null) return 0;
@@ -355,7 +355,7 @@ public class ExecutorService extends AccessibilityService {
                     int effect;
                     for (int i = 0; i < rulesList.size(); i++) {
                         if (rulesList.get(i).getFor().equals(lastTimePackageName) && !foregroundPackageName.equals("")) {
-                            effect = isTimedHavingEffect(rulesList.get(i).getId());
+                            effect = isTimedHavingEffect(rulesList.get(i).getId(), false);
                             le("EFFECT" + effect);
                             if (!rulesList.get(i).getStatus()) {
                                 if (effect != 1) continue;
