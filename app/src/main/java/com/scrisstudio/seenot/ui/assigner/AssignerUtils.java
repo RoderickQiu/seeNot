@@ -24,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityWindowInfo;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -49,10 +50,11 @@ import com.scrisstudio.seenot.service.RuleInfo;
 import com.scrisstudio.seenot.ui.rule.FilterInfoAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -572,38 +574,42 @@ public class AssignerUtils {
                 btTargetSelectExit = viewCustomization.findViewById(R.id.set_filter_target_select_exit),
                 btTargetDone = viewCustomization.findViewById(R.id.set_filter_target_done);
 
-        if (outlineParams.alpha == 0) {
+        if (outlineParams.alpha == 0) {//TODO everytime, not-this-app notif. shown badly
             if (!ExecutorService.foregroundPackageName.equals(ExecutorService.currentHomePackage) &&
                     !ExecutorService.foregroundPackageName.equals("com.scrisstudio.seenot")) {
                 btTargetSelect.setVisibility(View.GONE);
                 btTargetSelectExit.setVisibility(View.VISIBLE);
                 btTargetDone.setVisibility(View.GONE);
-                AccessibilityNodeInfo root = mService.getRootInActiveWindow();
-                if (root == null) return;
+                AccessibilityNodeInfo root = null;
+                for (AccessibilityWindowInfo windowInfo : mService.getWindows()) {
+                    if (windowInfo.getType() == AccessibilityWindowInfo.TYPE_APPLICATION)
+                        root = windowInfo.getRoot();
+                }
+                if (root == null) {
+                    if (mService.getRootInActiveWindow() == null) return;
+                    else root = mService.getRootInActiveWindow();
+                }
                 layoutOverlayOutline.removeAllViews();
-                ArrayList<AccessibilityNodeInfo> roots = new ArrayList<>();
-                roots.add(root);
                 ArrayList<AccessibilityNodeInfo> nodeList = new ArrayList<>();
                 HashMap<String, Integer> idMap = new HashMap<>();
-                findAllNode(roots, nodeList);
-                nodeList.sort((a, b1) -> {
-                    Rect rectA = new Rect();
-                    Rect rectB = new Rect();
-                    a.getBoundsInScreen(rectA);
-                    b1.getBoundsInScreen(rectB);
-                    return rectB.width() * rectB.height() - rectA.width() * rectA.height();
-                });
+                findAllNode(root, nodeList);
                 for (final AccessibilityNodeInfo e : nodeList) {
                     // if cannot get, don't even allow click it
                     String tempId = e.getViewIdResourceName();
-                    if (tempId == null && (type == 3 || type == 4)) continue;
+                    if (tempId == null && (type == 3 || type == 4 || type == 7)) continue;
                     if (tempId == null) tempId = "---";
-                    if (!tempId.contains(foregroundPackageName)) continue;
+                    else if (!tempId.contains(foregroundPackageName)) continue; // fix fking bug
                     CharSequence tempDescription = e.getContentDescription();
                     CharSequence tempText = (e.getText() != null) ? ("" + e.getText()) : tempDescription;
                     tempText = (tempText == null) ? "" : tempText;
-                    if (tempText.equals("") && (type == 2 || type == 5)) continue;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                        tempText = (tempText.equals("")) ? "" : e.getTooltipText();
+                    }
+                    if ((tempText.equals("")) && (type == 2 || type == 5 || type == 6)) continue;
                     if (!isParentClickable(e) && (type == 4 || type == 5)) continue;
+
+                    if (e.getText() != null || e.getContentDescription() != null)
+                        l("ect: " + e + " child: " + e.getChildCount());
 
                     if (idMap.containsKey(tempId))
                         idMap.put(tempId, idMap.getOrDefault(tempId, 0) + 1);
@@ -621,49 +627,38 @@ public class AssignerUtils {
                     CharSequence finalTempText = tempText;
                     String finalTempId = tempId;
                     img.setOnFocusChangeListener((v1, hasFocus) -> {
-                        btTargetDone.setVisibility(View.VISIBLE);
-                        if (hasFocus) {
-                            AccessibilityNodeInfo tempNode = e;
-                            ArrayList<Integer> indicesList = new ArrayList<>();
-                            while (true) {
-                                for (int i = 0; i < tempNode.getParent().getChildCount(); i++) {
-                                    if (tempNode.getParent().getChild(i).equals(tempNode)) {
-                                        indicesList.add(i);
-                                        break;
+                        try {
+                            btTargetDone.setVisibility(View.VISIBLE);
+                            if (hasFocus) {
+                                if (type == 2 || type == 5 || type == 6) {
+                                    triggerValue.setText(finalTempText);
+                                } else if (type == 3 || type == 4 || type == 7) {
+                                    triggerValue.setText(finalTempId);
+                                    if (type == 3) {
+                                        if (idMap.getOrDefault(finalTempId, 0) > 2)
+                                            sendToast(viewToast, "此 id 在页面中多次使用，可能不适合当作判定条件", LENGTH_LONG);
+                                    } else if (type == 4) { // type 4
+                                        if (idMap.getOrDefault(finalTempId, 0) > 1)
+                                            sendToast(viewToast, "此 id 在页面不止一次使用，可能无法正确判断应当点击哪一个", LENGTH_LONG);
+                                    } else {
+                                        if (idMap.getOrDefault(finalTempId, 0) > 2)
+                                            sendToast(viewToast, "此 id 在页面不止一次使用，可能造成误判", LENGTH_LONG);
                                     }
-                                }
-                                tempNode = tempNode.getParent();
-
-                                if (tempNode.equals(root)) {
-                                    Collections.reverse(indicesList);
-                                    break;
-                                }
-                            }
-
-                            if (type == 2 || type == 5 || type == 6) {
-                                triggerValue.setText(finalTempText);
-                            } else if (type == 3 || type == 4 || type == 7) {
-                                triggerValue.setText(finalTempId);
-                                if (type == 3) {
-                                    if (idMap.getOrDefault(finalTempId, 0) > 2)
-                                        sendToast(viewToast, "此 id 在页面中多次使用，可能不适合当作判定条件", LENGTH_LONG);
-                                } else if (type == 4) { // type 4
-                                    if (idMap.getOrDefault(finalTempId, 0) > 1)
-                                        sendToast(viewToast, "此 id 在页面不止一次使用，可能无法正确判断应当点击哪一个", LENGTH_LONG);
                                 } else {
-                                    if (idMap.getOrDefault(finalTempId, 0) > 2)
-                                        sendToast(viewToast, "此 id 在页面不止一次使用，可能造成误判", LENGTH_LONG);
+                                    triggerValue.setText(resources.getString(R.string.strange_error));
                                 }
-                            } else {
-                                triggerValue.setText(resources.getString(R.string.strange_error));
-                            }
 
-                            v1.setBackgroundResource(R.drawable.node_focus);
-                        } else {
-                            v1.setBackgroundResource(R.drawable.node);
+                                v1.setBackgroundResource(R.drawable.node_focus);
+                            } else {
+                                v1.setBackgroundResource(R.drawable.node);
+                            }
+                        } catch (Exception e1) {
+                            le("ERR: " + e1.getLocalizedMessage());
                         }
                     });
                     layoutOverlayOutline.addView(img, params);
+                    if (e.getText() != null || e.getContentDescription() != null)
+                        l("Select: " + e + " child: " + e.getChildCount());
                 }
                 outlineParams.alpha = 0.5f;
                 outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
@@ -690,18 +685,16 @@ public class AssignerUtils {
         }
     }
 
-    private static void findAllNode
-            (ArrayList<AccessibilityNodeInfo> roots, ArrayList<AccessibilityNodeInfo> list) {
-        ArrayList<AccessibilityNodeInfo> childrenList = new ArrayList<>();
-        for (AccessibilityNodeInfo e : roots) {
-            if (e == null) continue;
-            list.add(e);
-            for (int n = 0; n < e.getChildCount(); n++) {
-                childrenList.add(e.getChild(n));
+    private static void findAllNode(AccessibilityNodeInfo root, ArrayList<AccessibilityNodeInfo> list) {
+        Queue<AccessibilityNodeInfo> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            AccessibilityNodeInfo info = queue.poll();
+            if (info == null) continue;
+            list.add(info);
+            for (int k = 0; k < info.getChildCount(); k++) {
+                queue.add(info.getChild(k));
             }
-        }
-        if (!childrenList.isEmpty()) {
-            findAllNode(childrenList, list);
         }
     }
 
