@@ -209,7 +209,7 @@ public class AssignerUtils {
         btSave.setOnClickListener(v -> {
             if (!foregroundPackageName.equals(current.getFor()) && !foregroundPackageName.equals("com.scrisstudio.seenot")) {
                 sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                        + "的，只能在那个程序打开时编辑", LENGTH_LONG);
+                        + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点击一下程序界面重新获取", LENGTH_LONG);
                 return;
             }
             String param = triggerValue.getText().toString();
@@ -250,7 +250,7 @@ public class AssignerUtils {
     private static void refreshSet(FilterInfo filter, View viewCustomization, View viewToast, int refreshMode) {
         if (!foregroundPackageName.equals(current.getFor()) && refreshMode == 1 && !foregroundPackageName.equals("com.scrisstudio.seenot")) {
             sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                    + "的，只能在那个程序打开时编辑", LENGTH_LONG);
+                    + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点击一下程序界面重新获取", LENGTH_LONG);
             return;
         }
 
@@ -348,9 +348,10 @@ public class AssignerUtils {
 
             if (current.getFor().equals(packageName))
                 popup.show();
-            else
+            else {
                 sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                        + "的，只能在那个程序打开时编辑", LENGTH_LONG);
+                        + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点击一下程序界面重新获取", LENGTH_LONG);
+            }
         });
 
         FilterInfoAdapter.setSaveListener((rule) -> {
@@ -563,7 +564,7 @@ public class AssignerUtils {
     private static void toggleOutline(FrameLayout layoutOverlayOutline, View viewCustomization, View viewTarget, View viewToast) {
         if (!foregroundPackageName.equals(current.getFor())) {
             sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                    + "的，只能在那个程序打开时编辑", LENGTH_LONG);
+                    + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点击一下程序界面重新获取", LENGTH_LONG);
             return;
         }
 
@@ -596,20 +597,18 @@ public class AssignerUtils {
                 for (final AccessibilityNodeInfo e : nodeList) {
                     // if cannot get, don't even allow click it
                     String tempId = e.getViewIdResourceName();
-                    if (tempId == null && (type == 3 || type == 4 || type == 7)) continue;
+                    if ((type == 3 || type == 4 || type == 7) && tempId == null) continue;
                     if (tempId == null) tempId = "---";
-                    else if (!tempId.contains(foregroundPackageName)) continue; // fix fking bug
+                    else if ((type == 3 || type == 4 || type == 7) && !tempId.contains(foregroundPackageName))
+                        continue; // fix fking bug
                     CharSequence tempDescription = e.getContentDescription();
                     CharSequence tempText = (e.getText() != null) ? ("" + e.getText()) : tempDescription;
                     tempText = (tempText == null) ? "" : tempText;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                        tempText = (tempText.equals("")) ? "" : e.getTooltipText();
+                        tempText = (tempText.equals("")) ? (e.getTooltipText() != null ? e.getTooltipText() : "") : tempText;
                     }
-                    if ((tempText.equals("")) && (type == 2 || type == 5 || type == 6)) continue;
-                    if (!isParentClickable(e) && (type == 4 || type == 5)) continue;
-
-                    if (e.getText() != null || e.getContentDescription() != null)
-                        l("ect: " + e + " child: " + e.getChildCount());
+                    if ((type == 2 || type == 5 || type == 6) && (tempText.equals(""))) continue;
+                    if ((type == 4 || type == 5) && !isParentClickable(e)) continue;
 
                     if (idMap.containsKey(tempId))
                         idMap.put(tempId, idMap.getOrDefault(tempId, 0) + 1);
@@ -627,38 +626,32 @@ public class AssignerUtils {
                     CharSequence finalTempText = tempText;
                     String finalTempId = tempId;
                     img.setOnFocusChangeListener((v1, hasFocus) -> {
-                        try {
-                            btTargetDone.setVisibility(View.VISIBLE);
-                            if (hasFocus) {
-                                if (type == 2 || type == 5 || type == 6) {
-                                    triggerValue.setText(finalTempText);
-                                } else if (type == 3 || type == 4 || type == 7) {
-                                    triggerValue.setText(finalTempId);
-                                    if (type == 3) {
-                                        if (idMap.getOrDefault(finalTempId, 0) > 2)
-                                            sendToast(viewToast, "此 id 在页面中多次使用，可能不适合当作判定条件", LENGTH_LONG);
-                                    } else if (type == 4) { // type 4
-                                        if (idMap.getOrDefault(finalTempId, 0) > 1)
-                                            sendToast(viewToast, "此 id 在页面不止一次使用，可能无法正确判断应当点击哪一个", LENGTH_LONG);
-                                    } else {
-                                        if (idMap.getOrDefault(finalTempId, 0) > 2)
-                                            sendToast(viewToast, "此 id 在页面不止一次使用，可能造成误判", LENGTH_LONG);
-                                    }
+                        btTargetDone.setVisibility(View.VISIBLE);
+                        if (hasFocus) {
+                            if (type == 2 || type == 5 || type == 6) {
+                                triggerValue.setText(finalTempText);
+                            } else if (type == 3 || type == 4 || type == 7) {
+                                triggerValue.setText(finalTempId);
+                                if (type == 3) {
+                                    if (idMap.getOrDefault(finalTempId, 0) > 2)
+                                        sendToast(viewToast, "此 id 在页面中多次使用，可能不适合当作判定条件", LENGTH_LONG);
+                                } else if (type == 4) { // type 4
+                                    if (idMap.getOrDefault(finalTempId, 0) > 1)
+                                        sendToast(viewToast, "此 id 在页面不止一次使用，可能无法正确判断应当点击哪一个", LENGTH_LONG);
                                 } else {
-                                    triggerValue.setText(resources.getString(R.string.strange_error));
+                                    if (idMap.getOrDefault(finalTempId, 0) > 2)
+                                        sendToast(viewToast, "此 id 在页面不止一次使用，可能造成误判", LENGTH_LONG);
                                 }
-
-                                v1.setBackgroundResource(R.drawable.node_focus);
                             } else {
-                                v1.setBackgroundResource(R.drawable.node);
+                                triggerValue.setText(resources.getString(R.string.strange_error));
                             }
-                        } catch (Exception e1) {
-                            le("ERR: " + e1.getLocalizedMessage());
+
+                            v1.setBackgroundResource(R.drawable.node_focus);
+                        } else {
+                            v1.setBackgroundResource(R.drawable.node);
                         }
                     });
                     layoutOverlayOutline.addView(img, params);
-                    if (e.getText() != null || e.getContentDescription() != null)
-                        l("Select: " + e + " child: " + e.getChildCount());
                 }
                 outlineParams.alpha = 0.5f;
                 outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;

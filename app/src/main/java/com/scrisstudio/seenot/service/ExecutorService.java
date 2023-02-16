@@ -2,7 +2,6 @@ package com.scrisstudio.seenot.service;
 
 import static com.scrisstudio.seenot.SeeNot.l;
 import static com.scrisstudio.seenot.SeeNot.le;
-import static com.scrisstudio.seenot.service.FloatingOperatorUtil.changeForDarkMode;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
@@ -11,7 +10,6 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -70,8 +68,6 @@ public class ExecutorService extends AccessibilityService {
             foregroundPackageName = "com.scrisstudio.seenot", lastTimePackageName = "",
             lastTimeClassName = "com.scrisstudio.seenot.MainActivity",
             packageName = "";
-    private ComponentName lastTimeComponentName = new ComponentName("com.scrisstudio.seenot",
-            "com.scrisstudio.seenot.MainActivity"), cName = lastTimeComponentName;
     private ActivityInfo lastTimeActivityInfo = new ActivityInfo();
     public static SharedPreferences sharedPreferences;
     public static NotificationManager normalNotificationManager;
@@ -89,7 +85,7 @@ public class ExecutorService extends AccessibilityService {
     private final Gson gson = new Gson();
     private PackageManager packageManager;
     private long lastContentChangedTime = 0, lastHandlerRunningTime = 0,
-            contentChangeTime = 0, handlerTime = 0;
+            contentChangeTime = 0, handlerTime = 0, lastPackageChangeTime = 0;
     private static PeriodicWorkRequest stayRequest;
     private static Random random = new Random();
     public static Resources resources;
@@ -306,7 +302,7 @@ public class ExecutorService extends AccessibilityService {
         }
 
         try {
-            FloatingOperatorUtil.addView(100, 0, 200, 100, 0);
+            FloatingOperatorUtil.addView(100, 100, 1, 4, 0);
         } catch (Exception e) {
             le("Failed adding floating, ERR: " + e.getLocalizedMessage());
             Toast.makeText(SeeNot.getAppContext(), R.string.floating_start_failed, Toast.LENGTH_LONG).show();
@@ -347,7 +343,13 @@ public class ExecutorService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
+        if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
+            foregroundPackageName = event.getPackageName().toString();
+        } else if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_CLICKED) {
+            foregroundPackageName = event.getPackageName().toString();
+            foregroundClassName = event.getClassName().toString();
+            l("Window state change: " + foregroundPackageName + "/" + foregroundClassName + " " + foregroundWindowId);
+        } else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
             if (isServiceRunning) {
                 if (!foregroundPackageName.equals(lastTimePackageName)) {
                     lastTimePackageName = foregroundPackageName;
@@ -369,7 +371,6 @@ public class ExecutorService extends AccessibilityService {
                             }
                         }
                     }
-                    FloatingOperatorUtil.updateText(cName + " " + currentFilters.size(), 0);
                     le("Current filters changed, " + currentFilters);
                 }
 
@@ -413,36 +414,8 @@ public class ExecutorService extends AccessibilityService {
                 foregroundPackageName = event.getPackageName().toString();
                 foregroundClassName = event.getClassName().toString();
                 foregroundWindowId = event.getWindowId();
-                if (hasRealActivity(new ComponentName(foregroundPackageName, foregroundClassName))) {
-                    cName = new ComponentName(foregroundPackageName, foregroundClassName);
-                    FloatingOperatorUtil.updateText(cName + " " + currentFilters.size(), 0);
-                    l("Window state change: " + cName + " " + foregroundWindowId);
-                } else {
-                    l("Bad Component: " + cName + " Event get package: " + event.getPackageName());
-                }
+                l("Window state change: " + foregroundPackageName + "/" + foregroundClassName + " " + foregroundWindowId);
             }
-        }
-
-        if ((isNightMode(SeeNot.getAppContext()) && !isDarkModeOn) || (!isNightMode(SeeNot.getAppContext()) && isDarkModeOn)) {
-            isDarkModeOn = !isDarkModeOn;
-            changeForDarkMode(0);
-        }
-    }
-
-
-    private boolean hasRealActivity(ComponentName componentName) {
-        if (componentName.equals(lastTimeComponentName))
-            return lastTimeActivityInfo != null;
-        else {
-            lastTimeComponentName = componentName;
-            lastTimeActivityInfo = null;
-            try {
-                lastTimeActivityInfo = packageManager.getActivityInfo(componentName, 0);
-            } catch (Exception e) {
-                lastTimeComponentName = new ComponentName("", ""); // clear bad component name
-                //le("ActivityInfo not found. " + e.getMessage());
-            }
-            return lastTimeActivityInfo != null;
         }
     }
 
