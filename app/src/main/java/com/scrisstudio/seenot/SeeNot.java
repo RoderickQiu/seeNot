@@ -72,6 +72,8 @@ public class SeeNot extends Application {
         }
     }
 
+    public static int typesCnt = 7;
+
     public static int getFilterTypeName(int type) {
         switch (type) {
             case 0:

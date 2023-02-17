@@ -346,9 +346,11 @@ public class ExecutorService extends AccessibilityService {
         if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
             foregroundPackageName = event.getPackageName().toString();
         } else if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_CLICKED) {
-            foregroundPackageName = event.getPackageName().toString();
-            foregroundClassName = event.getClassName().toString();
-            l("Window state change: " + foregroundPackageName + "/" + foregroundClassName + " " + foregroundWindowId);
+            if (isCapableClass(event.getClassName().toString())) {
+                foregroundPackageName = event.getPackageName().toString();
+                foregroundClassName = event.getClassName().toString();
+                l("Window state change: " + foregroundPackageName + "/" + foregroundClassName + " " + foregroundWindowId);
+            }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
             if (isServiceRunning) {
                 if (!foregroundPackageName.equals(lastTimePackageName)) {

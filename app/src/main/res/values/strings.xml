@@ -23,7 +23,7 @@
     <string name="service_not_running">部分权限未给予或程序服务不在运行，请现在打开。</string>
     <string name="permission_grant">获取权限</string>
     <string name="permission_overlay">悬浮窗权限</string>
-    <string name="permission_overlay_msg">用于服务保活，降低被杀几率。</string>
+    <string name="permission_overlay_msg">设置规则时，悬浮窗是必须的。</string>
     <string name="granted">已获取</string>
     <string name="ungranted">未得到</string>
     <string name="grant_now">获取</string>

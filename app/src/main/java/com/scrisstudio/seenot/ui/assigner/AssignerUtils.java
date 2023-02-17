@@ -11,6 +11,7 @@ import static com.scrisstudio.seenot.service.ExecutorService.inflater;
 import static com.scrisstudio.seenot.service.ExecutorService.mService;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -19,7 +20,6 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
-import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -29,7 +29,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -318,24 +317,31 @@ public class AssignerUtils {
                 return;
             }
 
-            AtomicInteger type = new AtomicInteger();
-            String packageName = ExecutorService.foregroundPackageName;
-            PopupMenu popup = new PopupMenu(SeeNot.getAppContext(), viewCustomization);
-            MenuInflater menuInflater = new MenuInflater(SeeNot.getAppContext());
-            menuInflater.inflate(R.menu.menu_filter_type, popup.getMenu());
-            popup.setOnMenuItemClickListener(item -> {
-                if (item.getItemId() == R.id.type_0) type.set(0);
-                else if (item.getItemId() == R.id.type_1) type.set(1);
-                else if (item.getItemId() == R.id.type_2) type.set(2);
-                else if (item.getItemId() == R.id.type_3) type.set(3);
-                else if (item.getItemId() == R.id.type_4) type.set(4);
-                else if (item.getItemId() == R.id.type_5) type.set(5);
-                else if (item.getItemId() == R.id.type_6) type.set(6);
-                else if (item.getItemId() == R.id.type_7) type.set(7);
+            final AlertDialog alertDialogTypeSelect;
+            final String[] items = {
+                    resources.getString(SeeNot.getFilterTypeName(0)),
+                    resources.getString(SeeNot.getFilterTypeName(1)),
+                    resources.getString(SeeNot.getFilterTypeName(2)),
+                    resources.getString(SeeNot.getFilterTypeName(3)),
+                    resources.getString(SeeNot.getFilterTypeName(4)),
+                    resources.getString(SeeNot.getFilterTypeName(5)),
+                    resources.getString(SeeNot.getFilterTypeName(6)),
+                    resources.getString(SeeNot.getFilterTypeName(7))
+            };
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(mService);
+            alertBuilder.setTitle("选择规则类型");
+            alertBuilder.setItems(items, (dialogInterface, i) -> {
+                int type = 0;
+                for (int j = 0; j <= SeeNot.typesCnt; j++) {
+                    if (resources.getString(SeeNot.getFilterTypeName(j)).equals(items[i])) {
+                        type = j;
+                        break;
+                    }
+                }
 
                 ArrayList<FilterInfo> filterInfos = current.getFilter();
 
-                FilterInfo filter = new FilterInfo(true, type.get(), current.getId(), "---", "---");
+                FilterInfo filter = new FilterInfo(true, type, current.getId(), "---", "---");
                 filterInfos.add(filter);
                 current.setFilter(filterInfos);
                 current.setFilterLength(current.getFilterLength() + 1);
@@ -343,11 +349,13 @@ public class AssignerUtils {
 
                 adapter.dataChange(filterInfos);
 
-                return false;
+                dialogInterface.dismiss();
             });
+            alertDialogTypeSelect = alertBuilder.create();
+            alertDialogTypeSelect.getWindow().setType(WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY);
 
-            if (current.getFor().equals(packageName))
-                popup.show();
+            if (current.getFor().equals(foregroundPackageName))
+                alertDialogTypeSelect.show();
             else {
                 sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
                         + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点击一下程序界面重新获取", LENGTH_LONG);
