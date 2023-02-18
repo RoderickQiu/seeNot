@@ -344,9 +344,10 @@ public class ExecutorService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
-            foregroundPackageName = event.getPackageName().toString();
+            if (!event.getPackageName().toString().contains("seenot"))
+                foregroundPackageName = event.getPackageName().toString();
         } else if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_CLICKED) {
-            if (isCapableClass(event.getClassName().toString())) {
+            if (isCapableClass(event.getClassName().toString()) && !event.getPackageName().toString().contains("seenot")) {
                 foregroundPackageName = event.getPackageName().toString();
                 foregroundClassName = event.getClassName().toString();
                 l("Window state change: " + foregroundPackageName + "/" + foregroundClassName + " " + foregroundWindowId);
