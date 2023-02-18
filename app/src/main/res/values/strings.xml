@@ -132,4 +132,8 @@
     <string name="filter_swipe_text_tip">点击\"选择\"打开文字选择模式，并选择一遇到就上滑返回的文字，并点击\"确认\"保存。注：少数应用的部分文字无法解析。</string>
     <string name="filter_swipe_id_tip">点击\"选择\"打开元素选择模式，并选择一遇到就上滑返回的相关元素以获取其元素 ID，并点击\"确认\"保存。</string>
     <string name="set_rule_timed">设置定时</string>
+    <string name="closure_title">临时还是永久关闭</string>
+    <string name="closure_temp">临时关闭</string>
+    <string name="closure_forever">永久关闭</string>
+    <string name="set_closure_reopen_time">设置多少小时后重新开启</string>
 </resources>

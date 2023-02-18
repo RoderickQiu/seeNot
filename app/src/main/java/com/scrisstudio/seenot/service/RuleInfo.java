@@ -10,8 +10,9 @@ public class RuleInfo {
     private String ruleForName;
     private ArrayList<FilterInfo> filter;
     private int filterLength;
+    private long reopenTime;
 
-    public RuleInfo(int id, boolean status, String title, String ruleFor, String ruleForName, ArrayList<FilterInfo> filter, int filterLength) {
+    public RuleInfo(int id, boolean status, String title, String ruleFor, String ruleForName, ArrayList<FilterInfo> filter, int filterLength, long reopenTime) {
         this.id = id;
         this.status = status;
         this.title = title;
@@ -19,6 +20,7 @@ public class RuleInfo {
         this.ruleForName = ruleForName;
         this.filter = filter;
         this.filterLength = filterLength;
+        this.reopenTime = reopenTime;
     }
 
     public int getId() {
@@ -71,5 +73,13 @@ public class RuleInfo {
 
     public void setFilterLength(int filterLength) {
         this.filterLength = filterLength;
+    }
+
+    public long getReopenTime() {
+        return reopenTime;
+    }
+
+    public void setReopenTime(long reopenTime) {
+        this.reopenTime = reopenTime;
     }
 }

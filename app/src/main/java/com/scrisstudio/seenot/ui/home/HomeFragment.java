@@ -98,14 +98,14 @@ public class HomeFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        RuleInfoAdapter adapter = new RuleInfoAdapter(getActivity(), rules, timed, sharedPreferences);
+        RuleInfoAdapter adapter = new RuleInfoAdapter(getActivity(), getFragmentManager(), rules, timed, sharedPreferences);
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new RuleInfoCardDecoration());
 
         binding.fab.show();
         binding.fab.setOnClickListener(v -> {
             SharedPreferences.Editor edit = sharedPreferences.edit();
-            rules.add(new RuleInfo(sharedPreferences.getInt("rule-id-max", 0), true, "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0));
+            rules.add(new RuleInfo(sharedPreferences.getInt("rule-id-max", 0), true, "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0, 0));
             edit.putString("rules", gson.toJson(rules));
             edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
             edit.apply();

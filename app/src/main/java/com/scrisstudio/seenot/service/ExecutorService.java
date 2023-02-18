@@ -359,6 +359,9 @@ public class ExecutorService extends AccessibilityService {
                     int effect;
                     for (int i = 0; i < rulesList.size(); i++) {
                         if (rulesList.get(i).getFor().equals(lastTimePackageName) && !foregroundPackageName.equals("")) {
+                            if (!rulesList.get(i).getStatus() && (rulesList.get(i).getReopenTime() != 0
+                                    && rulesList.get(i).getReopenTime() < new Date().getTime()))
+                                rulesList.get(i).setStatus(true);
                             effect = isTimedHavingEffect(rulesList.get(i).getId(), false);
                             le("EFFECT" + effect);
                             if (!rulesList.get(i).getStatus()) {

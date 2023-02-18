@@ -87,7 +87,7 @@ public class RuleTimedAdapter extends RecyclerView.Adapter<RuleTimedAdapter.MyVi
         for (RuleInfo i : ruleList) {
             if (i.getId() == in) return i;
         }
-        return new RuleInfo(0, true, "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0);
+        return new RuleInfo(0, true, "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0, 0);
     }
 
     public static ArrayList<Integer> getRealScope(int scope) {

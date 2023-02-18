@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -26,9 +27,12 @@ import com.scrisstudio.seenot.service.RuleInfo;
 import com.scrisstudio.seenot.service.TimedInfo;
 import com.scrisstudio.seenot.ui.assigner.AssignerUtils;
 
+import java.lang.ref.WeakReference;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyViewHolder> {
 
@@ -37,12 +41,14 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
     private static List<RuleInfo> mList = null;
     private static List<TimedInfo> timedList = null;
     private final SharedPreferences sharedPreferences;
+    private static FragmentManager fragmentManager;
     private final Context context;
     private final Gson gson;
 
-    public RuleInfoAdapter(Context context, List<RuleInfo> mList,
+    public RuleInfoAdapter(Context context, FragmentManager fragmentManager, List<RuleInfo> mList,
                            List<TimedInfo> timedList, SharedPreferences sharedPreferences) {
         this.context = context;
+        this.fragmentManager = fragmentManager;
         this.sharedPreferences = sharedPreferences;
         this.timedList = timedList;
         this.mList = mList;
@@ -103,19 +109,32 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
             } else
                 holder.ruleTimed.setVisibility(View.GONE);
 
+            AtomicBoolean hasOpenedDialog = new AtomicBoolean(false);
+            if (!rule.getStatus() && (rule.getReopenTime() != 0 && rule.getReopenTime() < new Date().getTime()))
+                rule.setStatus(true);
             holder.statusSwitch.setChecked(rule.getStatus());
-            holder.statusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                SharedPreferences.Editor edit = sharedPreferences.edit();
+            holder.statusSwitch.setOnClickListener((buttonView) -> {
+                if (holder.statusSwitch.isChecked() || hasOpenedDialog.get()) {
+                    SharedPreferences.Editor edit = sharedPreferences.edit();
 
-                rule.setStatus(isChecked);
-                mList.set(position, rule);
-                edit.putString("rules", gson.toJson(mList));
-                edit.apply();
-
-                ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
-                AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
-                MainActivity.setSharedPreferences(sharedPreferences);
-                callBack.onEdit(position, mList, MODE_EXECUTOR);
+                    rule.setStatus(holder.statusSwitch.isChecked());
+                    rule.setReopenTime(0);
+                    mList.set(position, rule);
+                    edit.putString("rules", gson.toJson(mList));
+                    edit.apply();
+                    ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
+                    AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
+                    MainActivity.setSharedPreferences(sharedPreferences);
+                    callBack.onEdit(position, mList, MODE_EXECUTOR);
+                } else {
+                    hasOpenedDialog.set(true);
+                    holder.statusSwitch.setChecked(true);
+                    WeakReference<SwitchMaterial> status = new WeakReference<>(holder.statusSwitch);
+                    ClosureDialogFragment.display(fragmentManager, position, status, sharedPreferences);
+                    ClosureDialogFragment.setOnSubmitListener(() -> {
+                        holder.statusSwitch.setChecked(false);
+                    });
+                }
             });
 
             holder.editButton.setOnClickListener(v -> {
@@ -167,7 +186,11 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
     @SuppressLint("NotifyDataSetChanged")
     public void dataChange(List<RuleInfo> l) {
         mList = l;
-        notifyDataSetChanged();
+        try {
+            notifyDataSetChanged();
+        } catch (Exception e) {
+            le("ERR: " + e.getLocalizedMessage());
+        }
     }
 
     @Override
