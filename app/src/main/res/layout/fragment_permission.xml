@@ -7,427 +7,433 @@
     tools:context=".ui.permission.PermissionFragment"
     android:background="?attr/colorOnSecondary">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="4dp"
-        android:orientation="vertical"
+        android:layout_marginVertical="4dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginVertical="8dp"
-            android:checkable="true"
-            android:clickable="true"
-            android:clipToPadding="false"
-            android:focusable="true"
-            app:cardBackgroundColor="?attr/colorOnPrimary"
-            app:cardElevation="3dp">
+            android:orientation="vertical">
 
-            <RelativeLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp">
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:checkable="true"
+                android:clickable="true"
+                android:clipToPadding="false"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorOnPrimary"
+                app:cardElevation="3dp">
 
-                <LinearLayout
-                    android:layout_width="200dp"
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="3dp"
-                    android:minWidth="150dp"
-                    android:orientation="vertical"
-                    tools:ignore="RelativeOverlap">
+                    android:orientation="horizontal"
+                    android:padding="20dp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="200dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="3dp"
+                        android:minWidth="150dp"
+                        android:orientation="vertical"
+                        tools:ignore="RelativeOverlap">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/permission_notification"
+                                android:textAppearance="?attr/textAppearanceHeadline6" />
+
+                            <TextView
+                                android:id="@+id/permission_notification_granted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/granted"
+                                android:textColor="@color/green"
+                                android:visibility="gone" />
+
+                            <TextView
+                                android:id="@+id/permission_notification_ungranted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/ungranted"
+                                android:textColor="@color/red"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/permission_notification"
-                            android:textAppearance="?attr/textAppearanceHeadline6" />
-
-                        <TextView
-                            android:id="@+id/permission_notification_granted"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/granted"
-                            android:textColor="@color/green"
-                            android:visibility="gone" />
-
-                        <TextView
-                            android:id="@+id/permission_notification_ungranted"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/ungranted"
-                            android:textColor="@color/red"
-                            android:visibility="gone" />
+                            android:text="@string/permission_notification_msg" />
 
                     </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/permission_notification"
+                        android:layout_width="66dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/permission_notification_msg" />
+                        android:layout_alignParentEnd="true"
+                        android:text="@string/grant_now"
+                        tools:ignore="RelativeOverlap" />
 
-                </LinearLayout>
+                </RelativeLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/permission_notification"
-                    android:layout_width="66dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="@string/grant_now"
-                    tools:ignore="RelativeOverlap" />
+            </com.google.android.material.card.MaterialCardView>
 
-            </RelativeLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginVertical="8dp"
-            android:checkable="true"
-            android:clickable="true"
-            android:clipToPadding="false"
-            android:focusable="true"
-            app:cardBackgroundColor="?attr/colorOnPrimary"
-            app:cardElevation="3dp">
-
-            <RelativeLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp">
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:checkable="true"
+                android:clickable="true"
+                android:clipToPadding="false"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorOnPrimary"
+                app:cardElevation="3dp">
 
-                <LinearLayout
-                    android:layout_width="200dp"
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="3dp"
-                    android:minWidth="150dp"
-                    android:orientation="vertical"
-                    tools:ignore="RelativeOverlap">
+                    android:orientation="horizontal"
+                    android:padding="20dp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="200dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="3dp"
+                        android:minWidth="150dp"
+                        android:orientation="vertical"
+                        tools:ignore="RelativeOverlap">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/permission_overlay"
+                                android:textAppearance="?attr/textAppearanceHeadline6" />
+
+                            <TextView
+                                android:id="@+id/permission_overlay_granted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/granted"
+                                android:textColor="@color/green"
+                                android:visibility="gone" />
+
+                            <TextView
+                                android:id="@+id/permission_overlay_ungranted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/ungranted"
+                                android:textColor="@color/red"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/permission_overlay"
-                            android:textAppearance="?attr/textAppearanceHeadline6" />
-
-                        <TextView
-                            android:id="@+id/permission_overlay_granted"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/granted"
-                            android:textColor="@color/green"
-                            android:visibility="gone" />
-
-                        <TextView
-                            android:id="@+id/permission_overlay_ungranted"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/ungranted"
-                            android:textColor="@color/red"
-                            android:visibility="gone" />
+                            android:text="@string/permission_overlay_msg" />
 
                     </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/permission_overlay"
+                        android:layout_width="66dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/permission_overlay_msg" />
+                        android:layout_alignParentEnd="true"
+                        android:text="@string/grant_now"
+                        tools:ignore="RelativeOverlap" />
 
-                </LinearLayout>
+                </RelativeLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/permission_overlay"
-                    android:layout_width="66dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="@string/grant_now"
-                    tools:ignore="RelativeOverlap" />
+            </com.google.android.material.card.MaterialCardView>
 
-            </RelativeLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginVertical="8dp"
-            android:checkable="true"
-            android:clickable="true"
-            android:clipToPadding="false"
-            android:focusable="true"
-            app:cardBackgroundColor="?attr/colorOnPrimary"
-            app:cardElevation="3dp">
-
-            <RelativeLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp">
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:checkable="true"
+                android:clickable="true"
+                android:clipToPadding="false"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorOnPrimary"
+                app:cardElevation="3dp">
 
-                <LinearLayout
-                    android:layout_width="200dp"
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="3dp"
-                    android:minWidth="150dp"
-                    android:orientation="vertical"
-                    tools:ignore="RelativeOverlap">
+                    android:orientation="horizontal"
+                    android:padding="20dp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="200dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="3dp"
+                        android:minWidth="150dp"
+                        android:orientation="vertical"
+                        tools:ignore="RelativeOverlap">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/permission_accessibility"
+                                android:textAppearance="?attr/textAppearanceHeadline6" />
+
+                            <TextView
+                                android:id="@+id/permission_accessibility_granted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/granted"
+                                android:textColor="@color/green"
+                                android:visibility="gone" />
+
+                            <TextView
+                                android:id="@+id/permission_accessibility_ungranted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/ungranted"
+                                android:textColor="@color/red"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/permission_accessibility"
-                            android:textAppearance="?attr/textAppearanceHeadline6" />
+                            android:text="@string/permission_accessibility_msg" />
 
                         <TextView
-                            android:id="@+id/permission_accessibility_granted"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/granted"
-                            android:textColor="@color/green"
-                            android:visibility="gone" />
-
-                        <TextView
-                            android:id="@+id/permission_accessibility_ungranted"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/ungranted"
-                            android:textColor="@color/red"
-                            android:visibility="gone" />
+                            android:text="@string/now_open_service"
+                            android:textAppearance="?attr/textAppearanceCaption"
+                            android:textStyle="italic" />
 
                     </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/permission_accessibility"
+                        android:layout_width="66dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/permission_accessibility_msg" />
+                        android:layout_alignParentEnd="true"
+                        android:text="@string/grant_now"
+                        tools:ignore="RelativeOverlap" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/now_open_service"
-                        android:textAppearance="?attr/textAppearanceCaption"
-                        android:textStyle="italic" />
+                </RelativeLayout>
 
-                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/permission_accessibility"
-                    android:layout_width="66dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="@string/grant_now"
-                    tools:ignore="RelativeOverlap" />
-
-            </RelativeLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginVertical="8dp"
-            android:checkable="true"
-            android:clickable="true"
-            android:clipToPadding="false"
-            android:focusable="true"
-            app:cardBackgroundColor="?attr/colorOnPrimary"
-            app:cardElevation="3dp">
-
-            <RelativeLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp">
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:checkable="true"
+                android:clickable="true"
+                android:clipToPadding="false"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorOnPrimary"
+                app:cardElevation="3dp">
 
-                <LinearLayout
-                    android:layout_width="200dp"
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="3dp"
-                    android:minWidth="150dp"
-                    android:orientation="vertical"
-                    tools:ignore="RelativeOverlap">
+                    android:orientation="horizontal"
+                    android:padding="20dp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="200dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="3dp"
+                        android:minWidth="150dp"
+                        android:orientation="vertical"
+                        tools:ignore="RelativeOverlap">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/permission_battery"
+                                android:textAppearance="?attr/textAppearanceHeadline6" />
+
+                            <TextView
+                                android:id="@+id/permission_battery_granted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/granted"
+                                android:textColor="@color/green"
+                                android:visibility="gone" />
+
+                            <TextView
+                                android:id="@+id/permission_battery_ungranted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:ellipsize="end"
+                                android:includeFontPadding="false"
+                                android:singleLine="true"
+                                android:text="@string/ungranted"
+                                android:textColor="@color/red"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/permission_battery"
-                            android:textAppearance="?attr/textAppearanceHeadline6" />
-
-                        <TextView
-                            android:id="@+id/permission_battery_granted"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/granted"
-                            android:textColor="@color/green"
-                            android:visibility="gone" />
-
-                        <TextView
-                            android:id="@+id/permission_battery_ungranted"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:ellipsize="end"
-                            android:includeFontPadding="false"
-                            android:singleLine="true"
-                            android:text="@string/ungranted"
-                            android:textColor="@color/red"
-                            android:visibility="gone" />
+                            android:text="@string/permission_battery_msg" />
 
                     </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/permission_battery"
+                        android:layout_width="66dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/permission_battery_msg" />
+                        android:layout_alignParentEnd="true"
+                        android:text="@string/grant_now"
+                        tools:ignore="RelativeOverlap" />
 
-                </LinearLayout>
+                </RelativeLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/permission_battery"
-                    android:layout_width="66dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="@string/grant_now"
-                    tools:ignore="RelativeOverlap" />
+            </com.google.android.material.card.MaterialCardView>
 
-            </RelativeLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginVertical="8dp"
-            android:checkable="true"
-            android:clickable="true"
-            android:clipToPadding="false"
-            android:focusable="true"
-            app:cardBackgroundColor="?attr/colorOnPrimary"
-            app:cardElevation="3dp">
-
-            <RelativeLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp">
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:checkable="true"
+                android:clickable="true"
+                android:clipToPadding="false"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorOnPrimary"
+                app:cardElevation="3dp">
 
-                <LinearLayout
-                    android:layout_width="200dp"
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="3dp"
-                    android:minWidth="150dp"
-                    android:orientation="vertical"
-                    tools:ignore="RelativeOverlap">
+                    android:orientation="horizontal"
+                    android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="200dp"
                         android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:includeFontPadding="false"
-                        android:singleLine="true"
-                        android:text="@string/permission_background"
-                        android:textAppearance="?attr/textAppearanceHeadline6" />
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="3dp"
+                        android:minWidth="150dp"
+                        android:orientation="vertical"
+                        tools:ignore="RelativeOverlap">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:includeFontPadding="false"
+                            android:singleLine="true"
+                            android:text="@string/permission_background"
+                            android:textAppearance="?attr/textAppearanceHeadline6" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:includeFontPadding="false"
+                            android:text="@string/dunno_granted"
+                            android:textColor="@color/orange_900" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/permission_background_msg" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/permission_background"
+                        android:layout_width="78dp"
                         android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:includeFontPadding="false"
-                        android:text="@string/dunno_granted"
-                        android:textColor="@color/orange_900" />
+                        android:layout_alignParentEnd="true"
+                        android:text="@string/how_to_grant"
+                        tools:ignore="RelativeOverlap" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/permission_background_msg" />
+                </RelativeLayout>
 
-                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/permission_background"
-                    android:layout_width="78dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="@string/how_to_grant"
-                    tools:ignore="RelativeOverlap" />
+        </LinearLayout>
 
-            </RelativeLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-    </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

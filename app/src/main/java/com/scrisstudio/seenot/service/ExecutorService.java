@@ -302,7 +302,7 @@ public class ExecutorService extends AccessibilityService {
         }
 
         try {
-            FloatingOperatorUtil.addView(100, 100, 1, 4, 0);
+            FloatingOperatorUtil.addView(0, 0, 1, 2, 0);
         } catch (Exception e) {
             le("Failed adding floating, ERR: " + e.getLocalizedMessage());
             Toast.makeText(SeeNot.getAppContext(), R.string.floating_start_failed, Toast.LENGTH_LONG).show();
