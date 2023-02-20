@@ -39,7 +39,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:gravity="center_vertical" />
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
+            <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/filter_status_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -107,7 +107,7 @@
 
             <Button
                 android:id="@+id/set_filter_refresh"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/ic_baseline_refresh_24"
@@ -135,7 +135,7 @@
 
                 <Button
                     android:id="@+id/set_filter_target_select_exit"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/ic_baseline_exit_24"
@@ -148,7 +148,7 @@
 
                 <Button
                     android:id="@+id/set_filter_target_select"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/ic_baseline_edit_24"
@@ -161,7 +161,7 @@
 
                 <Button
                     android:id="@+id/set_filter_target_done"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/ic_baseline_done_24"
@@ -178,7 +178,7 @@
 
         <TextView
             android:id="@+id/assigner_set_tip"
-            style="@style/TextAppearance.MaterialComponents.Caption"
+            style="@style/TextAppearance.Material3.BodySmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 

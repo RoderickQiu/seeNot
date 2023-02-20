@@ -9,7 +9,8 @@
         <SwitchPreferenceCompat
             app:key="master-switch"
             app:title="@string/master_switch"
-            app:defaultValue="true" />
+            app:defaultValue="true"
+            android:widgetLayout="@layout/preference_material_switch" />
 
         <Preference
             app:key="export"

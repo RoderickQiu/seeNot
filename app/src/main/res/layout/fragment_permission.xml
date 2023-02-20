@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.permission.PermissionFragment"
-    android:background="?attr/colorOnSecondary">
+    tools:context=".ui.permission.PermissionFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -27,8 +26,8 @@
                 android:clickable="true"
                 android:clipToPadding="false"
                 android:focusable="true"
-                app:cardBackgroundColor="?attr/colorOnPrimary"
-                app:cardElevation="3dp">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardElevation="1dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -94,7 +93,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/permission_notification"
-                        android:layout_width="66dp"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:text="@string/grant_now"
@@ -113,8 +112,8 @@
                 android:clickable="true"
                 android:clipToPadding="false"
                 android:focusable="true"
-                app:cardBackgroundColor="?attr/colorOnPrimary"
-                app:cardElevation="3dp">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardElevation="1dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -180,7 +179,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/permission_overlay"
-                        android:layout_width="66dp"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:text="@string/grant_now"
@@ -199,8 +198,8 @@
                 android:clickable="true"
                 android:clipToPadding="false"
                 android:focusable="true"
-                app:cardBackgroundColor="?attr/colorOnPrimary"
-                app:cardElevation="3dp">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardElevation="1dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -273,7 +272,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/permission_accessibility"
-                        android:layout_width="66dp"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:text="@string/grant_now"
@@ -292,8 +291,8 @@
                 android:clickable="true"
                 android:clipToPadding="false"
                 android:focusable="true"
-                app:cardBackgroundColor="?attr/colorOnPrimary"
-                app:cardElevation="3dp">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardElevation="1dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -359,7 +358,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/permission_battery"
-                        android:layout_width="66dp"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:text="@string/grant_now"
@@ -378,8 +377,8 @@
                 android:clickable="true"
                 android:clipToPadding="false"
                 android:focusable="true"
-                app:cardBackgroundColor="?attr/colorOnPrimary"
-                app:cardElevation="3dp">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardElevation="1dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -422,7 +421,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/permission_background"
-                        android:layout_width="78dp"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:text="@string/how_to_grant"

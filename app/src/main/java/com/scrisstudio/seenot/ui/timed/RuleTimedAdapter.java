@@ -16,7 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.gson.Gson;
 import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
@@ -220,7 +220,7 @@ public class RuleTimedAdapter extends RecyclerView.Adapter<RuleTimedAdapter.MyVi
         TextView ruleId, ruleTitle, ruleDescription;
         ImageButton editButton, deleteButton;
         Button deleteRecheckButton;
-        SwitchMaterial statusSwitch;
+        MaterialSwitch statusSwitch;
 
         public MyViewHolder(View view) {
             super(view);

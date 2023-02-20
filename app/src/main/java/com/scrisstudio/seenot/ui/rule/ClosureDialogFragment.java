@@ -5,6 +5,8 @@ import static com.scrisstudio.seenot.service.ExecutorService.MODE_EXECUTOR;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Selection;
@@ -22,7 +24,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -49,14 +51,14 @@ public class ClosureDialogFragment extends DialogFragment {
     private static ArrayList<RuleInfo> rules;
     private static ArrayList<TimedInfo> timed;
     private static final Gson gson = new Gson();
-    private static WeakReference<SwitchMaterial> statusSwitch;
+    private static WeakReference<MaterialSwitch> statusSwitch;
     private Button okButton;
     private ChipGroup typeChips;
     private TextInputLayout reopenTime;
     private RelativeLayout closureView;
 
     public static void display(FragmentManager fragmentManager, int pos,
-                               WeakReference<SwitchMaterial> status, SharedPreferences sp) {
+                               WeakReference<MaterialSwitch> status, SharedPreferences sp) {
         ClosureDialogFragment dialog = new ClosureDialogFragment();
         position = pos;
         sharedPreferences = sp;
@@ -89,8 +91,9 @@ public class ClosureDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        Objects.requireNonNull(getDialog()).getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         View view = null;
-        view = inflater.inflate(R.layout.dialog_closure, container, false);//TODO make closure fragment
+        view = inflater.inflate(R.layout.dialog_closure, container, false);
         if (view != null) {
             okButton = view.findViewById(R.id.closure_ok_button);
             typeChips = view.findViewById(R.id.closure_type_sel);

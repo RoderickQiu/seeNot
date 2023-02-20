@@ -1,0 +1,22 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item>
+    <shape>
+      <solid android:color="?attr/colorSurface" />
+      <corners
+          android:bottomLeftRadius="@dimen/material3_corner"
+          android:bottomRightRadius="@dimen/material3_corner"
+          android:topLeftRadius="@dimen/material3_corner"
+          android:topRightRadius="@dimen/material3_corner" />
+    </shape>
+  </item>
+  <item>
+    <shape>
+      <solid android:color="?attr/colorSurface" />
+      <corners
+          android:bottomLeftRadius="@dimen/material3_corner"
+          android:bottomRightRadius="@dimen/material3_corner"
+          android:topLeftRadius="@dimen/material3_corner"
+          android:topRightRadius="@dimen/material3_corner" />
+    </shape>
+  </item>
+</layer-list>

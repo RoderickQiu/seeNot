@@ -36,6 +36,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private final String password = "seenot";
 
     private final SharedPreferences.OnSharedPreferenceChangeListener listener = (sharedPreferences, key) -> {
+        //TODO Material Switch
         if (Objects.equals(key, "master-switch")) {
             ExecutorService.isServiceRunning = sharedPreferences.getBoolean(key, true);
         } else if (Objects.equals(key, "import")) {
@@ -96,6 +97,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         setPreferencesFromResource(R.xml.preference, rootKey);
+        requireActivity().setTheme(R.style.Theme_SeeNot);
 
         Preference timedSettings = findPreference("timed-settings");
         if (timedSettings != null) {
@@ -133,7 +135,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             });
         }
 
-        // make it looks like a password
+        // make it looks like a password TODO M3
         EditTextPreference numberPreference = findPreference("password");
         if (numberPreference != null)
             numberPreference.setOnBindEditTextListener(editText -> editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));

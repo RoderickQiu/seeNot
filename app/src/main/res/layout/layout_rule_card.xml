@@ -14,8 +14,7 @@
         android:clipToPadding="false"
         android:focusable="true"
         android:theme="@style/Theme.SeeNot"
-        app:cardBackgroundColor="?attr/colorOnPrimary"
-        app:cardElevation="3dp">
+        app:cardElevation="1dp">
 
         <TextView
             android:id="@+id/rule_id"
@@ -102,7 +101,7 @@
                         android:gravity="center_vertical|end"
                         android:layout_marginStart="8dp">
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/rule_status_switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

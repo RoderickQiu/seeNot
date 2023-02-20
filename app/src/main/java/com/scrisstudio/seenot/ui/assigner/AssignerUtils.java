@@ -11,7 +11,6 @@ import static com.scrisstudio.seenot.service.ExecutorService.inflater;
 import static com.scrisstudio.seenot.service.ExecutorService.mService;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -27,15 +26,18 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -84,6 +86,8 @@ public class AssignerUtils {
 
     @SuppressLint("ClickableViewAccessibility")
     public static void initAssigner(int modeId, int position, int filterId) {
+        mService.setTheme(R.style.Theme_SeeNot); // fix theme problem
+
         windowManager = (WindowManager) mService.getSystemService(WINDOW_SERVICE);
         sharedPreferences = ExecutorService.sharedPreferences;
         AssignerUtils.position = position;
@@ -178,7 +182,7 @@ public class AssignerUtils {
         FilterInfo filter = current.getFilter().get(filterId);
         ((TextView) viewCustomization.findViewById(R.id.filter_set_type)).setText(SeeNot.getFilterTypeName(filter.getType()));
 
-        final SwitchMaterial filterSwitch = viewCustomization.findViewById(R.id.filter_status_switch);
+        final MaterialSwitch filterSwitch = viewCustomization.findViewById(R.id.filter_status_switch);
         filterSwitch.setChecked(filter.getStatus());
         filterSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             filter.setStatus(isChecked);
@@ -328,7 +332,7 @@ public class AssignerUtils {
                     resources.getString(SeeNot.getFilterTypeName(6)),
                     resources.getString(SeeNot.getFilterTypeName(7))
             };
-            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(mService);
+            MaterialAlertDialogBuilder alertBuilder = new MaterialAlertDialogBuilder(mService);
             alertBuilder.setTitle("选择规则类型");
             alertBuilder.setItems(items, (dialogInterface, i) -> {
                 int type = 0;
@@ -498,11 +502,11 @@ public class AssignerUtils {
         customizationParams.format = PixelFormat.TRANSPARENT;
         customizationParams.gravity = Gravity.START | Gravity.TOP;
         customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-        customizationParams.width = width;
+        customizationParams.width = width - 60;
         customizationParams.height = 800;
         customizationParams.x = (metrics.widthPixels - customizationParams.width) / 2;
         customizationParams.y = height - customizationParams.height - 500;
-        customizationParams.alpha = 0.75f;
+        customizationParams.alpha = 0.84f;
         customizationParams.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING;
 
         outlineParams = new WindowManager.LayoutParams();
@@ -528,8 +532,14 @@ public class AssignerUtils {
     }
 
     private static void initQuit(View viewCustomization, View viewTarget) {
-        final LinearLayout btQuit = viewCustomization.findViewById(R.id.button_quit);
-        btQuit.setOnClickListener(v -> {
+        final TextView btQuitText = viewCustomization.findViewById(R.id.button_quit_text);
+        final ImageButton btQuitImg = viewCustomization.findViewById(R.id.button_quit_img);
+        btQuitText.setOnClickListener(v -> {
+            windowManager.removeViewImmediate(viewCustomization);
+            windowManager.removeViewImmediate(viewTarget);
+            ruleSave(MODE_EXECUTOR);
+        });
+        btQuitImg.setOnClickListener(v -> {
             windowManager.removeViewImmediate(viewCustomization);
             windowManager.removeViewImmediate(viewTarget);
             ruleSave(MODE_EXECUTOR);

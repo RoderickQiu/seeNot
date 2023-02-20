@@ -8,7 +8,7 @@
     android:layout_marginEnd="5dp"
     android:gravity="top"
     android:orientation="vertical"
-    android:paddingTop="0dp"
+    android:paddingTop="20dp"
     android:paddingBottom="20dp">
 
     <LinearLayout
@@ -35,13 +35,12 @@
                 android:textSize="18sp" />
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:id="@+id/rule_name"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:inputType="textShortMessage"
                 app:placeholderText="@string/rule_name_placeholder"
-                app:boxBackgroundMode="filled"
-                app:boxBackgroundColor="#E5BC18"
                 app:boxStrokeColor="@color/gray_700">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -91,7 +90,7 @@
 
             <Button
                 android:id="@+id/rule_for_refresh"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -108,7 +107,7 @@
 
         <TextView
             android:id="@+id/assigner_pre_tip"
-            style="@style/TextAppearance.MaterialComponents.Caption"
+            style="@style/TextAppearance.Material3.BodySmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 

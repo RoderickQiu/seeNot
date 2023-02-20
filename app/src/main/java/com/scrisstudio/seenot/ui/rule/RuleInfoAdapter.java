@@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.gson.Gson;
 import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
@@ -129,7 +129,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
                 } else {
                     hasOpenedDialog.set(true);
                     holder.statusSwitch.setChecked(true);
-                    WeakReference<SwitchMaterial> status = new WeakReference<>(holder.statusSwitch);
+                    WeakReference<MaterialSwitch> status = new WeakReference<>(holder.statusSwitch);
                     ClosureDialogFragment.display(fragmentManager, position, status, sharedPreferences);
                     ClosureDialogFragment.setOnSubmitListener(() -> {
                         holder.statusSwitch.setChecked(false);
@@ -206,7 +206,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
         TextView ruleId, ruleTitle, ruleFor, ruleTimed;
         ImageButton editButton, deleteButton;
         Button deleteRecheckButton;
-        SwitchMaterial statusSwitch;
+        MaterialSwitch statusSwitch;
 
         public MyViewHolder(View view) {
             super(view);
