@@ -108,6 +108,14 @@ public class MainActivity extends AppCompatActivity {
         Intent serviceIntent = new Intent(this, ExecutorService.class);
         startService(serviceIntent);
 
+        try {
+            Settings.Secure.putString(getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.seenot/.service.ExecutorService");
+            Settings.Secure.putString(getContentResolver(),
+                    Settings.Secure.ACCESSIBILITY_ENABLED, "1");
+        } catch (Exception ignored) {
+        }
+
         isNotificationEnabled = getSystemService(NotificationManager.class).areNotificationsEnabled();
         isOverlayEnabled = Settings.canDrawOverlays(this);
         isBatteryOptimIgnored = ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName());
@@ -119,30 +127,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        try {
-            Settings.Secure.putString(getContentResolver(),
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "com.scrisstudio.seenot/.service.ExecutorService");
-            Settings.Secure.putString(getContentResolver(),
-                    Settings.Secure.ACCESSIBILITY_ENABLED, "1");
-        } catch (Exception ignored) {
-        }
-
-        // master switch check
-        if (!sharedPreferences.getBoolean("master-switch", true)) {
-            Intent intent = new Intent("banner_channel");
-            intent.putExtra("banner_message", resources.getString(R.string.function_closed));
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        }
-        // permission check
-        if (!(isAccessibilitySettingsOn(SeeNot.getAppContext()) && Settings.canDrawOverlays(SeeNot.getAppContext()) &&
-                getSystemService(NotificationManager.class).areNotificationsEnabled() &&
-                ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()))) {
-            Intent intent = new Intent("banner_channel");
-            intent.putExtra("banner_message", resources.getString(R.string.service_not_running));
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        }
-
-        setSupportActionBar(binding.appBarMain.toolbar);
+        setSupportActionBar(binding.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -154,9 +139,10 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.toString().contains("Home")) {
-                binding.appBarMain.toolbar.setTitle(R.string.app_full_name);
+                binding.toolbar.setTitle(R.string.app_full_name);
+                checkIfBannerNecessary(getResources(), PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext()));
             }
-            if (SeeNot.shouldNavigateTo == 0 && ((lastTimeDestination.contains("Permission") && (destination.toString().contains("Home") || destination.toString().contains("Permission"))) || (lastTimeDestination.contains("Settings") && (destination.toString().contains("Home") || destination.toString().contains("Settings"))))) {
+            if (SeeNot.shouldNavigateTo == 0 && ((lastTimeDestination.contains("Permission") && (destination.toString().contains("Home") || destination.toString().contains("Permission"))) || (lastTimeDestination.contains("Settings") && (destination.toString().contains("Home") || destination.toString().contains("Settings"))) || (lastTimeDestination.contains("About") && (destination.toString().contains("Home"))))) {
                 finish();
                 Intent intent = new Intent(MainActivity.this, MainActivity.class);
                 intent.putExtra("password", "success");
@@ -169,6 +155,8 @@ public class MainActivity extends AppCompatActivity {
             navController.navigate(SeeNot.shouldNavigateTo);
             SeeNot.shouldNavigateTo = 0;
         }
+
+        checkIfBannerNecessary(getResources(), PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext()));
 
         // password
         if (savedInstanceState == null) {
@@ -196,6 +184,21 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             le("Password init failed with message: " + e);
+        }
+    }
+
+    public void checkIfBannerNecessary(Resources resources, SharedPreferences sharedPreferences) {
+        // permission check
+        if (!(isAccessibilitySettingsOn(SeeNot.getAppContext()) && Settings.canDrawOverlays(SeeNot.getAppContext()) &&
+                getSystemService(NotificationManager.class).areNotificationsEnabled() &&
+                ((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName()))) {
+            Intent intent = new Intent("banner_channel");
+            intent.putExtra("banner_message", resources.getString(R.string.service_not_running));
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        } else if (!sharedPreferences.getBoolean("master-switch", true)) {// master switch check
+            Intent intent = new Intent("banner_channel");
+            intent.putExtra("banner_message", resources.getString(R.string.function_closed));
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
     }
 

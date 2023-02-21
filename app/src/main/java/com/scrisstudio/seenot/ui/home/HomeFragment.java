@@ -121,7 +121,7 @@ public class HomeFragment extends Fragment {
         banner.setLeftButtonListener(banner1 -> banner.dismiss());
         banner.setRightButtonListener(banner1 -> banner.dismiss());
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(bannerMessageReceiver,
+        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(bannerMessageReceiver,
                 new IntentFilter("banner_channel"));
 
         AssignerUtils.setOnQuitListener((position, list, mode) -> {
@@ -155,7 +155,7 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         try {
-            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(bannerMessageReceiver);
+            LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(bannerMessageReceiver);
         } catch (Exception ignored) {
         }
         binding = null;

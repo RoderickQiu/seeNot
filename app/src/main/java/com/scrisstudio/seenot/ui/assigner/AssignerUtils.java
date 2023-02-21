@@ -116,7 +116,6 @@ public class AssignerUtils {
             windowManager.addView(viewTarget, outlineParams);
             windowManager.addView(viewCustomization, customizationParams);
         } catch (Exception e) {
-            le(e.getLocalizedMessage());
             try {
                 windowManager.removeViewImmediate(viewTarget);
                 windowManager.removeViewImmediate(viewCustomization);
@@ -204,6 +203,7 @@ public class AssignerUtils {
         layoutTextFindForm.setVisibility((filter.getType() >= 2 && filter.getType() <= 7)
                 ? View.VISIBLE : View.GONE);
 
+        triggerValue.setVisibility(View.VISIBLE);
         if (triggerValueMaxWidth == 0) triggerValueMaxWidth = triggerValue.getMaxWidth();
         triggerValue.setMaxWidth((filter.getType() == 2 || filter.getType() == 5 || filter.getType() == 6) ? (int) (triggerValueMaxWidth * 0.6) : triggerValueMaxWidth);
 
@@ -212,7 +212,7 @@ public class AssignerUtils {
         btSave.setOnClickListener(v -> {
             if (!foregroundPackageName.equals(current.getFor()) && !foregroundPackageName.equals("com.scrisstudio.seenot")) {
                 sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                        + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点击一下程序界面重新获取", LENGTH_LONG);
+                        + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点一下程序界面或滑动列表，然后重新获取", LENGTH_LONG);
                 return;
             }
             String param = triggerValue.getText().toString();
@@ -253,12 +253,14 @@ public class AssignerUtils {
     private static void refreshSet(FilterInfo filter, View viewCustomization, View viewToast, int refreshMode) {
         if (!foregroundPackageName.equals(current.getFor()) && refreshMode == 1 && !foregroundPackageName.equals("com.scrisstudio.seenot")) {
             sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                    + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点击一下程序界面重新获取", LENGTH_LONG);
+                    + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点一下程序界面或滑动列表，然后重新获取", LENGTH_LONG);
             return;
         }
 
         String triggerValue = "", triggerLabel = resources.getString(R.string.filter_trigger), tip = "";
         viewCustomization.findViewById(R.id.filter_set).setVisibility(View.VISIBLE);
+        viewCustomization.findViewById(R.id.set_filter_trigger_value).setVisibility(View.VISIBLE);
+        viewCustomization.findViewById(R.id.set_filter_trigger_label).setVisibility(View.VISIBLE);
         switch (filter.getType()) {
             case 0:
                 viewCustomization.findViewById(R.id.filter_set).setVisibility(View.GONE);
@@ -362,7 +364,7 @@ public class AssignerUtils {
                 alertDialogTypeSelect.show();
             else {
                 sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                        + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点击一下程序界面重新获取", LENGTH_LONG);
+                        + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点一下程序界面或滑动列表，然后重新获取", LENGTH_LONG);
             }
         });
 
@@ -393,6 +395,7 @@ public class AssignerUtils {
             ruleSave(MODE_EXECUTOR);
         });
         if (current.getFor().equals("com.software.any")) {
+            viewCustomization.findViewById(R.id.rule_for_refresh).setVisibility(View.VISIBLE);
             viewCustomization.findViewById(R.id.rule_for_refresh).setOnClickListener(v -> ((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).setText(getAppRealName(ExecutorService.foregroundPackageName)));
             viewCustomization.findViewById(R.id.button_save_pre).setOnClickListener(v -> {
                 if (Objects.requireNonNull(((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).getText()).toString().equals(resources.getString(R.string.click_right_to_set)) || Objects.requireNonNull(((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).getText()).toString().equals("")) {
@@ -582,7 +585,7 @@ public class AssignerUtils {
     private static void toggleOutline(FrameLayout layoutOverlayOutline, View viewCustomization, View viewTarget, View viewToast) {
         if (!foregroundPackageName.equals(current.getFor())) {
             sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                    + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点击一下程序界面重新获取", LENGTH_LONG);
+                    + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点一下程序界面或滑动列表，然后重新获取", LENGTH_LONG);
             return;
         }
 
@@ -593,7 +596,9 @@ public class AssignerUtils {
                 btTargetSelectExit = viewCustomization.findViewById(R.id.set_filter_target_select_exit),
                 btTargetDone = viewCustomization.findViewById(R.id.set_filter_target_done);
 
-        if (outlineParams.alpha == 0) {//TODO everytime, not-this-app notif. shown badly
+        triggerValue.setVisibility(View.VISIBLE);
+
+        if (outlineParams.alpha == 0) {
             if (!ExecutorService.foregroundPackageName.equals(ExecutorService.currentHomePackage) &&
                     !ExecutorService.foregroundPackageName.equals("com.scrisstudio.seenot")) {
                 btTargetSelect.setVisibility(View.GONE);

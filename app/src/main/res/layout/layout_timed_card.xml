@@ -100,7 +100,7 @@
 
                         <ImageButton
                             android:id="@+id/edit_button"
-                            style="@style/Widget.MaterialComponents.Button"
+                            style="@style/Widget.Material3.Button"
                             android:layout_width="36dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="4dp"
@@ -110,7 +110,7 @@
 
                         <ImageButton
                             android:id="@+id/delete_button"
-                            style="@style/Widget.MaterialComponents.Button"
+                            style="@style/Widget.Material3.Button"
                             android:layout_width="36dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="6dp"
@@ -120,10 +120,11 @@
 
                         <Button
                             android:id="@+id/delete_button_recheck"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
-                            android:layout_width="78dp"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:layout_marginHorizontal="0dp"
+                            android:layout_width="60dp"
                             android:layout_height="wrap_content"
-                            android:backgroundTint="?attr/colorOnPrimary"
                             android:text="@string/delete_confirm"
                             android:visibility="gone" />
 

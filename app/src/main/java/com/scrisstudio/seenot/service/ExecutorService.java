@@ -273,7 +273,7 @@ public class ExecutorService extends AccessibilityService {
                 }
             } catch (Exception ignored) {
             }
-        }, 2000);
+        }, 3000);
 
         WorkManager.getInstance(this).cancelAllWorkByTag("stay-request");
     }
@@ -341,16 +341,23 @@ public class ExecutorService extends AccessibilityService {
         WorkManager.getInstance(SeeNot.getAppContext()).enqueueUniquePeriodicWork("stay", ExistingPeriodicWorkPolicy.REPLACE, stayRequest);
     }
 
+    private void alertWindowStateChange(String packageName, String className, int windowId) {
+        if (!foregroundClassName.equals(className) || !foregroundPackageName.equals(packageName))
+            l("Window state change: " + packageName + "/" + className + " " + windowId);
+    }
+
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
-            if (!event.getPackageName().toString().contains("seenot"))
+            if (!event.getPackageName().toString().contains("seenot")) {
+                alertWindowStateChange(event.getPackageName().toString(), foregroundClassName, foregroundWindowId);
                 foregroundPackageName = event.getPackageName().toString();
+            }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_CLICKED) {
             if (isCapableClass(event.getClassName().toString()) && !event.getPackageName().toString().contains("seenot")) {
+                alertWindowStateChange(event.getPackageName().toString(), event.getClassName().toString(), foregroundWindowId);
                 foregroundPackageName = event.getPackageName().toString();
                 foregroundClassName = event.getClassName().toString();
-                l("Window state change: " + foregroundPackageName + "/" + foregroundClassName + " " + foregroundWindowId);
             }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
             if (isServiceRunning) {
@@ -417,10 +424,10 @@ public class ExecutorService extends AccessibilityService {
             }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             if (isCapableClass(event.getClassName().toString())) {
+                alertWindowStateChange(event.getPackageName().toString(), event.getClassName().toString(), event.getWindowId());
                 foregroundPackageName = event.getPackageName().toString();
                 foregroundClassName = event.getClassName().toString();
                 foregroundWindowId = event.getWindowId();
-                l("Window state change: " + foregroundPackageName + "/" + foregroundClassName + " " + foregroundWindowId);
             }
         }
     }

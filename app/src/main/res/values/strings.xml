@@ -88,7 +88,7 @@
     <string name="copied_to_clipboard">已经复制到剪贴板</string>
     <string name="import_succeed">数据导入成功</string>
     <string name="import_failed">导入失败</string>
-    <string name="click_right_to_set">请点击右侧按钮设置</string>
+    <string name="click_right_to_set">点右侧按钮设置</string>
     <string name="click_to_apply">关闭窗口以应用</string>
     <string name="open_assigner_failed">打开设置面板失败，请检查无障碍服务是否已经打开</string>
     <string name="cannot_get_current_id">无法获取当前元素</string>
