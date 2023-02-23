@@ -87,7 +87,8 @@
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:text="@string/back_without_save"
-                android:textColor="@color/gray_800"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                android:drawableTint="?attr/colorOnPrimaryContainer"
                 tools:ignore="RtlHardcoded" />
 
             <Button
@@ -102,7 +103,8 @@
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:text="@string/set_mask_info"
-                android:textColor="@color/gray_800"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                android:drawableTint="?attr/colorOnPrimaryContainer"
                 tools:ignore="RtlHardcoded" />
 
             <Button
@@ -117,7 +119,8 @@
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:text="@string/set_rule_timed"
-                android:textColor="@color/gray_800"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                android:drawableTint="?attr/colorOnPrimaryContainer"
                 tools:ignore="RtlHardcoded" />
 
             <Button
@@ -133,8 +136,9 @@
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:text="@string/save"
-                android:textColor="@color/gray_800"
-                app:tint="@color/gray_800"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                app:tint="?attr/colorOnPrimaryContainer"
+                android:drawableTint="?attr/colorOnPrimaryContainer"
                 tools:ignore="RtlHardcoded"
                 android:visibility="gone" />
 
@@ -151,8 +155,9 @@
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:text="@string/continue_pre"
-                android:textColor="@color/gray_800"
-                app:tint="@color/gray_800"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                app:tint="?attr/colorOnPrimaryContainer"
+                android:drawableTint="?attr/colorOnPrimaryContainer"
                 tools:ignore="RtlHardcoded"
                 android:visibility="gone" />
 
@@ -164,12 +169,13 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="10dp"
                 android:drawableLeft="@drawable/ic_baseline_add_24"
+                android:drawableTint="?attr/colorOnPrimaryContainer"
                 android:drawablePadding="4dp"
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:text="@string/new_subrule"
-                android:textColor="@color/gray_800"
-                app:tint="@color/gray_800"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                app:tint="?attr/colorOnPrimaryContainer"
                 tools:ignore="RtlHardcoded" />
 
         </RelativeLayout>
@@ -194,7 +200,7 @@
                 android:paddingTop="18dp"
                 android:paddingBottom="1dp"
                 android:text="@string/press_here_move"
-                android:textColor="@color/gray_700"
+                android:textColor="?attr/colorOnPrimaryContainer"
                 android:textSize="14sp"
                 android:layout_centerVertical="true"
                 tools:ignore="RelativeOverlap" />
@@ -219,7 +225,7 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="25dp"
                     android:text="@string/click_to_apply"
-                    android:textColor="@color/gray_700"
+                    android:textColor="?attr/colorOnPrimaryContainer"
                     android:textSize="14sp"
                     tools:ignore="RelativeOverlap" />
 
@@ -233,7 +239,7 @@
                     android:backgroundTint="#00000000"
                     android:contentDescription="@string/exit"
                     android:src="@drawable/ic_baseline_close_21"
-                    app:tint="@color/gray_700" />
+                    app:tint="?attr/colorOnPrimaryContainer" />
 
             </LinearLayout>
 

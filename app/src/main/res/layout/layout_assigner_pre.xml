@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/rule_title_label"
                 android:textStyle="bold"
-                android:textColor="@color/black"
+                android:textColor="?attr/colorOnPrimaryContainer"
                 android:textSize="18sp" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textShortMessage"
                 app:placeholderText="@string/rule_name_placeholder"
-                app:boxStrokeColor="@color/gray_700">
+                app:boxStrokeColor="?attr/colorOnPrimaryContainer">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/rule_name_textfield"
@@ -75,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/rule_for_msg"
                     android:textStyle="bold"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnPrimaryContainer"
                     android:textSize="18sp" />
 
                 <TextView
@@ -83,7 +83,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
-                    android:textColor="@color/gray_800"
+                    android:textColor="?attr/colorOnPrimaryContainer"
                     android:textSize="18sp" />
 
             </LinearLayout>
@@ -100,7 +100,8 @@
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:text="@string/refresh"
-                android:textColor="@color/gray_800"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                android:drawableTint="?attr/colorOnPrimaryContainer"
                 tools:ignore="RtlHardcoded" />
 
         </RelativeLayout>
@@ -110,7 +111,6 @@
             style="@style/TextAppearance.Material3.BodySmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:layout_marginTop="6dp"
             android:text="@string/assigner_pre_tip" />
 

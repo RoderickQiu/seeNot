@@ -24,7 +24,7 @@
             android:text="---"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@color/gray_800" />
+            android:textColor="?attr/colorOnPrimaryContainer" />
 
         <TextView
             android:id="@+id/filter_value"
@@ -37,7 +37,7 @@
             android:singleLine="true"
             android:text="---"
             android:textSize="12sp"
-            android:textColor="@color/gray_700" />
+            android:textColor="?attr/colorOnPrimaryContainer" />
 
     </LinearLayout>
 
@@ -54,11 +54,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_outline_edit_18"
+            android:drawableTint="?attr/colorOnPrimaryContainer"
             android:drawablePadding="4dp"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:text="@string/settings"
-            android:textColor="@color/gray_800"
+            android:textColor="?attr/colorOnPrimaryContainer"
             android:textSize="12sp"
             tools:ignore="RelativeOverlap,RtlHardcoded" />
 
@@ -69,11 +70,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:drawableLeft="@drawable/ic_baseline_remove_circle_18"
+            android:drawableTint="?attr/colorOnPrimaryContainer"
             android:drawablePadding="4dp"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:text="@string/delete"
-            android:textColor="@color/gray_800"
+            android:textColor="?attr/colorOnPrimaryContainer"
             android:textSize="12sp"
             tools:ignore="RtlHardcoded" />
 
@@ -86,7 +88,7 @@
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:text="@string/delete_confirm"
-            android:textColor="@color/gray_800"
+            android:textColor="?attr/colorOnPrimaryContainer"
             android:textSize="12sp"
             android:visibility="gone" />
 

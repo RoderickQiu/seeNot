@@ -30,11 +30,14 @@
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_inversePrimary</item>
         <item name="android:statusBarColor">@color/md_theme_dark_background</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog.Monet
+        </item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog.Monet</item>
     </style>
 
     <style name="Theme.SeeNot.Foreground" parent="@style/TextAppearance.AppCompat.Small">
-        <item name="android:textColor">#181818</item>
+        <item name="android:textColor">#B2B2B2</item>
     </style>
 
 </resources>

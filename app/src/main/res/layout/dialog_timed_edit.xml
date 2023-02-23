@@ -55,10 +55,16 @@
                     android:id="@+id/rule_for_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:smsp_selectedItemListColor="#E5BC18"
+                    app:smsp_selectedItemListColor="?attr/colorPrimary"
+                    app:smsp_itemListColor="?attr/colorOnBackground"
                     app:smsp_isOutlined="true"
-                    app:smsp_outlinedBoxColor="#7D7667"
-                    app:smsp_hintColor="#7D7667"
+                    app:smsp_outlinedBoxColor="?attr/colorOutline"
+                    app:smsp_hintColor="?attr/colorOnSurfaceVariant"
+                    app:smsp_itemColor="?attr/colorOnSurface"
+                    app:smsp_itemSize="16dp"
+                    app:smsp_hintSize="12.3dp"
+                    app:smsp_arrowColor="?attr/colorOnSurface"
+                    app:smsp_searchHintColor="?attr/colorOnSurfaceVariant"
                     app:smsp_hint="设置对应的规则" />
 
                 <LinearLayout
