@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
+import androidx.preference.Preference;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
@@ -26,6 +27,7 @@ import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.service.RuleInfo;
 import com.scrisstudio.seenot.service.TimedInfo;
 import com.scrisstudio.seenot.ui.assigner.AssignerUtils;
+import com.scrisstudio.seenot.ui.settings.SettingsFragment;
 
 import java.lang.ref.WeakReference;
 import java.util.Date;
@@ -114,27 +116,30 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
                 rule.setStatus(true);
             holder.statusSwitch.setChecked(rule.getStatus());
             holder.statusSwitch.setOnClickListener((buttonView) -> {
-                if (holder.statusSwitch.isChecked() || hasOpenedDialog.get()) {
-                    SharedPreferences.Editor edit = sharedPreferences.edit();
+                if (holder.statusSwitch.isChecked()) hasOpenedDialog.set(false);
+                if (holder.statusSwitch.isChecked() || SettingsFragment.checkReservation(new Preference(context), context)) {
+                    if (holder.statusSwitch.isChecked() || hasOpenedDialog.get()) {
+                        SharedPreferences.Editor edit = sharedPreferences.edit();
 
-                    rule.setStatus(holder.statusSwitch.isChecked());
-                    rule.setReopenTime(0);
-                    mList.set(position, rule);
-                    edit.putString("rules", gson.toJson(mList));
-                    edit.apply();
-                    ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
-                    AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
-                    MainActivity.setSharedPreferences(sharedPreferences);
-                    callBack.onEdit(position, mList, MODE_EXECUTOR);
-                } else {
-                    hasOpenedDialog.set(true);
-                    holder.statusSwitch.setChecked(true);
-                    WeakReference<MaterialSwitch> status = new WeakReference<>(holder.statusSwitch);
-                    ClosureDialogFragment.display(fragmentManager, position, status, sharedPreferences);
-                    ClosureDialogFragment.setOnSubmitListener(() -> {
-                        holder.statusSwitch.setChecked(false);
-                    });
-                }
+                        rule.setStatus(holder.statusSwitch.isChecked());
+                        rule.setReopenTime(0);
+                        mList.set(position, rule);
+                        edit.putString("rules", gson.toJson(mList));
+                        edit.apply();
+                        ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
+                        AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
+                        MainActivity.setSharedPreferences(sharedPreferences);
+                        callBack.onEdit(position, mList, MODE_EXECUTOR);
+                    } else {
+                        hasOpenedDialog.set(true);
+                        holder.statusSwitch.setChecked(true);
+                        WeakReference<MaterialSwitch> status = new WeakReference<>(holder.statusSwitch);
+                        ClosureDialogFragment.display(fragmentManager, position, status, sharedPreferences);
+                        ClosureDialogFragment.setOnSubmitListener(() -> {
+                            holder.statusSwitch.setChecked(false);
+                        });
+                    }
+                } else holder.statusSwitch.setChecked(true);
             });
 
             holder.editButton.setOnClickListener(v -> {

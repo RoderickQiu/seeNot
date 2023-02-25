@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.preference.Preference;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
@@ -25,6 +26,7 @@ import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.service.RuleInfo;
 import com.scrisstudio.seenot.service.TimedInfo;
 import com.scrisstudio.seenot.ui.assigner.AssignerUtils;
+import com.scrisstudio.seenot.ui.settings.SettingsFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -144,18 +146,20 @@ public class RuleTimedAdapter extends RecyclerView.Adapter<RuleTimedAdapter.MyVi
 
             holder.statusSwitch.setChecked(rule.getStatus());
             holder.statusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                SharedPreferences.Editor edit = sharedPreferences.edit();
+                if (holder.statusSwitch.isChecked() || SettingsFragment.checkReservation(new Preference(context), context)) {
+                    SharedPreferences.Editor edit = sharedPreferences.edit();
 
-                rule.setStatus(isChecked);
-                rule.setFirstLaunchTime(new Date().getTime());
-                mList.set(position, rule);
-                edit.putString("timed", gson.toJson(mList));
-                edit.apply();
+                    rule.setStatus(isChecked);
+                    rule.setFirstLaunchTime(new Date().getTime());
+                    mList.set(position, rule);
+                    edit.putString("timed", gson.toJson(mList));
+                    edit.apply();
 
-                ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
-                AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
-                MainActivity.setSharedPreferences(sharedPreferences);
-                callBack.onEdit(position, mList, MODE_EXECUTOR);
+                    ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
+                    AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
+                    MainActivity.setSharedPreferences(sharedPreferences);
+                    callBack.onEdit(position, mList, MODE_EXECUTOR);
+                } else holder.statusSwitch.setChecked(true);
             });
 
             holder.deleteButton.setOnClickListener(v -> {

@@ -28,11 +28,15 @@
         app:key="advanced_settings"
         app:title="@string/settings_advanced">
 
-        <EditTextPreference
+        <Preference
             app:key="password"
             app:summary="@string/settings_password_tip"
-            app:title="@string/settings_password"
-            app:dialogMessage="@string/settings_password_dialog_msg" />
+            app:title="@string/settings_password" />
+
+        <Preference
+            app:key="reservation-lock"
+            app:summary="@string/reservation_lock_msg"
+            app:title="@string/reservation_lock" />
 
         <Preference
             app:key="timed-settings"

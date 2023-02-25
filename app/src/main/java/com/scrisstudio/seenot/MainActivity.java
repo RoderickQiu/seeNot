@@ -79,6 +79,17 @@ public class MainActivity extends AppCompatActivity {
         resources = getResources();
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext());
+        if (!sharedPreferences.contains("reservation-lock")) {
+            SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
+            ruleInitEditor.putString("reservation-lock", "0");
+            ruleInitEditor.apply();
+        }
+        if (!sharedPreferences.contains("rl-time") ||
+                new Date().getTime() - sharedPreferences.getLong("rl-time", new Date().getTime() - 1000000L) > 10 * 60000L) {
+            SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
+            ruleInitEditor.putLong("rl-time", new Date().getTime() + 1000000L);
+            ruleInitEditor.apply();
+        }
         if (!sharedPreferences.contains("rules")) {
             SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
             ruleInitEditor.putString("rules", gson.toJson(rulesList));

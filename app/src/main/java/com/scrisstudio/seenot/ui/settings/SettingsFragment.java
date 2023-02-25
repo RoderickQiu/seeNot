@@ -9,14 +9,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.InputType;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreferenceCompat;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scottyab.aescrypt.AESCrypt;
@@ -27,6 +28,7 @@ import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.service.ExecutorService;
 
 import java.security.GeneralSecurityException;
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
@@ -36,7 +38,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private final String password = "seenot";
 
     private final SharedPreferences.OnSharedPreferenceChangeListener listener = (sharedPreferences, key) -> {
-        //TODO Material Switch
         if (Objects.equals(key, "master-switch")) {
             ExecutorService.isServiceRunning = sharedPreferences.getBoolean(key, true);
         } else if (Objects.equals(key, "import")) {
@@ -92,12 +93,48 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 startActivity(intent);
             } else Toast.makeText(getContext(), R.string.import_failed, Toast.LENGTH_SHORT).show();
         }
+        MainActivity.setSharedPreferences(sharedPreferences);
     };
+
+    public static boolean checkReservation(Preference preference, Context context) {
+        boolean isSwitch = preference instanceof SwitchPreferenceCompat;
+        int reservationLockTime = Integer.parseInt(MainActivity.sharedPreferences.getString("reservation-lock", "0"));
+        if (reservationLockTime > 0 && (!isSwitch || !((SwitchPreferenceCompat) preference).isChecked())) {
+            long timeDelta = new Date().getTime() - MainActivity.sharedPreferences.getLong("rl-time", new Date().getTime());
+            if (timeDelta <= reservationLockTime * 60 * 1000L) {
+                if (isSwitch) ((SwitchPreferenceCompat) preference).setChecked(true);
+
+                new MaterialAlertDialogBuilder(context)
+                        .setTitle(R.string.reserved_title)
+                        .setMessage(R.string.reserved_msg)
+                        .setNegativeButton(R.string.cancel, null)
+                        .setPositiveButton(timeDelta > 0 ? ("预约还剩 " + (int) (Math.ceil((double) timeDelta / 60000f)) + " 分") :
+                                "现在预约", (dialogInterface, i) -> {
+                            if (timeDelta <= 0) {
+                                SharedPreferences.Editor ruleInitEditor = MainActivity.sharedPreferences.edit();
+                                ruleInitEditor.putLong("rl-time", new Date().getTime());
+                                ruleInitEditor.apply();
+                            }
+                        })
+                        .show();
+                return false;
+            }
+        }
+        return true;
+    }
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         setPreferencesFromResource(R.xml.preference, rootKey);
         requireActivity().setTheme(R.style.Theme_SeeNot);
+
+        Preference masterSwitch = findPreference("master-switch");
+        if (masterSwitch != null) {
+            masterSwitch.setOnPreferenceClickListener(preference -> {
+                checkReservation(masterSwitch, requireContext());
+                return false;
+            });
+        }
 
         Preference timedSettings = findPreference("timed-settings");
         if (timedSettings != null) {
@@ -135,10 +172,29 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             });
         }
 
-        // make it looks like a password TODO M3
-        EditTextPreference numberPreference = findPreference("password");
-        if (numberPreference != null)
-            numberPreference.setOnBindEditTextListener(editText -> editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
+        Preference passwordPreference = findPreference("password");
+        if (passwordPreference != null) {
+            passwordPreference.setOnPreferenceClickListener(preference -> {
+                if (checkReservation(preference, requireContext())) {
+                    PwdDialogFragment.display(getFragmentManager(), MainActivity.sharedPreferences);
+                    PwdDialogFragment.setOnSubmitListener(() -> {
+                    });
+                }
+                return false;
+            });
+        }
+
+        Preference reservationLockPreference = findPreference("reservation-lock");
+        if (reservationLockPreference != null) {
+            reservationLockPreference.setOnPreferenceClickListener(preference -> {
+                if (checkReservation(preference, requireContext())) {
+                    RLockDialogFragment.display(getFragmentManager(), MainActivity.sharedPreferences);
+                    RLockDialogFragment.setOnSubmitListener(() -> {
+                    });
+                }
+                return false;
+            });
+        }
     }
 
     @Override
