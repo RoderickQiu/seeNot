@@ -22,6 +22,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.seenot.MainActivity;
@@ -104,15 +105,35 @@ public class HomeFragment extends Fragment {
 
         binding.fab.show();
         binding.fab.setOnClickListener(v -> {
-            SharedPreferences.Editor edit = sharedPreferences.edit();
-            rules.add(new RuleInfo(sharedPreferences.getInt("rule-id-max", 0), true, "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0, 0));
-            edit.putString("rules", gson.toJson(rules));
-            edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
-            edit.apply();
-            ExecutorService.setServiceBasicInfo(sharedPreferences, 0);
-            AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
-            MainActivity.setSharedPreferences(sharedPreferences);
-            adapter.dataChange(rules);
+            CharSequence[] addList = {"新建规则", "导入规则"};
+            new MaterialAlertDialogBuilder(requireContext()).setTitle("选择模式")
+                    .setItems(addList, (dialogInterface, i) -> {
+                        if (i == 0) {
+                            SharedPreferences.Editor edit = sharedPreferences.edit();
+                            rules.add(new RuleInfo(sharedPreferences.getInt("rule-id-max", 0), true, "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0, 0));
+                            edit.putString("rules", gson.toJson(rules));
+                            edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
+                            edit.apply();
+                            ExecutorService.setServiceBasicInfo(sharedPreferences, 0);
+                            AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
+                            MainActivity.setSharedPreferences(sharedPreferences);
+                            adapter.dataChange(rules);
+                        } else {
+                            ImportDialogFragment.display(getFragmentManager(), sharedPreferences);
+                            ImportDialogFragment.setOnSubmitListener((rules) -> {
+                                SharedPreferences.Editor edit = sharedPreferences.edit();
+                                this.rules = rules;
+                                edit.putString("rules", gson.toJson(rules));
+                                edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
+                                edit.apply();
+                                ExecutorService.setServiceBasicInfo(sharedPreferences, 0);
+                                AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
+                                MainActivity.setSharedPreferences(sharedPreferences);
+                                adapter.dataChange(rules);
+                            });
+                        }
+                    })
+                    .create().show();
         });
 
         resources = MainActivity.resources;

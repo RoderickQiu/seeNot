@@ -83,8 +83,10 @@
     <string name="settings_general">基本设置</string>
     <string name="settings_export">数据备份</string>
     <string name="settings_export_tip">点此备份应用的全部设置和规则</string>
+    <string name="settings_export_single">单条规则备份导出</string>
+    <string name="settings_export_single_tip">点此导出你所想要备份或分享的单条规则</string>
     <string name="settings_import">数据导入</string>
-    <string name="settings_import_tip">点此导入应用数据</string>
+    <string name="settings_import_tip">点此导入应用全部数据并覆盖当前数据；导入单条规则请在首页点击"添加规则"</string>
     <string name="copied_to_clipboard">已经复制到剪贴板</string>
     <string name="import_succeed">数据导入成功</string>
     <string name="import_failed">导入失败</string>
@@ -145,4 +147,6 @@
     <string name="cancel">取消</string>
     <string name="start_reservation">现在预约</string>
     <string name="reservation_lock_text_hint">需提前预约的分钟数</string>
+    <string name="import_single_rule">导入单条规则</string>
+    <string name="import_single_dialog_msg">输入在设置界面导出的单条规则文本以导入单条不见君规则</string>
 </resources>

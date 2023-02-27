@@ -17,6 +17,11 @@
             app:summary="@string/settings_export_tip"
             app:title="@string/settings_export" />
 
+        <Preference
+            app:key="export-single"
+            app:summary="@string/settings_export_single_tip"
+            app:title="@string/settings_export_single" />
+
         <EditTextPreference
             app:key="import"
             app:summary="@string/settings_import_tip"

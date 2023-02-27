@@ -26,8 +26,10 @@ import com.scrisstudio.seenot.R;
 import com.scrisstudio.seenot.RuleTimedActivity;
 import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.service.ExecutorService;
+import com.scrisstudio.seenot.service.RuleInfo;
 
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +37,7 @@ import java.util.Objects;
 public class SettingsFragment extends PreferenceFragmentCompat {
 
     private final Gson gson = new Gson();
-    private final String password = "seenot";
+    public static final String password = "seenot";
 
     private final SharedPreferences.OnSharedPreferenceChangeListener listener = (sharedPreferences, key) -> {
         if (Objects.equals(key, "master-switch")) {
@@ -157,17 +159,48 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 String encryptedMsg = "";
                 try {
                     encryptedMsg = AESCrypt.encrypt(password, output);
+
+                    // copy to clipboard
+                    ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("copied", encryptedMsg);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(requireContext(), R.string.copied_to_clipboard, Toast.LENGTH_LONG).show();
                 } catch (GeneralSecurityException e) {
                     le(e.getLocalizedMessage());
+                    Toast.makeText(requireContext(), R.string.strange_error, Toast.LENGTH_LONG).show();
                 }
                 le("Output: " + encryptedMsg);
 
-                // copy to clipboard
-                ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("copied", encryptedMsg);
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(requireContext(), R.string.copied_to_clipboard, Toast.LENGTH_LONG).show();
+                return false;
+            });
+        }
 
+        Preference preferenceSingleExport = findPreference("export-single");
+        if (preferenceSingleExport != null) {
+            preferenceSingleExport.setOnPreferenceClickListener(preference -> {
+                ArrayList<RuleInfo> rulesList = gson.fromJson(MainActivity.sharedPreferences.getString("rules", "{}"), new TypeToken<ArrayList<RuleInfo>>() {
+                }.getType());
+                ArrayList<CharSequence> ruleNames = new ArrayList<>();
+                for (RuleInfo i : rulesList)
+                    ruleNames.add(i.getTitle() + " (" + i.getForName() + ")");
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("选择导出哪一条规则").
+                        setItems(ruleNames.toArray(new CharSequence[0]), (dialogInterface, i) -> {
+                            String output = gson.toJson(rulesList.get(i)), encryptedMsg = "";
+                            try {
+                                encryptedMsg = AESCrypt.encrypt(password, output);
+                                // copy to clipboard
+                                ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                                ClipData clip = ClipData.newPlainText("copied", encryptedMsg);
+                                clipboard.setPrimaryClip(clip);
+                                Toast.makeText(requireContext(), R.string.copied_to_clipboard, Toast.LENGTH_LONG).show();
+                            } catch (GeneralSecurityException e) {
+                                le(e.getLocalizedMessage());
+                                Toast.makeText(requireContext(), R.string.strange_error, Toast.LENGTH_LONG).show();
+                            }
+                            le("Output: " + encryptedMsg + ", origin:" + output);
+
+                        }).create().show();
                 return false;
             });
         }

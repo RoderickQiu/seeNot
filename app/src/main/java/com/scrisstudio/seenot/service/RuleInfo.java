@@ -3,7 +3,7 @@ package com.scrisstudio.seenot.service;
 import java.util.ArrayList;
 
 public class RuleInfo {
-    private final int id;
+    private int id;
     private boolean status;
     private String title;
     private String ruleFor;
@@ -21,6 +21,10 @@ public class RuleInfo {
         this.filter = filter;
         this.filterLength = filterLength;
         this.reopenTime = reopenTime;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {
