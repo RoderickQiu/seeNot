@@ -1,6 +1,7 @@
 package com.scrisstudio.seenot.ui.assigner;
 
 import static android.content.Context.WINDOW_SERVICE;
+import static com.scrisstudio.seenot.SeeNot.getAppContext;
 import static com.scrisstudio.seenot.SeeNot.l;
 import static com.scrisstudio.seenot.SeeNot.le;
 import static com.scrisstudio.seenot.service.ExecutorService.MODE_ASSIGNER;
@@ -31,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -124,7 +126,11 @@ public class AssignerUtils {
                 windowManager.addView(viewCustomization, customizationParams);
             } catch (Exception e1) {
                 le(e1.getLocalizedMessage());
-                sendToast(viewToast, resources.getString(R.string.open_assigner_failed), LENGTH_LONG);
+                try {
+                    sendToast(viewToast, resources.getString(R.string.open_assigner_failed), LENGTH_LONG);
+                } catch (Exception e2) {
+                    Toast.makeText(getAppContext(), resources.getString(R.string.open_assigner_failed), Toast.LENGTH_SHORT).show();
+                }
             }
         }
 

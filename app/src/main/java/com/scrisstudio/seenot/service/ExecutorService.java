@@ -360,6 +360,7 @@ public class ExecutorService extends AccessibilityService {
                 foregroundClassName = event.getClassName().toString();
             }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
+            if (event.getContentChangeTypes() == 0) return;
             if (isServiceRunning) {
                 if (!foregroundPackageName.equals(lastTimePackageName)) {
                     lastTimePackageName = foregroundPackageName;
@@ -414,8 +415,12 @@ public class ExecutorService extends AccessibilityService {
                                     }
                                     break;
                                 default: // 2, 3, 4, 5
-                                    if (!tempFilter.getParam1().equals("---"))
-                                        wordFinder(getRootInActiveWindow(), true, tempFilter.getParam1(), tempFilter.getType());
+                                    if (!tempFilter.getParam1().equals("---")) {
+                                        for (int j = 0; j < getWindows().size(); j++) {
+                                            if (getWindows().get(j).isActive())
+                                                wordFinder(getWindows().get(j).getRoot(), true, tempFilter.getParam1(), tempFilter.getType());
+                                        }
+                                    }
                                     break;
                             }
                         }
@@ -461,15 +466,22 @@ public class ExecutorService extends AccessibilityService {
         if (!isServiceRunning || root == null) return;
 
         ArrayList<AccessibilityNodeInfo> queue = new ArrayList<>();
+        ArrayList<Integer> gradientQueue = new ArrayList<>();
         queue.add(root);
+        gradientQueue.add(0);
 
         String temp = null;
         while (queue.size() > 0) {
             AccessibilityNodeInfo info = queue.remove(0);
-            if (!isOnlyVisible || info.isVisibleToUser()) {
+            int gradient = gradientQueue.remove(0);
+            if ((!isOnlyVisible || info.isVisibleToUser()) || gradient > 0) {
                 if (info.getChildCount() != 0) {
                     for (int i = 0; i < info.getChildCount(); i++) {
                         if (info.getChild(i) != null) {
+                            if (info.toString().contains("WebView") || gradient > 0)
+                                gradientQueue.add(gradient == 0 ? 5 : gradient - 1);
+                            else
+                                gradientQueue.add(0);
                             queue.add(info.getChild(i));
                         }
                     }
@@ -481,6 +493,9 @@ public class ExecutorService extends AccessibilityService {
                         if (info.getText() != null) temp = info.getText().toString();
                         else if (info.getContentDescription() != null)
                             temp = info.getContentDescription().toString();
+                        else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                            temp = (String) info.getTooltipText();
+                        }
 
                         if (temp != null) {
                             if (temp.equals(word)) {
@@ -526,6 +541,9 @@ public class ExecutorService extends AccessibilityService {
                         if (info.getText() != null) temp = info.getText().toString();
                         else if (info.getContentDescription() != null)
                             temp = info.getContentDescription().toString();
+                        else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                            temp = (String) info.getTooltipText();
+                        }
 
                         if (temp != null) {
                             if (temp.equals(word)) {
@@ -541,6 +559,9 @@ public class ExecutorService extends AccessibilityService {
                         if (info.getText() != null) temp = info.getText().toString();
                         else if (info.getContentDescription() != null)
                             temp = info.getContentDescription().toString();
+                        else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                            temp = (String) info.getTooltipText();
+                        }
 
                         if (temp != null) {
                             if (temp.equals(word)) {
