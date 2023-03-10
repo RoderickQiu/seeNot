@@ -44,6 +44,8 @@ import com.scrisstudio.seenot.R;
 import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.ui.timed.RuleTimedAdapter;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -54,6 +56,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import kotlin.jvm.internal.Intrinsics;
 
 public class ExecutorService extends AccessibilityService {
     public static final String TAG = "SeeNot-AccessibilityService";
@@ -91,6 +95,7 @@ public class ExecutorService extends AccessibilityService {
     public static Resources resources;
     public static ArrayList<View> mFloatingViews = new ArrayList<>();
     public static WindowManager mWindowManager;
+    public static Process logCatProcess;
 
     public static boolean isStart() {
         return mService != null;
@@ -339,6 +344,29 @@ public class ExecutorService extends AccessibilityService {
                 .build();
 
         WorkManager.getInstance(SeeNot.getAppContext()).enqueueUniquePeriodicWork("stay", ExistingPeriodicWorkPolicy.REPLACE, stayRequest);
+
+        // make log persist
+        File logDir = this.getExternalFilesDir(null);
+        if (logDir != null) {
+            Intrinsics.checkNotNullExpressionValue(logDir, "publicAppDirectory");
+            File logDirectory = new File(logDir.getAbsolutePath() + "/logs");
+            if (!logDirectory.exists()) {
+                if (!logDirectory.mkdir())
+                    le("Log mkdir failed. ");
+            }
+
+            File logFile = new File(logDirectory, "logcat_" + System.currentTimeMillis() + ".txt");
+
+            try {
+                Runtime.getRuntime().exec("logcat -c");
+                logCatProcess = Runtime.getRuntime().exec("logcat -f " + logFile +
+                        " \"SeeNot-AccessibilityService:I SeeNot-Dialog:I *:W\"");
+            } catch (IOException e) {
+                le("Write to log file failed, ERR: " + e.getLocalizedMessage());
+            }
+
+            l("Logging persist service started, file: " + logFile.getAbsolutePath());
+        }
     }
 
     private void alertWindowStateChange(String packageName, String className, int windowId) {
