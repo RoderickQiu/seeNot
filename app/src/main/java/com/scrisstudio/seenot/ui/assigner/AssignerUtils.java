@@ -623,6 +623,13 @@ public class AssignerUtils {
                 ArrayList<AccessibilityNodeInfo> nodeList = new ArrayList<>();
                 HashMap<String, Integer> idMap = new HashMap<>();
                 findAllNode(root, nodeList);
+                nodeList.sort((a, b1) -> {
+                    Rect rectA = new Rect();
+                    Rect rectB = new Rect();
+                    a.getBoundsInScreen(rectA);
+                    b1.getBoundsInScreen(rectB);
+                    return rectB.width() * rectB.height() - rectA.width() * rectA.height();
+                });
                 for (final AccessibilityNodeInfo e : nodeList) {
                     // if cannot get, don't even allow click it
                     String tempId = e.getViewIdResourceName();
