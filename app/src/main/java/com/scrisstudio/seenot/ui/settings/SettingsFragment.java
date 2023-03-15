@@ -228,6 +228,20 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 return false;
             });
         }
+
+        Preference exportLogPreference = findPreference("export-log");
+        if (exportLogPreference != null) {
+            exportLogPreference.setOnPreferenceClickListener(preference -> {
+                new MaterialAlertDialogBuilder(requireContext()).
+                        setTitle(R.string.export_log).
+                        setMessage("请到系统文件应用中前往 " + requireContext().getExternalFilesDir(null)
+                                + "/logs 以手动导出所需要的日志。").
+                        setPositiveButton(R.string.ok, (dialogInterface, i) -> {
+                        }).
+                        create().show();
+                return false;
+            });
+        }
     }
 
     @Override

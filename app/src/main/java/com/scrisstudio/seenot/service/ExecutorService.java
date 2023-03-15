@@ -456,6 +456,7 @@ public class ExecutorService extends AccessibilityService {
                 }
             }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            if (event.getClassName() == null) return;//fix crash
             if (isCapableClass(event.getClassName().toString())) {
                 alertWindowStateChange(event.getPackageName().toString(), event.getClassName().toString(), event.getWindowId());
                 foregroundPackageName = event.getPackageName().toString();

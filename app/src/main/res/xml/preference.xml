@@ -48,6 +48,10 @@
             app:summary="@string/timed_settings_tip"
             app:title="@string/timed_settings" />
 
+        <Preference
+            app:key="export-log"
+            app:title="@string/export_log" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

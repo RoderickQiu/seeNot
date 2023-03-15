@@ -149,4 +149,5 @@
     <string name="reservation_lock_text_hint">需提前预约的分钟数</string>
     <string name="import_single_rule">导入单条规则</string>
     <string name="import_single_dialog_msg">输入在设置界面导出的单条规则文本以导入单条不见君规则</string>
+    <string name="export_log">获取服务日志</string>
 </resources>
