@@ -377,11 +377,13 @@ public class ExecutorService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
+            if (event.getPackageName() == null) return;//fix crash
             if (!event.getPackageName().toString().contains("seenot")) {
                 alertWindowStateChange(event.getPackageName().toString(), foregroundClassName, foregroundWindowId);
                 foregroundPackageName = event.getPackageName().toString();
             }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_CLICKED) {
+            if (event.getClassName() == null || event.getPackageName() == null) return;//fix crash
             if (isCapableClass(event.getClassName().toString()) && !event.getPackageName().toString().contains("seenot")) {
                 alertWindowStateChange(event.getPackageName().toString(), event.getClassName().toString(), foregroundWindowId);
                 foregroundPackageName = event.getPackageName().toString();
@@ -456,7 +458,7 @@ public class ExecutorService extends AccessibilityService {
                 }
             }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-            if (event.getClassName() == null) return;//fix crash
+            if (event.getClassName() == null || event.getPackageName() == null) return;//fix crash
             if (isCapableClass(event.getClassName().toString())) {
                 alertWindowStateChange(event.getPackageName().toString(), event.getClassName().toString(), event.getWindowId());
                 foregroundPackageName = event.getPackageName().toString();
