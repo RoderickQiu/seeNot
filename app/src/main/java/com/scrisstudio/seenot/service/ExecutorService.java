@@ -2,6 +2,7 @@ package com.scrisstudio.seenot.service;
 
 import static com.scrisstudio.seenot.SeeNot.l;
 import static com.scrisstudio.seenot.SeeNot.le;
+import static com.scrisstudio.seenot.SeeNot.typesCnt;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
@@ -96,6 +97,7 @@ public class ExecutorService extends AccessibilityService {
     public static ArrayList<View> mFloatingViews = new ArrayList<>();
     public static WindowManager mWindowManager;
     public static Process logCatProcess;
+    private static String[] filterTypeNames = new String[typesCnt];
 
     public static boolean isStart() {
         return mService != null;
@@ -319,6 +321,9 @@ public class ExecutorService extends AccessibilityService {
             l("Service invoking...");
 
             resources = MainActivity.resources;
+            for (int i = 0; i < typesCnt; i++) {
+                filterTypeNames[i] = resources.getString(SeeNot.getFilterTypeName(i));
+            }
 
             if (sharedPreferences != null) {
                 setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
@@ -432,12 +437,13 @@ public class ExecutorService extends AccessibilityService {
                             switch (tempFilter.getType()) {
                                 case 0:
                                     performGlobalAction(GLOBAL_ACTION_HOME);
-                                    Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType())), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
+                                            , Toast.LENGTH_SHORT).show();
                                     break;
                                 case 1:
                                     if (foregroundClassName.equals(tempFilter.getParam1())) {
                                         if (performGlobalAction(GLOBAL_ACTION_BACK)) {
-                                            Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType())) + "：\"" + tempFilter.getParam1().replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()] + "：\"" + tempFilter.getParam1().replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
                                         } else {
                                             performGlobalAction(GLOBAL_ACTION_HOME);
                                             Toast.makeText(SeeNot.getAppContext(), "返回上一页失败，直接退出程序：\"" + tempFilter.getParam1().replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
@@ -505,6 +511,7 @@ public class ExecutorService extends AccessibilityService {
         while (queue.size() > 0) {
             AccessibilityNodeInfo info = queue.remove(0);
             int gradient = gradientQueue.remove(0);
+            if (info == null) continue;
             if ((!isOnlyVisible || info.isVisibleToUser()) || gradient > 0) {
                 if (info.getChildCount() != 0) {
                     for (int i = 0; i < info.getChildCount(); i++) {
@@ -531,7 +538,7 @@ public class ExecutorService extends AccessibilityService {
                         if (temp != null) {
                             if (temp.equals(word)) {
                                 if (performGlobalAction(GLOBAL_ACTION_BACK)) {
-                                    Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
+                                    Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
                                             + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
                                 } else {
                                     performGlobalAction(GLOBAL_ACTION_HOME);
@@ -546,7 +553,7 @@ public class ExecutorService extends AccessibilityService {
                         if (temp != null) {
                             if (temp.equals(word)) {
                                 if (performGlobalAction(GLOBAL_ACTION_BACK)) {
-                                    Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
+                                    Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
                                             + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
                                 } else {
                                     performGlobalAction(GLOBAL_ACTION_HOME);
@@ -561,7 +568,7 @@ public class ExecutorService extends AccessibilityService {
                         if (temp != null) {
                             if (temp.equals(word)) {
                                 getClickable(info).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
+                                Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
                                         + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
                                 return;
                             }
@@ -579,8 +586,8 @@ public class ExecutorService extends AccessibilityService {
                         if (temp != null) {
                             if (temp.equals(word)) {
                                 getClickable(info).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                Toast.makeText(SeeNot.getAppContext(), resources.getString(SeeNot.getFilterTypeName(tempFilter.getType()))
-                                        + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
+                                        + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         }
@@ -597,7 +604,8 @@ public class ExecutorService extends AccessibilityService {
                         if (temp != null) {
                             if (temp.equals(word)) {
                                 doGesture(0);
-                                //doGesture(1);
+                                Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
+                                        + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
                             }
                         }
                         break;
@@ -606,7 +614,8 @@ public class ExecutorService extends AccessibilityService {
                         if (temp != null) {
                             if (temp.equals(word)) {
                                 doGesture(0);
-                                //doGesture(1);
+                                Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
+                                        + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
                             }
                         }
                         break;
