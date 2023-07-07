@@ -331,21 +331,21 @@ public class AssignerUtils {
 
             final AlertDialog alertDialogTypeSelect;
             final String[] items = {
-                    resources.getString(SeeNot.getFilterTypeName(0)),
-                    resources.getString(SeeNot.getFilterTypeName(1)),
-                    resources.getString(SeeNot.getFilterTypeName(2)),
-                    resources.getString(SeeNot.getFilterTypeName(3)),
-                    resources.getString(SeeNot.getFilterTypeName(4)),
-                    resources.getString(SeeNot.getFilterTypeName(5)),
-                    resources.getString(SeeNot.getFilterTypeName(6)),
-                    resources.getString(SeeNot.getFilterTypeName(7))
+                    SeeNot.getFilterTypeName(0),
+                    SeeNot.getFilterTypeName(1),
+                    SeeNot.getFilterTypeName(2),
+                    SeeNot.getFilterTypeName(3),
+                    SeeNot.getFilterTypeName(4),
+                    SeeNot.getFilterTypeName(5),
+                    SeeNot.getFilterTypeName(6),
+                    SeeNot.getFilterTypeName(7)
             };
             MaterialAlertDialogBuilder alertBuilder = new MaterialAlertDialogBuilder(mService);
             alertBuilder.setTitle("选择规则类型");
             alertBuilder.setItems(items, (dialogInterface, i) -> {
                 int type = 0;
                 for (int j = 0; j <= SeeNot.typesCnt; j++) {
-                    if (resources.getString(SeeNot.getFilterTypeName(j)).equals(items[i])) {
+                    if (SeeNot.getFilterTypeName(j).equals(items[i])) {
                         type = j;
                         break;
                     }

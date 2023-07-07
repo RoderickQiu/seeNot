@@ -115,8 +115,8 @@ public class FloatingOperatorUtil {
             mFloatingViews.clear();
         } catch (Exception e) {
             le("remove failed" + e.getLocalizedMessage());
-            Toast.makeText(SeeNot.getAppContext(), "消除遮罩失败，如果遮罩一直错误地存在，烦请手动前往系统无障碍设置重启见否服务", Toast.LENGTH_LONG).show();
-            sendSimpleNotification("见否可能出了个错？", "消除遮罩失败，如果遮罩一直错误地存在，烦请手动前往系统无障碍设置重启见否服务");
+            Toast.makeText(SeeNot.getAppContext(), "消除遮罩失败", Toast.LENGTH_LONG).show();
+            sendSimpleNotification("见否可能出了个错？", "消除遮罩失败");
         }
     }
 

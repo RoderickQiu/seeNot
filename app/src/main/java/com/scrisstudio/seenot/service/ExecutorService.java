@@ -14,7 +14,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
@@ -73,7 +72,6 @@ public class ExecutorService extends AccessibilityService {
             foregroundPackageName = "com.scrisstudio.seenot", lastTimePackageName = "",
             lastTimeClassName = "com.scrisstudio.seenot.MainActivity",
             packageName = "";
-    private ActivityInfo lastTimeActivityInfo = new ActivityInfo();
     public static SharedPreferences sharedPreferences;
     public static NotificationManager normalNotificationManager;
     private final Handler mHandler = new Handler();
@@ -87,10 +85,7 @@ public class ExecutorService extends AccessibilityService {
     private static ArrayList<RuleInfo> rulesList = new ArrayList<>();
     private static ArrayList<FilterInfo> currentFilters = new ArrayList<>(), tempFilters;
     private static FilterInfo tempFilter;
-    private final Gson gson = new Gson();
-    private PackageManager packageManager;
-    private long lastContentChangedTime = 0, lastHandlerRunningTime = 0,
-            contentChangeTime = 0, handlerTime = 0, lastPackageChangeTime = 0;
+    private long lastHandlerRunningTime = 0, handlerTime = 0;
     private static PeriodicWorkRequest stayRequest;
     private static Random random = new Random();
     public static Resources resources;
@@ -320,16 +315,13 @@ public class ExecutorService extends AccessibilityService {
 
             l("Service invoking...");
 
-            resources = MainActivity.resources;
             for (int i = 0; i < typesCnt; i++) {
-                filterTypeNames[i] = resources.getString(SeeNot.getFilterTypeName(i));
+                filterTypeNames[i] = SeeNot.getFilterTypeName(i);
             }
 
             if (sharedPreferences != null) {
                 setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
             }
-
-            packageManager = getPackageManager();
 
             try {
                 setForegroundService();
@@ -512,114 +504,119 @@ public class ExecutorService extends AccessibilityService {
             AccessibilityNodeInfo info = queue.remove(0);
             int gradient = gradientQueue.remove(0);
             if (info == null) continue;
-            if ((!isOnlyVisible || info.isVisibleToUser()) || gradient > 0) {
-                if (info.getChildCount() != 0) {
-                    for (int i = 0; i < info.getChildCount(); i++) {
-                        if (info.getChild(i) != null) {
-                            if (info.toString().contains("WebView") || gradient > 0)
-                                gradientQueue.add(gradient == 0 ? 5 : gradient - 1);
-                            else
-                                gradientQueue.add(0);
-                            queue.add(info.getChild(i));
+
+            try {
+                if ((!isOnlyVisible || info.isVisibleToUser()) || gradient > 0) {
+                    if (info.getChildCount() != 0) {
+                        for (int i = 0; i < info.getChildCount(); i++) {
+                            if (info.getChild(i) != null) {
+                                if (info.toString().contains("WebView") || gradient > 0)
+                                    gradientQueue.add(gradient == 0 ? 5 : gradient - 1);
+                                else
+                                    gradientQueue.add(0);
+                                queue.add(info.getChild(i));
+                            }
                         }
                     }
-                }
 
-                switch (type) {
-                    case 2: // text force-back
-                        temp = null;
-                        if (info.getText() != null) temp = info.getText().toString();
-                        else if (info.getContentDescription() != null)
-                            temp = info.getContentDescription().toString();
-                        else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                            temp = (String) info.getTooltipText();
-                        }
-
-                        if (temp != null) {
-                            if (temp.equals(word)) {
-                                if (performGlobalAction(GLOBAL_ACTION_BACK)) {
-                                    Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
-                                            + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    performGlobalAction(GLOBAL_ACTION_HOME);
-                                    Toast.makeText(SeeNot.getAppContext(), "返回上一页失败，直接退出程序：\"" + word + "\"", Toast.LENGTH_SHORT).show();
-                                }
-                                return;
+                    switch (type) {
+                        case 2: // text force-back
+                            temp = null;
+                            if (info.getText() != null) temp = info.getText().toString();
+                            else if (info.getContentDescription() != null)
+                                temp = info.getContentDescription().toString();
+                            else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                                temp = (String) info.getTooltipText();
                             }
-                        }
-                        break;
-                    case 3: // id force-back
-                        temp = info.getViewIdResourceName();
-                        if (temp != null) {
-                            if (temp.equals(word)) {
-                                if (performGlobalAction(GLOBAL_ACTION_BACK)) {
+
+                            if (temp != null) {
+                                if (temp.equals(word)) {
+                                    if (performGlobalAction(GLOBAL_ACTION_BACK)) {
+                                        Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
+                                                + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        performGlobalAction(GLOBAL_ACTION_HOME);
+                                        Toast.makeText(SeeNot.getAppContext(), "返回上一页失败，直接退出程序：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                                    }
+                                    return;
+                                }
+                            }
+                            break;
+                        case 3: // id force-back
+                            temp = info.getViewIdResourceName();
+                            if (temp != null) {
+                                if (temp.equals(word)) {
+                                    if (performGlobalAction(GLOBAL_ACTION_BACK)) {
+                                        Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
+                                                + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        performGlobalAction(GLOBAL_ACTION_HOME);
+                                        Toast.makeText(SeeNot.getAppContext(), "返回上一页失败，直接退出程序：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                    }
+                                    return;
+                                }
+                            }
+                            break;
+                        case 4: // id auto-click
+                            temp = info.getViewIdResourceName();
+                            if (temp != null) {
+                                if (temp.equals(word)) {
+                                    getClickable(info).performAction(AccessibilityNodeInfo.ACTION_CLICK);
                                     Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
                                             + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    performGlobalAction(GLOBAL_ACTION_HOME);
-                                    Toast.makeText(SeeNot.getAppContext(), "返回上一页失败，直接退出程序：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                    return;
                                 }
-                                return;
                             }
-                        }
-                        break;
-                    case 4: // id auto-click
-                        temp = info.getViewIdResourceName();
-                        if (temp != null) {
-                            if (temp.equals(word)) {
-                                getClickable(info).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
-                                        + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
-                                return;
+                            break;
+                        case 5: // text auto-click
+                            temp = null;
+                            if (info.getText() != null) temp = info.getText().toString();
+                            else if (info.getContentDescription() != null)
+                                temp = info.getContentDescription().toString();
+                            else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                                temp = (String) info.getTooltipText();
                             }
-                        }
-                        break;
-                    case 5: // text auto-click
-                        temp = null;
-                        if (info.getText() != null) temp = info.getText().toString();
-                        else if (info.getContentDescription() != null)
-                            temp = info.getContentDescription().toString();
-                        else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                            temp = (String) info.getTooltipText();
-                        }
 
-                        if (temp != null) {
-                            if (temp.equals(word)) {
-                                getClickable(info).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
-                                        + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
-                                return;
+                            if (temp != null) {
+                                if (temp.equals(word)) {
+                                    getClickable(info).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                    Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
+                                            + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                             }
-                        }
-                        break;
-                    case 6: // text swipe
-                        temp = null;
-                        if (info.getText() != null) temp = info.getText().toString();
-                        else if (info.getContentDescription() != null)
-                            temp = info.getContentDescription().toString();
-                        else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                            temp = (String) info.getTooltipText();
-                        }
+                            break;
+                        case 6: // text swipe
+                            temp = null;
+                            if (info.getText() != null) temp = info.getText().toString();
+                            else if (info.getContentDescription() != null)
+                                temp = info.getContentDescription().toString();
+                            else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                                temp = (String) info.getTooltipText();
+                            }
 
-                        if (temp != null) {
-                            if (temp.equals(word)) {
-                                doGesture(0);
-                                Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
-                                        + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                            if (temp != null) {
+                                if (temp.equals(word)) {
+                                    doGesture(0);
+                                    Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
+                                            + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                                }
                             }
-                        }
-                        break;
-                    case 7: // id swipe
-                        temp = info.getViewIdResourceName();
-                        if (temp != null) {
-                            if (temp.equals(word)) {
-                                doGesture(0);
-                                Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
-                                        + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                            break;
+                        case 7: // id swipe
+                            temp = info.getViewIdResourceName();
+                            if (temp != null) {
+                                if (temp.equals(word)) {
+                                    doGesture(0);
+                                    Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
+                                            + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                }
                             }
-                        }
-                        break;
+                            break;
+                    }
                 }
+            } catch (Exception e) {
+                le("ERR: " + e.getMessage());
             }
         }
     }

@@ -74,25 +74,25 @@ public class SeeNot extends Application {
 
     public static int typesCnt = 7;
 
-    public static int getFilterTypeName(int type) {
+    public static String getFilterTypeName(int type) {
         switch (type) {
             case 0:
-                return R.string.filter_ban_app;
+                return "禁止进入此程序";//R.string.filter_ban_app;
             case 1:
-                return R.string.filter_ban_activity;
+                return "禁止进入此页面";//R.string.filter_ban_activity;
             case 2:
-                return R.string.filter_ban_text;
+                return "找到文字后退出";//R.string.filter_ban_text;
             case 5:
-                return R.string.filter_auto_click_text;
+                return "找到文字后自动点击";//R.string.filter_auto_click_text;
             case 6:
-                return R.string.filter_swipe_text;
+                return "找到文字后反向划动";//R.string.filter_swipe_text;
             case 3:
-                return R.string.filter_ban_id;
+                return "找到元素后退出";//R.string.filter_ban_id;
             case 4:
-                return R.string.filter_auto_click_id;
+                return "找到元素后自动点击";//R.string.filter_auto_click_id;
             case 7:
-                return R.string.filter_swipe_id;
+                return "找到元素后反向划动";//R.string.filter_swipe_id;
         }
-        return R.string.type_not_found;
+        return "未知规则";//R.string.type_not_found;
     }
 }

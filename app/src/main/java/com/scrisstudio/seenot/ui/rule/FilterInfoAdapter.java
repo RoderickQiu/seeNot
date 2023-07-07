@@ -81,7 +81,7 @@ public class FilterInfoAdapter extends RecyclerView.Adapter<FilterInfoAdapter.My
             if (current.getFilter().get(filterId).getType() != 0)
                 holder.filterValue.setText(current.getFilter().get(filterId).getParam1().replace(current.getFor(), ""));
             else holder.filterValue.setVisibility(View.GONE);
-            holder.filterType.setText(AssignerUtils.resources.getString(SeeNot.getFilterTypeName(current.getFilter().get(filterId).getType())));
+            holder.filterType.setText(SeeNot.getFilterTypeName(current.getFilter().get(filterId).getType()));
             holder.setButton.setOnClickListener(v -> AssignerUtils.initAssigner(2, position, filterId));
             holder.deleteButton.setOnClickListener(v -> {
                 holder.deleteButton.setVisibility(View.GONE);
