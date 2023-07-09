@@ -168,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         checkIfBannerNecessary(getResources(), PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext()));
-
         // password
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
@@ -182,6 +181,12 @@ public class MainActivity extends AppCompatActivity {
         }
         if (extra == null) extra = "";
         if (!extra.equals("success")) passwordInit();
+
+        // welcome
+        if (!sharedPreferences.contains("welcome")) {
+            Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+            startActivity(intent);
+        }
     }
 
     public static void passwordInit() {

@@ -150,4 +150,12 @@
     <string name="import_single_rule">导入单条规则</string>
     <string name="import_single_dialog_msg">输入在设置界面导出的单条规则文本以导入单条不见君规则</string>
     <string name="export_log">获取服务日志</string>
+    <string name="welcome">欢迎使用不见君</string>
+    <string name="welcome_msg">各大APP愈加臃肿，而不见君使你能保持简单</string>
+    <string name="start">让我们开始吧</string>
+    <string name="welcome_msg_2">下一代屏幕时间管理方案，就在这里</string>
+    <string name="welcome_priv">隐私和权限</string>
+    <string name="welcome_priv_msg">继续使用代表同意</string>
+    <string name="welcome_priv_title">《不见君使用须知》</string>
+    <string name="must_need">必须先获取这些权限才能使用不见君</string>
 </resources>
