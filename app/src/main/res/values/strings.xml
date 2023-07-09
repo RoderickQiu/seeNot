@@ -9,7 +9,7 @@
     <string name="menu_about">关于</string>
     <string name="menu_permission">权限</string>
     <string name="app_full_name">seeNot 不见君</string>
-    <string name="roderick_qiu_app">By Roderick Qiu et al.</string>
+    <string name="roderick_qiu_app">作者：@RoderickQiu</string>
     <string name="delete_confirm">确认删除</string>
     <string name="empty_view">列表为空。点击\"+\"按钮新建规则。</string>
     <string name="operation_done">操作完成</string>
@@ -158,4 +158,5 @@
     <string name="welcome_priv_msg">继续使用代表同意</string>
     <string name="welcome_priv_title">《不见君使用须知》</string>
     <string name="must_need">必须先获取这些权限才能使用不见君</string>
+    <string name="privacy_notice_page">隐私协议</string>
 </resources>

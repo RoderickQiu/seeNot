@@ -39,6 +39,14 @@ public class AboutFragment extends Fragment {
             startActivity(intent);
         });
 
+        binding.privacyNoticePage.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+        binding.privacyNoticePage.getPaint().setAntiAlias(true);
+        binding.privacyNoticePage.setOnClickListener((v) -> {
+            Uri uri = Uri.parse("https://seenot.r-q.name/privacy");
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        });
+
         return root;
     }
 

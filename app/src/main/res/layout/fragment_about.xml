@@ -71,6 +71,20 @@
                 android:text="@string/license_page"
                 android:textSize="14sp" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" | "
+                android:textSize="14sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/privacy_notice_page"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/privacy_notice_page"
+                android:textSize="14sp" />
+
         </LinearLayout>
 
     </LinearLayout>
