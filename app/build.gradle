@@ -2,15 +2,34 @@ plugins {
     id 'com.android.application'
 }
 
+def getVersionCode() {// 获取版本号
+    def versionFile = file('version.properties')// 读取第一步新建的文件
+    if (versionFile.canRead()) {// 判断文件读取异常
+        Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionFile))
+        def versionCode = versionProps['VERSION_CODE'].toInteger()// 读取文件里面的版本号
+        def runTasks = gradle.startParameter.taskNames
+        //if (':app:assembleRelease' in runTasks || 'task1' in runTasks) { //仅在assembleRelease任务增加版本号
+        // 版本号自增之后再写入文件（此处是关键，版本号自增+1）
+        versionProps['VERSION_CODE'] = (++versionCode).toString()
+        versionProps.store(versionFile.newWriter(), null)
+        project.logger.lifecycle("Version Code: " + versionCode)
+        return versionCode // 返回自增之后的版本号
+    } else {
+        throw new GradleException("Could not find version.properties!")
+    }
+}
+
 android {
     compileSdk 33
 
+    def currentVersionCode = getVersionCode()
     defaultConfig {
         applicationId "com.scrisstudio.seenot"
         minSdk 26
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        versionCode currentVersionCode
+        versionName "1.0." + currentVersionCode + "-beta"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

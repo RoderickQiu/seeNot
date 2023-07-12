@@ -17,13 +17,12 @@
         android:textColor="?attr/colorOnSurface" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/version_nav"
         android:layout_marginBottom="24dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceTitleSmall"
-        android:textColor="?attr/colorOnSurfaceVariant"
-        android:text="@string/version" />
+        android:textColor="?attr/colorOnSurfaceVariant" />
 </LinearLayout>

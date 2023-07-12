@@ -5,6 +5,7 @@ import static com.scrisstudio.seenot.SeeNot.lastTimeDestination;
 import static com.scrisstudio.seenot.SeeNot.le;
 import static com.scrisstudio.seenot.ui.permission.PermissionFragment.isAccessibilitySettingsOn;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -36,6 +38,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.seenot.databinding.ActivityMainBinding;
+import com.scrisstudio.seenot.service.APKVersionInfoUtils;
 import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.struct.FetcherInfo;
 import com.scrisstudio.seenot.struct.PushedInfo;
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
         }.getType());
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
             }
             lastTimeDestination = destination.toString();
         });
+
+        ((TextView) binding.navView.getHeaderView(0).findViewById(R.id.version_nav)).setText("v" + APKVersionInfoUtils.getVersionName(this));//TODO
 
         if (SeeNot.shouldNavigateTo != 0) {
             navController.navigate(SeeNot.shouldNavigateTo);

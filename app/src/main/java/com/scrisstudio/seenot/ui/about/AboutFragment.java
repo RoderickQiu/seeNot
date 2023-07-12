@@ -1,5 +1,6 @@
 package com.scrisstudio.seenot.ui.about;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.net.Uri;
@@ -12,16 +13,20 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.scrisstudio.seenot.databinding.FragmentAboutBinding;
+import com.scrisstudio.seenot.service.APKVersionInfoUtils;
 
 public class AboutFragment extends Fragment {
 
     private FragmentAboutBinding binding;
 
+    @SuppressLint("SetTextI18n")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentAboutBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        binding.version.setText("v" + APKVersionInfoUtils.getVersionName(requireContext()));
 
         binding.scrisStudioApp.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         binding.scrisStudioApp.getPaint().setAntiAlias(true);

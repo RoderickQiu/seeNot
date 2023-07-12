@@ -4,12 +4,11 @@
     <string name="menu_home">首页</string>
     <string name="service_name" translatable="false">👋 seeNot 不见君 👋</string>
     <string name="service_description">为了使用软件的功能，就需要开启此服务。此服务不会访问网络，因此你的数据是完全安全的，我们也不会使用任何方法获取你在做什么。我们需要那些权限仅仅是为了解析应用布局。</string>
-    <string name="version" translatable="false">v1.0</string>
     <string name="menu_settings">设置</string>
     <string name="menu_about">关于</string>
     <string name="menu_permission">权限</string>
     <string name="app_full_name">seeNot 不见君</string>
-    <string name="roderick_qiu_app">作者：@RoderickQiu</string>
+    <string name="roderick_qiu_app">作者 @RoderickQiu</string>
     <string name="delete_confirm">确认删除</string>
     <string name="empty_view">列表为空。点击\"+\"按钮新建规则。</string>
     <string name="operation_done">操作完成</string>
