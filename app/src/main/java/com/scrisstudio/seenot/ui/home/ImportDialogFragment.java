@@ -27,7 +27,7 @@ import com.google.gson.reflect.TypeToken;
 import com.scottyab.aescrypt.AESCrypt;
 import com.scrisstudio.seenot.R;
 import com.scrisstudio.seenot.SeeNot;
-import com.scrisstudio.seenot.service.RuleInfo;
+import com.scrisstudio.seenot.struct.RuleInfo;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;

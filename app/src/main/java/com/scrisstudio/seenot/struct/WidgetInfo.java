@@ -1,4 +1,4 @@
-package com.scrisstudio.seenot.service;
+package com.scrisstudio.seenot.struct;
 
 
 import android.graphics.Rect;

@@ -23,8 +23,8 @@ import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
 import com.scrisstudio.seenot.RuleTimedActivity;
 import com.scrisstudio.seenot.service.ExecutorService;
-import com.scrisstudio.seenot.service.RuleInfo;
-import com.scrisstudio.seenot.service.TimedInfo;
+import com.scrisstudio.seenot.struct.RuleInfo;
+import com.scrisstudio.seenot.struct.TimedInfo;
 import com.scrisstudio.seenot.ui.assigner.AssignerUtils;
 import com.scrisstudio.seenot.ui.settings.SettingsFragment;
 

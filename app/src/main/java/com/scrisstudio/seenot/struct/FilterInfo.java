@@ -1,4 +1,4 @@
-package com.scrisstudio.seenot.service;
+package com.scrisstudio.seenot.struct;
 
 public class FilterInfo {
     private boolean status;

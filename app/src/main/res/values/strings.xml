@@ -159,4 +159,9 @@
     <string name="welcome_priv_title">《不见君使用须知》</string>
     <string name="must_need">必须先获取这些权限才能使用不见君</string>
     <string name="privacy_notice_page">隐私协议</string>
+    <string name="notif">通知</string>
+    <string name="navigation_drawer_open">打开</string>
+    <string name="navigation_drawer_close">关闭</string>
+    <string name="notifications_title">不见君团队通知</string>
+    <string name="no_notification_or_bad_net">暂时没有通知，或者网络缓慢。</string>
 </resources>

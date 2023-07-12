@@ -15,9 +15,15 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.ActionMenuItemView;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
@@ -31,10 +37,16 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.seenot.databinding.ActivityMainBinding;
 import com.scrisstudio.seenot.service.ExecutorService;
-import com.scrisstudio.seenot.service.RuleInfo;
-import com.scrisstudio.seenot.service.TimedInfo;
+import com.scrisstudio.seenot.struct.FetcherInfo;
+import com.scrisstudio.seenot.struct.PushedInfo;
+import com.scrisstudio.seenot.struct.RuleInfo;
+import com.scrisstudio.seenot.struct.TimedInfo;
+import com.scrisstudio.seenot.ui.notification.NotifyDialogFragment;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.ref.SoftReference;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,12 +59,14 @@ public class MainActivity extends AppCompatActivity {
     private static final Gson gson = new Gson();
     private static ArrayList<RuleInfo> rulesList = new ArrayList<>();
     private static ArrayList<TimedInfo> timedList = new ArrayList<>();
+    ArrayList<Integer> pushedReadList = new ArrayList<>();
     private static String password, extra;
     public static Resources resources;
     public static SharedPreferences sharedPreferences;
     public static Boolean isNotificationEnabled = false, isOverlayEnabled = false, isBatteryOptimIgnored = false;
     public static String packageName = "";
     public static SoftReference<View> viewCustomization = null, viewTarget = null;
+    public ActionBarDrawerToggle mDrawerToggle;
 
     public static void runOnUI(Runnable runnable) {
         UIHandler.post(runnable);
@@ -95,7 +109,14 @@ public class MainActivity extends AppCompatActivity {
             ruleInitEditor.putString("rules", gson.toJson(rulesList));
             ruleInitEditor.apply();
         }
+        if (!sharedPreferences.contains("read-push")) {
+            SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
+            ruleInitEditor.putString("read-push", gson.toJson(pushedReadList));
+            ruleInitEditor.apply();
+        }
         rulesList = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<ArrayList<RuleInfo>>() {
+        }.getType());
+        pushedReadList = gson.fromJson(sharedPreferences.getString("read-push", "{}"), new TypeToken<ArrayList<Integer>>() {
         }.getType());
         if (!sharedPreferences.contains("timed")) {
             SharedPreferences.Editor timedInitEditor = sharedPreferences.edit();
@@ -140,6 +161,8 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
+        mDrawerToggle = new ActionBarDrawerToggle(this, drawer, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(mDrawerToggle);
         NavigationView navigationView = binding.navView;
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_settings, R.id.nav_permission, R.id.nav_about)
@@ -187,6 +210,49 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
             startActivity(intent);
         }
+
+        new Thread(() -> {
+            URL url = null;
+            try {
+                url = new URL("https://seenot-1259749012.cos.ap-hongkong.myqcloud.com/push.json");
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(url.openStream()));
+                String inputLine;
+                StringBuilder rawData = new StringBuilder("");
+                while ((inputLine = in.readLine()) != null)
+                    rawData.append(inputLine);
+                FetcherInfo fetched = gson.fromJson(String.valueOf(rawData), new TypeToken<FetcherInfo>() {
+                }.getType());
+                ArrayList<PushedInfo> list = fetched.getPush();
+                for (PushedInfo info : list) {
+                    if (!pushedReadList.contains(info.getId())) {
+                        //noinspection RestrictedApi
+                        ((ActionMenuItemView) findViewById(R.id.notification_btn))
+                                .setIcon(ResourcesCompat.getDrawable(resources, R.drawable.baseline_notification_important_24, getTheme()));
+                        break;
+                    }
+                }
+                in.close();
+            } catch (Exception e) {
+                le("ERR: " + e);
+            }
+        }).start();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.top_bar_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) return true;
+        else if (item.getItemId() == R.id.notification_btn) {
+            NotifyDialogFragment notifyDialogFragment = new NotifyDialogFragment();
+            notifyDialogFragment.show(getSupportFragmentManager(), "NotifyDialogFragment");
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public static void passwordInit() {

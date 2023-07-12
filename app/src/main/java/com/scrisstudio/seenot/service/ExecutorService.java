@@ -42,6 +42,9 @@ import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
 import com.scrisstudio.seenot.SeeNot;
+import com.scrisstudio.seenot.struct.FilterInfo;
+import com.scrisstudio.seenot.struct.RuleInfo;
+import com.scrisstudio.seenot.struct.TimedInfo;
 import com.scrisstudio.seenot.ui.timed.RuleTimedAdapter;
 
 import java.io.File;
