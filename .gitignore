@@ -19,4 +19,3 @@ local.properties
 *.apk
 app/debug/output-metadata.json
 *.key0
-app/version.properties

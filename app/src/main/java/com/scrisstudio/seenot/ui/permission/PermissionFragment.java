@@ -135,6 +135,12 @@ public class PermissionFragment extends Fragment {
             startActivity(intent);
         });
 
+        binding.permissionBack.setOnClickListener(v -> {
+            Intent intent = new Intent(requireActivity(), MainActivity.class);
+            intent.putExtra("password", "success");
+            startActivity(intent);
+        });
+
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(permissionMessageReceiver,
                 new IntentFilter("permission_channel"));
     }

@@ -163,4 +163,6 @@
     <string name="navigation_drawer_close">关闭</string>
     <string name="notifications_title">不见君团队通知</string>
     <string name="no_notification_or_bad_net">暂时没有通知，或者网络缓慢。</string>
+    <string name="all_offline">这些权限所获取的所有数据将保证只在本地被处理而不会上传，因此您的数据是完全安全的</string>
+    <string name="permission_back">完成，返回主界面</string>
 </resources>
