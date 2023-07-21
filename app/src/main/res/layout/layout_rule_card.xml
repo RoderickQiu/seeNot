@@ -118,24 +118,14 @@
                             app:tint="?attr/colorPrimary" />
 
                         <ImageButton
-                            android:id="@+id/delete_button"
+                            android:id="@+id/rule_menu_button"
                             style="@style/Widget.Material3.Button"
                             android:layout_width="36dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="6dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@drawable/ic_baseline_delete_outline_24"
+                            android:src="@drawable/baseline_menu_24"
                             app:tint="?attr/colorPrimary" />
-
-                        <Button
-                            android:id="@+id/delete_button_recheck"
-                            style="@style/Widget.Material3.Button.TextButton"
-                            android:layout_marginHorizontal="0dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:layout_width="60dp"
-                            android:layout_height="wrap_content"
-                            android:text="@string/delete_confirm"
-                            android:visibility="gone" />
 
                     </LinearLayout>
 

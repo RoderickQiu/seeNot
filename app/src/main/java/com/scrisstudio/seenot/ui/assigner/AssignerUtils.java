@@ -12,7 +12,6 @@ import static com.scrisstudio.seenot.service.ExecutorService.inflater;
 import static com.scrisstudio.seenot.service.ExecutorService.mService;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -45,7 +44,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
-import com.scrisstudio.seenot.RuleTimedActivity;
 import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.struct.FilterInfo;
@@ -148,7 +146,7 @@ public class AssignerUtils {
         viewCustomization.findViewById(R.id.button_assigner_back).setVisibility(View.GONE);
         viewCustomization.findViewById(R.id.button_new_filter).setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.button_save_pre).setVisibility(mode == 0 ? View.VISIBLE : View.GONE);
-        viewCustomization.findViewById(R.id.button_set_timed).setVisibility(mode == 0 ? View.VISIBLE : View.GONE);
+        //viewCustomization.findViewById(R.id.button_set_timed).setVisibility(mode == 0 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.button_save_rule).setVisibility(mode == 2 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.button_set_rule).setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.button_assigner_back).setVisibility(mode == 2 ? View.VISIBLE : View.GONE);
@@ -390,19 +388,10 @@ public class AssignerUtils {
     private static void initPre(View viewCustomization, View viewToast, View viewTarget, FrameLayout layoutOverlayOutline) {
         ((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).setText(current.getTitle());
         ((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).setText(resources.getString(R.string.click_right_to_set));
-        viewCustomization.findViewById(R.id.button_set_timed).setOnClickListener(v -> {
-            Intent intent = new Intent();
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setClass(SeeNot.getAppContext(), RuleTimedActivity.class);
-            SeeNot.getAppContext().startActivity(intent);
-
-            windowManager.removeViewImmediate(viewCustomization);
-            windowManager.removeViewImmediate(viewTarget);
-            ruleSave(MODE_EXECUTOR);
-        });
         if (current.getFor().equals("com.software.any")) {
             viewCustomization.findViewById(R.id.rule_for_refresh).setVisibility(View.VISIBLE);
             viewCustomization.findViewById(R.id.rule_for_refresh).setOnClickListener(v -> ((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).setText(getAppRealName(ExecutorService.foregroundPackageName)));
+            ((TextView) viewCustomization.findViewById(R.id.assigner_pre_tip)).setText(R.string.assigner_pre_tip);
             viewCustomization.findViewById(R.id.button_save_pre).setOnClickListener(v -> {
                 if (Objects.requireNonNull(((TextView) viewCustomization.findViewById(R.id.pre_rule_for)).getText()).toString().equals(resources.getString(R.string.click_right_to_set)) || Objects.requireNonNull(((TextInputEditText) viewCustomization.findViewById(R.id.rule_name_textfield)).getText()).toString().equals("")) {
                     sendToast(viewToast, resources.getString(R.string.fill_the_blanks), LENGTH_LONG);

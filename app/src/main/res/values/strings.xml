@@ -51,8 +51,9 @@
     <string name="save">保存</string>
     <string name="new_subrule">新建子规则</string>
     <string name="rule_title_label">规则名：</string>
-    <string name="assigner_pre_tip">请勿在不见君应用内或系统桌面进行设置。前往要设置的应用并点击\"刷新\"以获得正确的应用包名。若获取不正确，请尝试再点击一下程序界面空白处然后再点一次\"刷新\"。</string>
-    <string name="rule_name_placeholder">请在此输入规则名</string>
+    <string name="assigner_pre_tip">
+        请勿在不见君应用内或系统桌面进行设置。前往要设置的应用并点击\"刷新\"以获得正确的应用包名。若获取不正确，请尝试再点击一下程序界面空白处或推出重进，然后再点一次\"刷新\"。</string>
+    <string name="rule_name_placeholder">在此输入规则名</string>
     <string name="continue_pre">继续设置</string>
     <string name="refresh">刷新</string>
     <string name="cannot_modify_after_pre">已经完成设定后不能修改对应程序。</string>

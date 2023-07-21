@@ -2,27 +2,36 @@ package com.scrisstudio.seenot.ui.rule;
 
 import static com.scrisstudio.seenot.SeeNot.le;
 import static com.scrisstudio.seenot.service.ExecutorService.MODE_EXECUTOR;
+import static com.scrisstudio.seenot.ui.settings.SettingsFragment.password;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.scottyab.aescrypt.AESCrypt;
 import com.scrisstudio.seenot.MainActivity;
 import com.scrisstudio.seenot.R;
+import com.scrisstudio.seenot.RuleTimedActivity;
+import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.service.ExecutorService;
 import com.scrisstudio.seenot.struct.RuleInfo;
 import com.scrisstudio.seenot.struct.TimedInfo;
@@ -30,10 +39,10 @@ import com.scrisstudio.seenot.ui.assigner.AssignerUtils;
 import com.scrisstudio.seenot.ui.settings.SettingsFragment;
 
 import java.lang.ref.WeakReference;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyViewHolder> {
@@ -151,38 +160,70 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
                 }
             });
 
-            holder.deleteButton.setOnClickListener(v -> {
-                holder.deleteButton.setVisibility(View.GONE);
-                holder.deleteRecheckButton.setVisibility(View.VISIBLE);
+            final AlertDialog alertDialogRuleMenu;
+            final String[] items = {"删除", "导出", "定时"};
+            MaterialAlertDialogBuilder alertBuilder = new MaterialAlertDialogBuilder(context);
+            alertBuilder.setTitle("对规则执行操作");
+            alertBuilder.setItems(items, (dialogInterface, i) -> {
+                switch (i) {
+                    case 0: //delete
+                        new MaterialAlertDialogBuilder(context)
+                                .setTitle("确定删除" + rule.getTitle() + "吗？")
+                                .setMessage("此操作不可逆，请谨慎删除。")
+                                .setNegativeButton("取消", null)
+                                .setPositiveButton("确定", (dialogInterface1, i1) -> {
+                                    SharedPreferences.Editor edit = sharedPreferences.edit();
+                                    mList.remove(position);
+                                    notifyDataSetChanged();
 
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        try {
-                            MainActivity.runOnUI(() -> {
-                                holder.deleteButton.setVisibility(View.VISIBLE);
-                                holder.deleteRecheckButton.setVisibility(View.GONE);
-                            });
-                        } catch (Exception ignored) {
+                                    edit.putString("rules", gson.toJson(mList));
+                                    edit.apply();
+
+                                    ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
+                                    AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
+                                    MainActivity.setSharedPreferences(sharedPreferences);
+                                    callBack.onEdit(position, mList, MODE_EXECUTOR);
+
+                                    Toast.makeText(context.getApplicationContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
+                                }).show();
+                        break;
+                    case 1: //export-single
+                        ArrayList<RuleInfo> rulesList = gson.fromJson(MainActivity.sharedPreferences.getString("rules", "{}"), new TypeToken<ArrayList<RuleInfo>>() {
+                        }.getType());
+                        boolean hasDone = false;
+                        for (RuleInfo r : rulesList) {
+                            if (rule.getId() == r.getId()) {
+                                String output = gson.toJson(rulesList.get(i)), encryptedMsg = "";
+                                try {
+                                    encryptedMsg = AESCrypt.encrypt(password, output);
+                                    // copy to clipboard
+                                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                                    ClipData clip = ClipData.newPlainText("copied", encryptedMsg);
+                                    clipboard.setPrimaryClip(clip);
+                                    Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_LONG).show();
+                                    hasDone = true;
+                                } catch (GeneralSecurityException e) {
+                                    hasDone = false;
+                                    le(e.getLocalizedMessage());
+                                }
+                                le("Output: " + encryptedMsg + ", origin:" + output);
+                            }
                         }
-                    }
-                }, 3000);
+                        if (!hasDone) {
+                            Toast.makeText(context, R.string.strange_error, Toast.LENGTH_LONG).show();
+                        }
+                        break;
+                    case 2: // rule-timed
+                        Intent intent = new Intent();
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setClass(context, RuleTimedActivity.class);
+                        SeeNot.getAppContext().startActivity(intent);
+                        break;
+                }
             });
-            holder.deleteRecheckButton.setOnClickListener(v -> {
-                SharedPreferences.Editor edit = sharedPreferences.edit();
-                mList.remove(position);
-                notifyDataSetChanged();
-
-                edit.putString("rules", gson.toJson(mList));
-                edit.apply();
-
-                ExecutorService.setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
-                AssignerUtils.setAssignerSharedPreferences(sharedPreferences);
-                MainActivity.setSharedPreferences(sharedPreferences);
-                callBack.onEdit(position, mList, MODE_EXECUTOR);
-
-                Toast.makeText(context.getApplicationContext(), R.string.operation_done, Toast.LENGTH_SHORT).show();
+            alertDialogRuleMenu = alertBuilder.create();
+            holder.menuButton.setOnClickListener(v -> {
+                alertDialogRuleMenu.show();
             });
         }
 
@@ -209,8 +250,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView ruleId, ruleTitle, ruleFor, ruleTimed;
-        ImageButton editButton, deleteButton;
-        Button deleteRecheckButton;
+        ImageButton editButton, menuButton;
         MaterialSwitch statusSwitch;
 
         public MyViewHolder(View view) {
@@ -220,8 +260,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
             ruleFor = view.findViewById(R.id.rule_for);
             ruleTimed = view.findViewById(R.id.rule_timed);
             editButton = view.findViewById(R.id.edit_button);
-            deleteButton = view.findViewById(R.id.delete_button);
-            deleteRecheckButton = view.findViewById(R.id.delete_button_recheck);
+            menuButton = view.findViewById(R.id.rule_menu_button);
             statusSwitch = view.findViewById(R.id.rule_status_switch);
         }
     }
