@@ -12,11 +12,13 @@ import static com.scrisstudio.seenot.service.ExecutorService.inflater;
 import static com.scrisstudio.seenot.service.ExecutorService.mService;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -24,6 +26,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -139,9 +143,11 @@ public class AssignerUtils {
     private static void setMode(View viewCustomization, View viewToast, View viewTarget, int mode, FrameLayout layoutOverlayOutline) {
         initMode(viewCustomization, viewToast, viewTarget, mode, layoutOverlayOutline);
 
+        viewCustomization.findViewById(R.id.assigner_content).setVisibility(View.VISIBLE);
         viewCustomization.findViewById(R.id.assigner_pre).setVisibility(mode == 0 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.assigner_home).setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.assigner_set).setVisibility(mode == 2 ? View.VISIBLE : View.GONE);
+        viewCustomization.findViewById(R.id.assigner_webview).setVisibility(View.GONE);
 
         viewCustomization.findViewById(R.id.button_assigner_back).setVisibility(View.GONE);
         viewCustomization.findViewById(R.id.button_new_filter).setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
@@ -165,6 +171,21 @@ public class AssignerUtils {
             } catch (Exception e) {
                 le(e.getLocalizedMessage());
             }
+
+        viewCustomization.findViewById(R.id.press_here_helper).setOnClickListener((v) -> {
+            WebView webView = (WebView) viewCustomization.findViewById(R.id.assigner_webview);
+            if (webView.getVisibility() == View.GONE) {
+                ((TextView) viewCustomization.findViewById(R.id.press_here_helper)).setText(R.string.close_helper);
+                viewCustomization.findViewById(R.id.assigner_content).setVisibility(View.GONE);
+                webView.setVisibility(View.VISIBLE);
+                webView.setWebViewClient(new WebViewClient());
+                webView.loadUrl("https://seenot.pages.dev/" + "zh/" + "assigner" + mode + ".html");
+            } else {
+                viewCustomization.findViewById(R.id.assigner_content).setVisibility(View.VISIBLE);
+                webView.setVisibility(View.GONE);
+                ((TextView) viewCustomization.findViewById(R.id.press_here_helper)).setText(R.string.press_here_helper);
+            }
+        });
     }
 
     private static void initMode(View viewCustomization, View viewToast, View viewTarget, int mode, FrameLayout layoutOverlayOutline) {

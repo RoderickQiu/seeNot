@@ -8,4 +8,10 @@
         android:title="@string/notif"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/helper_btn"
+        android:icon="@drawable/baseline_help_outline_24"
+        android:title="@string/helper"
+        app:showAsAction="ifRoom" />
+
 </menu>

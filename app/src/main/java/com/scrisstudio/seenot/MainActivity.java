@@ -19,6 +19,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -34,6 +36,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.preference.PreferenceManager;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -53,6 +56,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -70,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     public static String packageName = "";
     public static SoftReference<View> viewCustomization = null, viewTarget = null;
     public ActionBarDrawerToggle mDrawerToggle;
+    private static String currentDestination = "Home";
 
     public static void runOnUI(Runnable runnable) {
         UIHandler.post(runnable);
@@ -176,6 +181,14 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.toString().contains("Home"))
+                currentDestination = "Home";
+            else if (destination.toString().contains("Permission"))
+                currentDestination = "Permission";
+            else if (destination.toString().contains("About"))
+                currentDestination = "About";
+            else if (destination.toString().contains("Settings"))
+                currentDestination = "Settings";
             if (destination.toString().contains("Home")) {
                 binding.toolbar.setTitle(R.string.app_full_name);
                 checkIfBannerNecessary(getResources(), PreferenceManager.getDefaultSharedPreferences(SeeNot.getAppContext()));
@@ -189,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
             lastTimeDestination = destination.toString();
         });
 
-        ((TextView) binding.navView.getHeaderView(0).findViewById(R.id.version_nav)).setText("v" + APKVersionInfoUtils.getVersionName(this));//TODO
+        ((TextView) binding.navView.getHeaderView(0).findViewById(R.id.version_nav)).setText("v" + APKVersionInfoUtils.getVersionName(this));
 
         if (SeeNot.shouldNavigateTo != 0) {
             navController.navigate(SeeNot.shouldNavigateTo);
@@ -257,6 +270,21 @@ public class MainActivity extends AppCompatActivity {
         else if (item.getItemId() == R.id.notification_btn) {
             NotifyDialogFragment notifyDialogFragment = new NotifyDialogFragment();
             notifyDialogFragment.show(getSupportFragmentManager(), "NotifyDialogFragment");
+        } else if (item.getItemId() == R.id.helper_btn) {
+            if (!Objects.equals(currentDestination, "About")) {
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+                View view = getLayoutInflater().inflate(R.layout.dialog_webview_helper, null);
+                WebView webView = (WebView) view.findViewById(R.id.helper_webview);
+                webView.setWebViewClient(new WebViewClient());
+                webView.loadUrl("https://seenot.pages.dev/" + "zh/" + currentDestination + ".html");
+                builder.setView(view);
+                builder.setPositiveButton(R.string.ok, null);
+                builder.show();
+            } else {
+                new MaterialAlertDialogBuilder(this).setTitle(R.string.no_helper)
+                        .setMessage(R.string.no_helper_msg).setPositiveButton(R.string.ok, null)
+                        .show();
+            }
         }
         return super.onOptionsItemSelected(item);
     }

@@ -91,7 +91,7 @@
     <string name="import_succeed">数据导入成功</string>
     <string name="import_failed">导入失败</string>
     <string name="click_right_to_set">点右侧按钮设置</string>
-    <string name="click_to_apply">关闭窗口以应用</string>
+    <string name="click_to_apply">保存并关闭</string>
     <string name="open_assigner_failed">打开设置面板失败，请检查无障碍服务是否已经打开</string>
     <string name="cannot_get_current_id">无法获取当前元素</string>
     <string name="cannot_get_current_text">无法获得当前文字</string>
@@ -166,4 +166,9 @@
     <string name="no_notification_or_bad_net">暂时没有通知，或者网络缓慢。</string>
     <string name="all_offline">这些权限所获取的所有数据将保证只在本地被处理而不会上传，因此您的数据是完全安全的</string>
     <string name="permission_back">完成，返回主界面</string>
+    <string name="helper">帮助</string>
+    <string name="no_helper">当前页面没有说明</string>
+    <string name="no_helper_msg">换个页面试试吧。</string>
+    <string name="press_here_helper">帮助</string>
+    <string name="close_helper">关闭帮助</string>
 </resources>

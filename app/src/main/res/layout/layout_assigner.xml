@@ -18,7 +18,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -35,6 +35,15 @@
             android:id="@+id/guideline_assigner_bottom"
             app:layout_constraintGuide_percent=".8"
             android:orientation="horizontal" />
+
+        <WebView
+            android:id="@+id/assigner_webview"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/guideline_assigner_top"
+            app:layout_constraintBottom_toTopOf="@id/guideline_assigner_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:ignore="WebViewLayout" />
 
         <ScrollView
             android:id="@+id/assigner_content"
@@ -174,20 +183,41 @@
             android:id="@+id/assigner_mover"
             android:paddingTop="4dp">
 
-            <TextView
-                android:id="@+id/press_here_move"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="10dp"
-                android:paddingTop="18dp"
                 android:paddingBottom="1dp"
-                android:text="@string/press_here_move"
-                android:textColor="?attr/colorOnPrimaryContainer"
-                android:textSize="14sp"
-                android:layout_centerVertical="true"
-                tools:ignore="RelativeOverlap" />
+                android:paddingTop="18dp">
+
+                <TextView
+                    android:id="@+id/press_here_move"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/press_here_move"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    android:textSize="14sp"
+                    tools:ignore="RelativeOverlap" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="  |  " />
+
+                <TextView
+                    android:id="@+id/press_here_helper"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/press_here_helper"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    android:textSize="14sp"
+                    tools:ignore="RelativeOverlap"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -217,7 +247,7 @@
                     android:id="@+id/button_quit_img"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginStart="0dp"
                     android:layout_marginEnd="2dp"
                     android:layout_marginTop="15dp"
                     android:backgroundTint="#00000000"
