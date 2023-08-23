@@ -1,5 +1,6 @@
 package com.scrisstudio.seenot.service;
 
+import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
 import static com.scrisstudio.seenot.SeeNot.l;
 import static com.scrisstudio.seenot.SeeNot.le;
 import static com.scrisstudio.seenot.SeeNot.typesCnt;
@@ -233,7 +234,8 @@ public class ExecutorService extends AccessibilityService {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(SeeNot.getAppContext(), CHANNEL_SERVICE_KEEPER_ID);
         builder.setSmallIcon(R.drawable.ic_notification)
                 .setCustomContentView(notificationLayout)
-                .setOngoing(true);
+                .setOngoing(true)
+                .setPriority(PRIORITY_LOW);
         Intent resultIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(SeeNot.getAppContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pendingIntent);
@@ -251,6 +253,13 @@ public class ExecutorService extends AccessibilityService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        l("Start command");
+        try {
+            setForegroundService();
+        } catch (Exception e) {
+            Toast.makeText(SeeNot.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
+            le("1Starting foreground service failed, err message: " + e);
+        }
         return START_STICKY;
     }
 
@@ -278,7 +287,7 @@ public class ExecutorService extends AccessibilityService {
                 }
             } catch (Exception ignored) {
             }
-        }, 3000);
+        }, 4000);
 
         WorkManager.getInstance(this).cancelAllWorkByTag("stay-request");
     }
@@ -289,6 +298,8 @@ public class ExecutorService extends AccessibilityService {
         super.onServiceConnected();
         mService = this;
         inflater = LayoutInflater.from(this);
+
+        l("Service connected");
 
         isDarkModeOn = isNightMode(SeeNot.getAppContext());
 
@@ -325,14 +336,14 @@ public class ExecutorService extends AccessibilityService {
             if (sharedPreferences != null) {
                 setServiceBasicInfo(sharedPreferences, MODE_EXECUTOR);
             }
-
-            try {
-                setForegroundService();
-            } catch (Exception e) {
-                Toast.makeText(SeeNot.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
-                le("Starting foreground service failed, err message: " + e);
-            }
         } else le("Service already invoked");
+
+        try {
+            setForegroundService();
+        } catch (Exception e) {
+            Toast.makeText(SeeNot.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
+            le("2Starting foreground service failed, err message: " + e);
+        }
 
         WorkManager.getInstance(this).cancelAllWorkByTag("stay-request");
 

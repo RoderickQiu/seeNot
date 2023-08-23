@@ -179,7 +179,7 @@ public class AssignerUtils {
                 viewCustomization.findViewById(R.id.assigner_content).setVisibility(View.GONE);
                 webView.setVisibility(View.VISIBLE);
                 webView.setWebViewClient(new WebViewClient());
-                webView.loadUrl("https://seenot.pages.dev/" + "zh/" + "assigner" + mode + ".html");
+                webView.loadUrl("https://seenot.pages.dev/" + "zh/" + "Assigner" + mode + ".html");
             } else {
                 viewCustomization.findViewById(R.id.assigner_content).setVisibility(View.VISIBLE);
                 webView.setVisibility(View.GONE);

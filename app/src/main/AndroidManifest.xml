@@ -68,6 +68,7 @@
             android:name=".service.ExecutorService"
             android:enabled="true"
             android:exported="true"
+            android:priority="1000"
             android:foregroundServiceType="dataSync"
             android:label="@string/service_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">

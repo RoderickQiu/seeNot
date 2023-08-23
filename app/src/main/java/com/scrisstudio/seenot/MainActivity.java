@@ -245,9 +245,13 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<PushedInfo> list = fetched.getPush();
                 for (PushedInfo info : list) {
                     if (!pushedReadList.contains(info.getId())) {
-                        //noinspection RestrictedApi
-                        ((ActionMenuItemView) findViewById(R.id.notification_btn))
-                                .setIcon(ResourcesCompat.getDrawable(resources, R.drawable.baseline_notification_important_24, getTheme()));
+                        try {
+                            //noinspection RestrictedApi
+                            ((ActionMenuItemView) findViewById(R.id.notification_btn))
+                                    .setIcon(ResourcesCompat.getDrawable(resources, R.drawable.baseline_notification_important_24, getTheme()));
+                        } catch (Exception e) {
+                            le("ERR: " + e);
+                        }
                         break;
                     }
                 }
