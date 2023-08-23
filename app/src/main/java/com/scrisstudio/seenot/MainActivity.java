@@ -1,5 +1,6 @@
 package com.scrisstudio.seenot;
 
+import static com.scrisstudio.seenot.SeeNot.getLocale;
 import static com.scrisstudio.seenot.SeeNot.l;
 import static com.scrisstudio.seenot.SeeNot.lastTimeDestination;
 import static com.scrisstudio.seenot.SeeNot.le;
@@ -280,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
                 View view = getLayoutInflater().inflate(R.layout.dialog_webview_helper, null);
                 WebView webView = (WebView) view.findViewById(R.id.helper_webview);
                 webView.setWebViewClient(new WebViewClient());
-                webView.loadUrl("https://seenot.pages.dev/" + "zh/" + currentDestination + ".html");
+                webView.loadUrl("https://seenot.pages.dev/" + getLocale() + "/" + currentDestination + ".html");
                 builder.setView(view);
                 builder.setPositiveButton(R.string.ok, null);
                 builder.show();

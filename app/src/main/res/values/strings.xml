@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">不见君</string>
-    <string name="action_menu">还没有完成</string>
     <string name="menu_home">首页</string>
-    <string name="service_name" translatable="false">👋 seeNot 不见君 👋</string>
+    <string name="service_name">👋 seeNot 不见君 👋</string>
     <string name="service_description">为了使用软件的功能，就需要开启此服务。此服务不会访问网络，因此你的数据是完全安全的，我们也不会使用任何方法获取你在做什么。我们需要那些权限仅仅是为了解析应用布局。</string>
     <string name="menu_settings">设置</string>
     <string name="menu_about">关于</string>
@@ -26,12 +25,10 @@
     <string name="granted">已获取</string>
     <string name="ungranted">未得到</string>
     <string name="grant_now">获取</string>
-    <string name="permissions">权限</string>
     <string name="permission_accessibility">无障碍服务权限</string>
     <string name="permission_accessibility_msg">一切见否服务都依靠此权限。</string>
     <string name="now_open_service">进入页面，请往下拉，找到“seeNot 不见君”并打开。若找不到，请点击“已下载的应用”。</string>
     <string name="default_notification_channel">常规通知</string>
-    <string name="service_start_failed_title">服务未开启</string>
     <string name="permission_battery_msg">用于防止系统杀死服务，续航其实并不会被显著影响。</string>
     <string name="permission_battery">系统省电白名单</string>
     <string name="how_to_grant">了解获取方式</string>
@@ -40,13 +37,9 @@
     <string name="permission_background">其他的重要权限</string>
     <string name="permission_notification">通知权限</string>
     <string name="permission_notification_msg">用于发送必要通知和防止服务被杀死。</string>
-    <string name="edit_page">编辑</string>
-    <string name="select">选中</string>
     <string name="press_here_move">按住空白处拖动</string>
-    <string name="divider">|</string>
     <string name="exit">退出</string>
     <string name="rule_for_msg">对于：</string>
-    <string name="expand_more">更多内容</string>
     <string name="set_mask_info">设置规则信息和定时</string>
     <string name="save">保存</string>
     <string name="new_subrule">新建子规则</string>
@@ -74,7 +67,6 @@
     <string name="filter_auto_click_text_tip">点击\"选择\"打开文字选择模式，并选择需要自动点击的文字，点击\"确认\"保存。注：少数应用的部分文字无法解析。</string>
     <string name="delete">删除</string>
     <string name="settings">设置</string>
-    <string name="type_not_found">未知规则</string>
     <string name="alreay_quit_app_filter">已有一条\"禁止进入程序\"的规则，不能增加新规则</string>
     <string name="filter_trigger">触发：</string>
     <string name="done">确认</string>
@@ -108,7 +100,6 @@
     <string name="timed_settings_tip">设置定时开启、关闭规则</string>
     <string name="timed_settings">规则定时</string>
     <string name="settings_advanced">高级设置</string>
-    <string name="service_has_quited">不见君服务可能已经退出</string>
     <string name="timed_edit_dialog_title">设置定时</string>
     <string name="ok">好</string>
     <string name="set_timed_title">设置定时规则名称</string>
@@ -133,7 +124,6 @@
     <string name="filter_swipe_id">找到元素后反向划动</string>
     <string name="filter_swipe_text_tip">点击\"选择\"打开文字选择模式，并选择一遇到就上滑返回的文字，并点击\"确认\"保存。注：少数应用的部分文字无法解析。</string>
     <string name="filter_swipe_id_tip">点击\"选择\"打开元素选择模式，并选择一遇到就上滑返回的相关元素以获取其元素 ID，并点击\"确认\"保存。</string>
-    <string name="set_rule_timed">设置定时</string>
     <string name="closure_title">临时还是永久关闭</string>
     <string name="closure_temp">临时关闭</string>
     <string name="closure_forever">永久关闭</string>
@@ -145,8 +135,6 @@
     <string name="reserved_title">预约模式已开启</string>
     <string name="reserved_msg">因此你现在不能操作</string>
     <string name="cancel">取消</string>
-    <string name="start_reservation">现在预约</string>
-    <string name="reservation_lock_text_hint">需提前预约的分钟数</string>
     <string name="import_single_rule">导入单条规则</string>
     <string name="import_single_dialog_msg">输入在设置界面导出的单条规则文本以导入单条不见君规则</string>
     <string name="export_log">获取服务日志</string>
@@ -154,7 +142,6 @@
     <string name="welcome_msg">各大APP愈加臃肿，而不见君使你能保持简单</string>
     <string name="start">让我们开始吧</string>
     <string name="welcome_msg_2">下一代屏幕时间管理方案，就在这里</string>
-    <string name="welcome_priv">隐私和权限</string>
     <string name="welcome_priv_msg">继续使用代表同意</string>
     <string name="welcome_priv_title">《不见君使用须知》</string>
     <string name="must_need">必须先获取这些权限才能使用不见君</string>

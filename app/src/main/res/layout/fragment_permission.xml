@@ -30,6 +30,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAlignment="center"
                     android:text="@string/must_need" />
 
                 <TextView
@@ -81,7 +82,8 @@
                                 android:includeFontPadding="false"
                                 android:singleLine="true"
                                 android:text="@string/permission_notification"
-                                android:textAppearance="?attr/textAppearanceHeadline6" />
+                                android:textStyle="bold"
+                                android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                             <TextView
                                 android:id="@+id/permission_notification_granted"
@@ -110,8 +112,8 @@
                         </LinearLayout>
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="36dp"
                             android:text="@string/permission_notification_msg" />
 
                     </LinearLayout>
@@ -167,7 +169,8 @@
                                 android:includeFontPadding="false"
                                 android:singleLine="true"
                                 android:text="@string/permission_overlay"
-                                android:textAppearance="?attr/textAppearanceHeadline6" />
+                                android:textStyle="bold"
+                                android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                             <TextView
                                 android:id="@+id/permission_overlay_granted"
@@ -253,7 +256,8 @@
                                 android:includeFontPadding="false"
                                 android:singleLine="true"
                                 android:text="@string/permission_accessibility"
-                                android:textAppearance="?attr/textAppearanceHeadline6" />
+                                android:textStyle="bold"
+                                android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                             <TextView
                                 android:id="@+id/permission_accessibility_granted"
@@ -346,7 +350,8 @@
                                 android:includeFontPadding="false"
                                 android:singleLine="true"
                                 android:text="@string/permission_battery"
-                                android:textAppearance="?attr/textAppearanceHeadline6" />
+                                android:textStyle="bold"
+                                android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                             <TextView
                                 android:id="@+id/permission_battery_granted"
@@ -427,7 +432,8 @@
                             android:includeFontPadding="false"
                             android:singleLine="true"
                             android:text="@string/permission_background"
-                            android:textAppearance="?attr/textAppearanceHeadline6" />
+                            android:textStyle="bold"
+                            android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -446,7 +452,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/permission_background"
-                        android:layout_width="80dp"
+                        android:layout_width="90dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:text="@string/how_to_grant"

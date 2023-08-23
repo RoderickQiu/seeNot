@@ -1,11 +1,16 @@
 package com.scrisstudio.seenot;
 
+import androidx.annotation.NonNull;
+
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.content.res.Configuration;
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
 import com.scrisstudio.seenot.service.ApplicationObserver;
@@ -17,8 +22,14 @@ public class SeeNot extends Application {
     public static String lastTimeDestination = "";
     public static int shouldNavigateTo = 0;
 
+    private static String locale;
+
     public static Context getAppContext() {
         return SeeNot.context;
+    }
+
+    public static String getLocale() {
+        return locale;
     }
 
     public static boolean isDebugApp() {
@@ -30,11 +41,30 @@ public class SeeNot extends Application {
         }
     }
 
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setLocale();
+    }
+
     public void onCreate() {
         super.onCreate();
         SeeNot.context = getApplicationContext();
         ProcessLifecycleOwner.get().getLifecycle().addObserver(new ApplicationObserver());
     }
+
+    private void setLocale() {
+        locale = getResources().getConfiguration().getLocales().get(0).getLanguage();
+        le(locale);
+        if (!locale.equals("zh")) {
+            locale = "en";
+            LocaleListCompat appLocale = LocaleListCompat.forLanguageTags("en-US");
+            AppCompatDelegate.setApplicationLocales(appLocale);
+        } else {
+            LocaleListCompat appLocale = LocaleListCompat.forLanguageTags("zh-CN");
+            AppCompatDelegate.setApplicationLocales(appLocale);
+        }
+    }
+
 
     public static final String TAG = "SeeNot-AccessibilityService";
 

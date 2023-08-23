@@ -26,6 +26,8 @@ import com.scrisstudio.seenot.R;
 import com.scrisstudio.seenot.SeeNot;
 import com.scrisstudio.seenot.databinding.FragmentPermissionBinding;
 
+import java.util.Objects;
+
 public class PermissionFragment extends Fragment {
 
     private FragmentPermissionBinding binding;
@@ -141,7 +143,7 @@ public class PermissionFragment extends Fragment {
             startActivity(intent);
         });
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(permissionMessageReceiver,
+        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(permissionMessageReceiver,
                 new IntentFilter("permission_channel"));
     }
 
