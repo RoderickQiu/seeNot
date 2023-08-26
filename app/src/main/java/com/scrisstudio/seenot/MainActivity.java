@@ -7,7 +7,9 @@ import static com.scrisstudio.seenot.SeeNot.le;
 import static com.scrisstudio.seenot.ui.permission.PermissionFragment.isAccessibilitySettingsOn;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -22,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -279,8 +282,15 @@ public class MainActivity extends AppCompatActivity {
             if (!Objects.equals(currentDestination, "About")) {
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
                 View view = getLayoutInflater().inflate(R.layout.dialog_webview_helper, null);
-                WebView webView = (WebView) view.findViewById(R.id.helper_webview);
-                webView.setWebViewClient(new WebViewClient());
+                WebView webView = view.findViewById(R.id.helper_webview);
+                ProgressBar progressBar = view.findViewById(R.id.helper_webview_progress);
+                progressBar.setVisibility(View.VISIBLE);
+                webView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public void onPageFinished(WebView view, String url) {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
                 webView.loadUrl("https://seenot.pages.dev/" + getLocale() + "/" + currentDestination + ".html");
                 builder.setView(view);
                 builder.setPositiveButton(R.string.ok, null);

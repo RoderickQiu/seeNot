@@ -34,6 +34,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -174,16 +175,23 @@ public class AssignerUtils {
             }
 
         viewCustomization.findViewById(R.id.press_here_helper).setOnClickListener((v) -> {
-            WebView webView = (WebView) viewCustomization.findViewById(R.id.assigner_webview);
+            WebView webView = viewCustomization.findViewById(R.id.assigner_webview);
+            ProgressBar progressBar = viewCustomization.findViewById(R.id.assigner_webview_progress);
             if (webView.getVisibility() == View.GONE) {
                 ((TextView) viewCustomization.findViewById(R.id.press_here_helper)).setText(R.string.close_helper);
                 viewCustomization.findViewById(R.id.assigner_content).setVisibility(View.GONE);
+                progressBar.setVisibility(View.VISIBLE);
                 webView.setVisibility(View.VISIBLE);
-                webView.setWebViewClient(new WebViewClient());
                 webView.loadUrl("https://seenot.pages.dev/" + getLocale() + "/" + "Assigner" + mode + ".html");
+                webView.setWebViewClient(new WebViewClient() {
+                    public void onPageFinished(WebView view, String url) {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
             } else {
                 viewCustomization.findViewById(R.id.assigner_content).setVisibility(View.VISIBLE);
                 webView.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 ((TextView) viewCustomization.findViewById(R.id.press_here_helper)).setText(R.string.press_here_helper);
             }
         });
