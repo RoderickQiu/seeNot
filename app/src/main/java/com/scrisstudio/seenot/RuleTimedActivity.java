@@ -59,7 +59,7 @@ public class RuleTimedActivity extends AppCompatActivity {
         rules = gson.fromJson(sharedPreferences.getString("rules", "{}"), new TypeToken<List<RuleInfo>>() {
         }.getType());
 
-        RuleTimedAdapter adapter = new RuleTimedAdapter(this, timed, rules, sharedPreferences);
+        RuleTimedAdapter adapter = new RuleTimedAdapter(this, timed, rules, sharedPreferences, getResources());
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new RuleInfoCardDecoration());
 

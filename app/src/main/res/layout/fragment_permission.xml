@@ -452,7 +452,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/permission_background"
-                        android:layout_width="90dp"
+                        android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:text="@string/how_to_grant"

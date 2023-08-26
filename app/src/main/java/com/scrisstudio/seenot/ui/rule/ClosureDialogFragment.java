@@ -164,7 +164,7 @@ public class ClosureDialogFragment extends DialogFragment {
         okButton.setOnClickListener(v -> {
             if ((!((Chip) typeChips.getChildAt(0)).isChecked() && !((Chip) typeChips.getChildAt(1)).isChecked())
                     || ((Chip) typeChips.getChildAt(0)).isChecked() && reopenTime.getEditText().getText().length() == 0) {
-                Toast.makeText(SeeNot.getAppContext(), "还没设置完呢，请重试", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SeeNot.getAppContext(), R.string.havent_all_finish, Toast.LENGTH_SHORT).show();
                 return;
             }
 

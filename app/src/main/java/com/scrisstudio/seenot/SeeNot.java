@@ -7,6 +7,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
@@ -43,7 +44,7 @@ public class SeeNot extends Application {
 
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        setLocale();
+        setLocale(getResources());
     }
 
     public void onCreate() {
@@ -52,8 +53,8 @@ public class SeeNot extends Application {
         ProcessLifecycleOwner.get().getLifecycle().addObserver(new ApplicationObserver());
     }
 
-    private void setLocale() {
-        locale = getResources().getConfiguration().getLocales().get(0).getLanguage();
+    public static void setLocale(Resources resources) {
+        locale = resources.getConfiguration().getLocales().get(0).getLanguage();
         le(locale);
         if (!locale.equals("zh")) {
             locale = "en";
@@ -107,21 +108,21 @@ public class SeeNot extends Application {
     public static String getFilterTypeName(int type) {
         switch (type) {
             case 0:
-                return "禁止进入此程序";//R.string.filter_ban_app;
+                return locale.equals("zh") ? "禁止进入此程序" : "Forbid access to app";//R.string.filter_ban_app;
             case 1:
-                return "禁止进入此页面";//R.string.filter_ban_activity;
+                return locale.equals("zh") ? "禁止进入此页面" : "Forbid access to the activity";//R.string.filter_ban_activity;
             case 2:
-                return "找到文字后退出";//R.string.filter_ban_text;
+                return locale.equals("zh") ? "找到文字后退出" : "Force back after finding the text";//R.string.filter_ban_text;
             case 5:
-                return "找到文字后自动点击";//R.string.filter_auto_click_text;
+                return locale.equals("zh") ? "找到文字后自动点击" : "Auto. click after finding the text";//R.string.filter_auto_click_text;
             case 6:
-                return "找到文字后反向划动";//R.string.filter_swipe_text;
+                return locale.equals("zh") ? "找到文字后反向划动" : "Swipe backwards after finding the text";//R.string.filter_swipe_text;
             case 3:
-                return "找到元素后退出";//R.string.filter_ban_id;
+                return locale.equals("zh") ? "找到元素后退出" : "Force back after finding the elem.";//R.string.filter_ban_id;
             case 4:
-                return "找到元素后自动点击";//R.string.filter_auto_click_id;
+                return locale.equals("zh") ? "找到元素后自动点击" : "Auto. click after finding the element";//R.string.filter_auto_click_id;
             case 7:
-                return "找到元素后反向划动";//R.string.filter_swipe_id;
+                return locale.equals("zh") ? "找到元素后反向划动" : "Swipe backwards after finding the elem.";//R.string.filter_swipe_id;
         }
         return "未知规则";//R.string.type_not_found;
     }

@@ -46,6 +46,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/rule_name_textfield"
                     android:textSize="14sp"
+                    android:layout_marginStart="8dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxLength="8"
@@ -82,7 +83,7 @@
                     android:id="@+id/pre_rule_for"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="3dp"
+                    android:layout_marginStart="4dp"
                     android:textColor="?attr/colorOnPrimaryContainer"
                     android:textSize="18sp" />
 

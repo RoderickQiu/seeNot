@@ -108,8 +108,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                         .setTitle(R.string.reserved_title)
                         .setMessage(R.string.reserved_msg)
                         .setNegativeButton(R.string.cancel, null)
-                        .setPositiveButton(timeDelta > 0 ? ("预约还剩 " + (int) (Math.ceil((double) timeDelta / 60000f)) + " 分") :
-                                "现在预约", (dialogInterface, i) -> {
+                        .setPositiveButton(timeDelta > 0 ? context.getResources().getString(R.string.reserve_still,
+                                ("" + (int) (Math.ceil((double) timeDelta / 60000f)))) :
+                                context.getResources().getString(R.string.reserve_now), (dialogInterface, i) -> {
                             if (timeDelta <= 0) {
                                 SharedPreferences.Editor ruleInitEditor = MainActivity.sharedPreferences.edit();
                                 ruleInitEditor.putLong("rl-time", new Date().getTime());
@@ -178,7 +179,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             preferenceSingleExport.setOnPreferenceClickListener(preference -> {
                 new MaterialAlertDialogBuilder(requireContext()).
                         setTitle(R.string.settings_export_single).
-                        setMessage("请在首页该规则菜单中选择”导出“以导出。").
+                        setMessage(R.string.settings_export_single_msg).
                         setPositiveButton(R.string.ok, (dialogInterface, i) -> {
                         }).
                         create().show();
@@ -215,8 +216,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             exportLogPreference.setOnPreferenceClickListener(preference -> {
                 new MaterialAlertDialogBuilder(requireContext()).
                         setTitle(R.string.export_log).
-                        setMessage("请到系统文件应用中前往 " + requireContext().getExternalFilesDir(null)
-                                + "/logs 以手动导出所需要的日志。").
+                        setMessage(requireContext().getResources().getString(R.string.get_service_log_msg,
+                                requireContext().getExternalFilesDir(null))).
                         setPositiveButton(R.string.ok, (dialogInterface, i) -> {
                         }).
                         create().show();

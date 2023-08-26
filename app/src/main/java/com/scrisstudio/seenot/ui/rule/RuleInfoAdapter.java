@@ -10,6 +10,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,16 +54,18 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
     private static List<TimedInfo> timedList = null;
     private final SharedPreferences sharedPreferences;
     private static FragmentManager fragmentManager;
+    private static Resources resources;
     private final Context context;
     private final Gson gson;
 
     public RuleInfoAdapter(Context context, FragmentManager fragmentManager, List<RuleInfo> mList,
-                           List<TimedInfo> timedList, SharedPreferences sharedPreferences) {
+                           List<TimedInfo> timedList, SharedPreferences sharedPreferences, Resources resources) {
         this.context = context;
-        this.fragmentManager = fragmentManager;
         this.sharedPreferences = sharedPreferences;
-        this.timedList = timedList;
-        this.mList = mList;
+        RuleInfoAdapter.fragmentManager = fragmentManager;
+        RuleInfoAdapter.resources = resources;
+        RuleInfoAdapter.timedList = timedList;
+        RuleInfoAdapter.mList = mList;
         gson = new Gson();
     }
 
@@ -116,7 +119,7 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
             holder.ruleFor.setText(rule.getForName());
 
             if (hasTimedInfo(rule.getId())) {
-                holder.ruleTimed.setText("有定时任务启用");
+                holder.ruleTimed.setText(resources.getString(R.string.have_timed_rule_on));
             } else
                 holder.ruleTimed.setVisibility(View.GONE);
 
@@ -161,17 +164,18 @@ public class RuleInfoAdapter extends RecyclerView.Adapter<RuleInfoAdapter.MyView
             });
 
             final AlertDialog alertDialogRuleMenu;
-            final String[] items = {"删除", "导出", "定时"};
+            final String[] items = {resources.getString(R.string.delete),
+                    resources.getString(R.string.output), resources.getString(R.string.timed_settings)};
             MaterialAlertDialogBuilder alertBuilder = new MaterialAlertDialogBuilder(context);
-            alertBuilder.setTitle("对规则执行操作");
+            alertBuilder.setTitle(resources.getString(R.string.perform_action_to_rule));
             alertBuilder.setItems(items, (dialogInterface, i) -> {
                 switch (i) {
                     case 0: //delete
                         new MaterialAlertDialogBuilder(context)
-                                .setTitle("确定删除" + rule.getTitle() + "吗？")
-                                .setMessage("此操作不可逆，请谨慎删除。")
-                                .setNegativeButton("取消", null)
-                                .setPositiveButton("确定", (dialogInterface1, i1) -> {
+                                .setTitle(resources.getString(R.string.confirm_delete_with_content, rule.getTitle()))
+                                .setMessage(resources.getString(R.string.action_not_invertible))
+                                .setNegativeButton(resources.getString(R.string.cancel), null)
+                                .setPositiveButton(resources.getString(R.string.done), (dialogInterface1, i1) -> {
                                     SharedPreferences.Editor edit = sharedPreferences.edit();
                                     mList.remove(position);
                                     notifyDataSetChanged();

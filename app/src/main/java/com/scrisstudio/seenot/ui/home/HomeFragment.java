@@ -99,18 +99,19 @@ public class HomeFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        RuleInfoAdapter adapter = new RuleInfoAdapter(getActivity(), getFragmentManager(), rules, timed, sharedPreferences);
+        RuleInfoAdapter adapter = new RuleInfoAdapter(getActivity(), getFragmentManager(), rules, timed, sharedPreferences, getResources());
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new RuleInfoCardDecoration());
 
         binding.fab.show();
         binding.fab.setOnClickListener(v -> {
-            CharSequence[] addList = {"新建规则", "导入规则"};
-            new MaterialAlertDialogBuilder(requireContext()).setTitle("选择模式")
+            CharSequence[] addList = {resources.getString(R.string.new_rule),
+                    resources.getString(R.string.import_single_rule)};
+            new MaterialAlertDialogBuilder(requireContext()).setTitle(resources.getString(R.string.select_mode))
                     .setItems(addList, (dialogInterface, i) -> {
                         if (i == 0) {
                             SharedPreferences.Editor edit = sharedPreferences.edit();
-                            rules.add(new RuleInfo(sharedPreferences.getInt("rule-id-max", 0), true, "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0, 0));
+                            rules.add(new RuleInfo(sharedPreferences.getInt("rule-id-max", 0), true, resources.getString(R.string.new_rule), "com.software.any", resources.getString(R.string.rule_for_not_set), new ArrayList<>(), 0, 0));
                             edit.putString("rules", gson.toJson(rules));
                             edit.putInt("rule-id-max", sharedPreferences.getInt("rule-id-max", 0) + 1);
                             edit.apply();

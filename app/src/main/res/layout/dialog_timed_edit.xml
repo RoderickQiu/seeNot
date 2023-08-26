@@ -65,7 +65,7 @@
                     app:smsp_hintSize="12.3dp"
                     app:smsp_arrowColor="?attr/colorOnSurface"
                     app:smsp_searchHintColor="?attr/colorOnSurfaceVariant"
-                    app:smsp_hint="设置对应的规则" />
+                    app:smsp_hint="@string/set_corresp_rule" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

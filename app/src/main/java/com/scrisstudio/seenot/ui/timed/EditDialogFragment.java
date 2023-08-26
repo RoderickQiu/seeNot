@@ -116,7 +116,7 @@ public class EditDialogFragment extends DialogFragment {
 
         TimedInfo cur = timed.get(position);
 
-        Objects.requireNonNull(title.getEditText()).setText(cur.getName().equals("未命名") ? "" : cur.getName());
+        Objects.requireNonNull(title.getEditText()).setText(cur.getName().equals(getResources().getString(R.string.untitled)) ? "" : cur.getName());
 
         ArrayList<String> rulesList = new ArrayList<>();
         for (int i = 0; i < rules.size(); i++) {

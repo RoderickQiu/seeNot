@@ -9,12 +9,17 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.scrisstudio.seenot.R;
+
 public class TimedWorkManager extends Worker {
+
+    Context context;
 
     public TimedWorkManager(
             @NonNull Context context,
             @NonNull WorkerParameters params) {
         super(context, params);
+        this.context = context;
     }
 
     @NonNull
@@ -22,7 +27,8 @@ public class TimedWorkManager extends Worker {
     public Result doWork() {
         try {
             if (!(ExecutorService.mService != null && ExecutorService.isForegroundServiceRunning))
-                sendSimpleNotification("不见君服务可能被系统错误退出了", "请前往系统无障碍设置重新打开它！");
+                sendSimpleNotification(context.getResources().getString(R.string.service_destroyed),
+                        context.getResources().getString(R.string.go_accessib_for_reopen));
             return Result.success();
         } catch (Exception e) {
             le("Err: " + e + " (Work Manager)");

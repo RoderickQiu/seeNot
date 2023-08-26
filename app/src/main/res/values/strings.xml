@@ -110,6 +110,13 @@
     <string name="week_fri">周五</string>
     <string name="week_sat">周六</string>
     <string name="week_sun">周日</string>
+    <string name="week_mon_s">一</string>
+    <string name="week_tues_s">二</string>
+    <string name="week_wed_s">三</string>
+    <string name="week_thur_s">四</string>
+    <string name="week_fri_s">五</string>
+    <string name="week_sat_s">六</string>
+    <string name="week_sun_s">日</string>
     <string name="only_once">仅当天</string>
     <string name="start_time">开始时间</string>
     <string name="end_time">结束时间</string>
@@ -158,4 +165,36 @@
     <string name="no_helper_msg">换个页面试试吧。</string>
     <string name="press_here_helper">帮助</string>
     <string name="close_helper">关闭帮助</string>
+    <string name="set_corresp_rule">设置对应的规则</string>
+    <string name="untitled">未命名</string>
+    <string name="rule_for_other">这条规则是关于%s的，只能在那个程序打开时编辑。若确实在这一程序中，请点一下程序界面或滑动列表，然后重新获取</string>
+    <string name="error_come">发生错误</string>
+    <string name="multi_id_type3">此 id 在页面中多次使用，可能不适合当作判定条件</string>
+    <string name="multi_id_type4">此 id 在页面不止一次使用，可能无法正确判断应当点击哪一个</string>
+    <string name="multi_id_other">此 id 在页面不止一次使用，可能造成误判</string>
+    <string name="cannot_set_here">不允许在此处设置规则</string>
+    <string name="new_rule">新建规则</string>
+    <string name="rule_for_not_set">未设置</string>
+    <string name="on">开</string>
+    <string name="off">关</string>
+    <string name="everyday">每天</string>
+    <string name="week_day_pre">周</string>
+    <string name="select_mode">选择模式</string>
+    <string name="confirm_delete_with_content">确定删除%s吗？</string>
+    <string name="output">导出</string>
+    <string name="perform_action_to_rule">对规则执行操作</string>
+    <string name="action_not_invertible">此操作不可逆，请谨慎删除。</string>
+    <string name="have_timed_rule_on">有定时任务启用</string>
+    <string name="service_not_enabled_short">不见君服务未开启</string>
+    <string name="back_last_failed">返回上一页失败，直接退出程序：</string>
+    <string name="service_destroyed" translatable="false">不见君服务可能被系统错误退出了</string>
+    <string name="go_accessib_for_reopen">请前往系统无障碍设置重新打开它！</string>
+    <string name="welcome_disclaimer_msg">免责声明：所有规则都是用户所设置的，软件本身并不提供，也不对用户的规则及其后果负责</string>
+    <string name="reserve_now">现在预约</string>
+    <string name="reserve_still">预约还剩%s分</string>
+    <string name="settings_export_single_msg">请在首页该规则菜单中选择”导出“以导出。</string>
+    <string name="get_service_log_msg">请到系统文件应用中前往 %s/logs 以手动导出所需要的日志。</string>
+    <string name="havent_all_finish">还没设置完呢，请重试</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

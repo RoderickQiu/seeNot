@@ -14,7 +14,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:paddingHorizontal="10dp">
 
             <TextView
                 android:id="@+id/welcome_title"
@@ -32,6 +33,7 @@
                 android:id="@+id/welcome_msg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAlignment="center"
                 android:text="@string/welcome_msg"
                 app:layout_constraintTop_toBottomOf="@id/welcome_title"
                 app:layout_constraintStart_toStartOf="parent"
@@ -43,6 +45,7 @@
                 android:id="@+id/welcome_msg_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAlignment="center"
                 android:text="@string/welcome_msg_2"
                 app:layout_constraintTop_toBottomOf="@id/welcome_msg"
                 app:layout_constraintStart_toStartOf="parent"
@@ -55,26 +58,47 @@
                 android:id="@+id/welcome_priv_msg_box"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 app:layout_constraintBottom_toTopOf="@id/welcome_submit"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginBottom="10dp">
+                android:layout_marginBottom="75dp"
+                android:paddingHorizontal="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAlignment="center"
                     android:text="@string/welcome_priv_msg"
                     style="@style/TextAppearance.AppCompat.Caption" />
 
                 <TextView
                     android:id="@+id/privacy_notice"
+                    android:textAlignment="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/welcome_priv_title"
                     style="@style/TextAppearance.AppCompat.Caption"
                     android:textColor="@color/orange_700"
                     android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/welcome_disclaimer_msg_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toTopOf="@id/welcome_submit"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="@string/welcome_disclaimer_msg"
+                    style="@style/TextAppearance.AppCompat.Caption" />
 
             </LinearLayout>
 

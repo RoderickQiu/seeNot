@@ -5,6 +5,7 @@ import static com.scrisstudio.seenot.service.ExecutorService.MODE_EXECUTOR;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,12 +44,14 @@ public class RuleTimedAdapter extends RecyclerView.Adapter<RuleTimedAdapter.MyVi
     private static List<TimedInfo> mList = null;
     private static List<RuleInfo> ruleList = null;
     private final SharedPreferences sharedPreferences;
+    private static Resources resources;
     private final Context context;
     private final Gson gson;
 
-    public RuleTimedAdapter(Context context, List<TimedInfo> timedList, List<RuleInfo> ruleInfoList, SharedPreferences sharedPreferences) {
+    public RuleTimedAdapter(Context context, List<TimedInfo> timedList, List<RuleInfo> ruleInfoList, SharedPreferences sharedPreferences, Resources resources) {
         this.context = context;
         this.sharedPreferences = sharedPreferences;
+        RuleTimedAdapter.resources = resources;
         mList = timedList;
         ruleList = ruleInfoList;
         this.gson = new Gson();
@@ -89,7 +92,7 @@ public class RuleTimedAdapter extends RecyclerView.Adapter<RuleTimedAdapter.MyVi
         for (RuleInfo i : ruleList) {
             if (i.getId() == in) return i;
         }
-        return new RuleInfo(0, true, "新建规则", "com.software.any", "未设置", new ArrayList<>(), 0, 0);
+        return new RuleInfo(0, true, resources.getString(R.string.new_rule), "com.software.any", resources.getString(R.string.rule_for_not_set), new ArrayList<>(), 0, 0);
     }
 
     public static ArrayList<Integer> getRealScope(int scope) {
@@ -110,14 +113,14 @@ public class RuleTimedAdapter extends RecyclerView.Adapter<RuleTimedAdapter.MyVi
     }
 
     private static String realScopeParser(ArrayList<Integer> list) {
-        StringBuilder builder = new StringBuilder("");
-        String[] week = {"一", "二", "三", "四", "五", "六", "日"};
+        StringBuilder builder = new StringBuilder();
+        String[] week = {resources.getString(R.string.week_mon_s), resources.getString(R.string.week_tues_s), resources.getString(R.string.week_wed_s), resources.getString(R.string.week_thur_s), resources.getString(R.string.week_fri_s), resources.getString(R.string.week_sat_s), resources.getString(R.string.week_sun_s)};
         if (list.size() == 0) {
-            builder.append("仅当天");
+            builder.append(resources.getString(R.string.only_once));
         } else if (list.size() == 7) {
-            builder.append("每天");
+            builder.append(resources.getString(R.string.everyday));
         } else {
-            builder.append("周");
+            builder.append(resources.getString(R.string.week_day_pre));
             for (int i = 0; i < list.size(); i++) {
                 builder.append(week[list.get(i) - 1]);
                 if (i != list.size() - 1) builder.append("/");
@@ -142,7 +145,8 @@ public class RuleTimedAdapter extends RecyclerView.Adapter<RuleTimedAdapter.MyVi
             holder.ruleId.setContentDescription(String.valueOf(rule.getId()));
             holder.ruleTitle.setText(rule.getName() + " (" + corresp.getForName() + ")");
             holder.ruleDescription.setText(realScopeParser(getRealScope(rule.getScope())) + " " +
-                    timeParser(rule.getStartTime()) + "~" + timeParser(rule.getEndTime()) + " | " + (rule.getMode() ? "开" : "关"));
+                    timeParser(rule.getStartTime()) + "~" + timeParser(rule.getEndTime()) + " | "
+                    + (rule.getMode() ? resources.getString(R.string.on) : resources.getString(R.string.off)));
 
             holder.statusSwitch.setChecked(rule.getStatus());
             holder.statusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {

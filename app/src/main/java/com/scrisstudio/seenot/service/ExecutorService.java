@@ -283,7 +283,8 @@ public class ExecutorService extends AccessibilityService {
                 if (!isStart()) {
                     Toast.makeText(SeeNot.getAppContext(), R.string.service_start_failed, Toast.LENGTH_LONG).show();
                     le("Service invoking didn't respond, a manual start might be needed.");
-                    sendSimpleNotification("不见君服务未开启", "不见君服务没有成功开启，请前往系统无障碍设置手动开启");
+                    sendSimpleNotification(resources.getString(R.string.service_not_enabled_short),
+                            resources.getString(R.string.service_start_failed));
                 }
             } catch (Exception ignored) {
             }
@@ -452,7 +453,7 @@ public class ExecutorService extends AccessibilityService {
                                             Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()] + "：\"" + tempFilter.getParam1().replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
                                         } else {
                                             performGlobalAction(GLOBAL_ACTION_HOME);
-                                            Toast.makeText(SeeNot.getAppContext(), "返回上一页失败，直接退出程序：\"" + tempFilter.getParam1().replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(SeeNot.getAppContext(), resources.getString(R.string.back_last_failed) + "\"" + tempFilter.getParam1().replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                     break;
@@ -481,11 +482,11 @@ public class ExecutorService extends AccessibilityService {
     }
 
     private boolean isCapableClass(String className) {
+        if (className == null) return false;
         if (className.equals(lastTimeClassName))
             return lastTimeClassCapable;
         else {
-            if (className == null) return false;
-            else if (className.contains("Activity"))
+            if (className.contains("Activity"))
                 return true;
             else
                 return !className.startsWith("android.widget.") && !className.startsWith("android.view.")
@@ -550,7 +551,7 @@ public class ExecutorService extends AccessibilityService {
                                                 + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
                                     } else {
                                         performGlobalAction(GLOBAL_ACTION_HOME);
-                                        Toast.makeText(SeeNot.getAppContext(), "返回上一页失败，直接退出程序：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(SeeNot.getAppContext(), resources.getString(R.string.back_last_failed) + "\"" + word + "\"", Toast.LENGTH_SHORT).show();
                                     }
                                     return;
                                 }
@@ -565,7 +566,7 @@ public class ExecutorService extends AccessibilityService {
                                                 + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
                                     } else {
                                         performGlobalAction(GLOBAL_ACTION_HOME);
-                                        Toast.makeText(SeeNot.getAppContext(), "返回上一页失败，直接退出程序：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(SeeNot.getAppContext(), resources.getString(R.string.back_last_failed) + "\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
                                     }
                                     return;
                                 }
@@ -669,7 +670,7 @@ public class ExecutorService extends AccessibilityService {
         le("Service unbind");
         mService = null;
         try {
-            sendSimpleNotification("不见君服务可能被系统错误退出了", "请前往系统无障碍设置重新打开它！");
+            sendSimpleNotification(resources.getString(R.string.service_destroyed), resources.getString(R.string.go_accessib_for_reopen));
         } catch (Exception ignored) {
         }
         return super.onUnbind(intent);
@@ -679,7 +680,7 @@ public class ExecutorService extends AccessibilityService {
     public void onDestroy() {
         le("Service destroy");
         try {
-            sendSimpleNotification("不见君服务可能被系统错误退出了", "请前往系统无障碍设置重新打开它！");
+            sendSimpleNotification(resources.getString(R.string.service_destroyed), resources.getString(R.string.go_accessib_for_reopen));
         } catch (Exception ignored) {
         }
         isFirstTimeInvokeService = true;

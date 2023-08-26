@@ -28,6 +28,8 @@ import com.scrisstudio.seenot.databinding.FragmentPermissionBinding;
 
 import java.util.Objects;
 
+import dev.doubledot.doki.ui.DokiActivity;
+
 public class PermissionFragment extends Fragment {
 
     private FragmentPermissionBinding binding;
@@ -129,12 +131,15 @@ public class PermissionFragment extends Fragment {
 
         //自启和后台运行
         binding.permissionBackground.setOnClickListener(v -> {
-            //打开浏览器链接
-            Intent intent = new Intent();
-            intent.setAction("android.intent.action.VIEW");
-            Uri content_url = Uri.parse("https://keep-alive.pages.dev/#" + SeeNot.getManufacturer());
-            intent.setData(content_url);
-            startActivity(intent);
+            if (SeeNot.getLocale().equals("zh")) {
+                Intent intent = new Intent();//打开浏览器链接
+                intent.setAction("android.intent.action.VIEW");
+                Uri content_url = Uri.parse("https://keep-alive.pages.dev/#" + SeeNot.getManufacturer());
+                intent.setData(content_url);
+                startActivity(intent);
+            } else {
+                DokiActivity.Companion.start(requireContext());
+            }
         });
 
         binding.permissionBack.setOnClickListener(v -> {

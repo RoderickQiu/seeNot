@@ -2,6 +2,7 @@ package com.scrisstudio.seenot.ui.assigner;
 
 import static android.content.Context.WINDOW_SERVICE;
 import static com.scrisstudio.seenot.SeeNot.getAppContext;
+import static com.scrisstudio.seenot.SeeNot.getLocale;
 import static com.scrisstudio.seenot.SeeNot.l;
 import static com.scrisstudio.seenot.SeeNot.le;
 import static com.scrisstudio.seenot.service.ExecutorService.MODE_ASSIGNER;
@@ -179,7 +180,7 @@ public class AssignerUtils {
                 viewCustomization.findViewById(R.id.assigner_content).setVisibility(View.GONE);
                 webView.setVisibility(View.VISIBLE);
                 webView.setWebViewClient(new WebViewClient());
-                webView.loadUrl("https://seenot.pages.dev/" + "zh/" + "Assigner" + mode + ".html");
+                webView.loadUrl("https://seenot.pages.dev/" + getLocale() + "/" + "Assigner" + mode + ".html");
             } else {
                 viewCustomization.findViewById(R.id.assigner_content).setVisibility(View.VISIBLE);
                 webView.setVisibility(View.GONE);
@@ -236,8 +237,7 @@ public class AssignerUtils {
 
         btSave.setOnClickListener(v -> {
             if (!foregroundPackageName.equals(current.getFor()) && !foregroundPackageName.equals("com.scrisstudio.seenot")) {
-                sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                        + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点一下程序界面或滑动列表，然后重新获取", LENGTH_LONG);
+                sendToast(viewToast, resources.getString(R.string.rule_for_other, getAppRealName(current.getFor())), LENGTH_LONG);
                 return;
             }
             String param = triggerValue.getText().toString();
@@ -277,8 +277,7 @@ public class AssignerUtils {
 
     private static void refreshSet(FilterInfo filter, View viewCustomization, View viewToast, int refreshMode) {
         if (!foregroundPackageName.equals(current.getFor()) && refreshMode == 1 && !foregroundPackageName.equals("com.scrisstudio.seenot")) {
-            sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                    + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点一下程序界面或滑动列表，然后重新获取", LENGTH_LONG);
+            sendToast(viewToast, resources.getString(R.string.rule_for_other, getAppRealName(current.getFor())), LENGTH_LONG);
             return;
         }
 
@@ -383,13 +382,14 @@ public class AssignerUtils {
                 dialogInterface.dismiss();
             });
             alertDialogTypeSelect = alertBuilder.create();
-            alertDialogTypeSelect.getWindow().setType(WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY);
+            Objects.requireNonNull(alertDialogTypeSelect.getWindow()).
+                    setType(WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY);
 
             if (current.getFor().equals(foregroundPackageName))
                 alertDialogTypeSelect.show();
             else {
-                sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                        + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点一下程序界面或滑动列表，然后重新获取", LENGTH_LONG);
+                sendToast(viewToast, resources.getString(R.string.rule_for_other,
+                        getAppRealName(current.getFor())), LENGTH_LONG);
             }
         });
 
@@ -468,7 +468,7 @@ public class AssignerUtils {
                 contentWidth.set(content.getWidth());
             }
         });
-        content.setText(input == null ? "发生错误" : input);
+        content.setText(input == null ? resources.getString(R.string.error_come) : input);
 
         MainActivity.runOnUI(() -> {
             try {
@@ -600,8 +600,8 @@ public class AssignerUtils {
 
     private static void toggleOutline(FrameLayout layoutOverlayOutline, View viewCustomization, View viewTarget, View viewToast) {
         if (!foregroundPackageName.equals(current.getFor())) {
-            sendToast(viewToast, "这条规则是关于" + getAppRealName(current.getFor())
-                    + "的，只能在那个程序打开时编辑。若确实在这一程序中，请点一下程序界面或滑动列表，然后重新获取", LENGTH_LONG);
+            sendToast(viewToast, resources.getString(R.string.rule_for_other,
+                    getAppRealName(current.getFor())), LENGTH_LONG);
             return;
         }
 
@@ -656,9 +656,12 @@ public class AssignerUtils {
                     if ((type == 2 || type == 5 || type == 6) && (tempText.equals(""))) continue;
                     if ((type == 4 || type == 5) && !isParentClickable(e)) continue;
 
-                    if (idMap.containsKey(tempId))
-                        idMap.put(tempId, idMap.getOrDefault(tempId, 0) + 1);
-                    else idMap.put(tempId, 1);
+                    if (idMap.containsKey(tempId)) {
+                        Integer it = idMap.getOrDefault(tempId, 0);
+                        if (it != null)
+                            idMap.put(tempId, it + 1);
+                        else idMap.put(tempId, 1);
+                    } else idMap.put(tempId, 1);
 
                     final Rect temRect = new Rect();
                     e.getBoundsInScreen(temRect);
@@ -678,16 +681,20 @@ public class AssignerUtils {
                                 triggerValue.setText(finalTempText);
                             } else if (type == 3 || type == 4 || type == 7) {
                                 triggerValue.setText(finalTempId);
-                                if (type == 3) {
-                                    if (idMap.getOrDefault(finalTempId, 0) > 2)
-                                        sendToast(viewToast, "此 id 在页面中多次使用，可能不适合当作判定条件", LENGTH_LONG);
-                                } else if (type == 4) { // type 4
-                                    if (idMap.getOrDefault(finalTempId, 0) > 1)
-                                        sendToast(viewToast, "此 id 在页面不止一次使用，可能无法正确判断应当点击哪一个", LENGTH_LONG);
-                                } else {
-                                    if (idMap.getOrDefault(finalTempId, 0) > 2)
-                                        sendToast(viewToast, "此 id 在页面不止一次使用，可能造成误判", LENGTH_LONG);
-                                }
+                                Integer itCnt = idMap.getOrDefault(finalTempId, 0);
+                                if (itCnt != null)
+                                    if (type == 3) {
+                                        if (itCnt > 2)
+                                            sendToast(viewToast, resources.getString(R.string.multi_id_type3), LENGTH_LONG);
+                                    } else if (type == 4) { // type 4
+                                        if (itCnt > 1)
+                                            sendToast(viewToast, resources.getString(R.string.multi_id_type4), LENGTH_LONG);
+                                    } else {
+                                        if (itCnt > 2)
+                                            sendToast(viewToast, resources.getString(R.string.multi_id_other), LENGTH_LONG);
+                                    }
+                                else
+                                    triggerValue.setText(resources.getString(R.string.strange_error));
                             } else {
                                 triggerValue.setText(resources.getString(R.string.strange_error));
                             }
@@ -703,7 +710,7 @@ public class AssignerUtils {
                 outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
                 windowManager.updateViewLayout(viewTarget, outlineParams);
             } else
-                sendToast(viewToast, "不允许在此处设置规则", LENGTH_SHORT);
+                sendToast(viewToast, resources.getString(R.string.cannot_set_here), LENGTH_SHORT);
         } else {
             outlineParams.alpha = 0f;
             outlineParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;

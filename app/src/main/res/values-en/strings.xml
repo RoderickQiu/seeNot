@@ -5,10 +5,10 @@
     <string name="service_description">In order to use the functions of the software, this service needs to be enabled. This service does not access the network, so your data is completely safe and we have no means of learning what you are doing. We need those permissions just to parse the application layout. </string>
     <string name="menu_settings">Settings</string>
     <string name="menu_about">About</string>
-    <string name="menu_permission">permission</string>
+    <string name="menu_permission">Permission</string>
     <string name="app_full_name">seeNot</string>
     <string name="roderick_qiu_app">Author @RoderickQiu</string>
-    <string name="delete_confirm">Confirm deletion</string>
+    <string name="delete_confirm">Yes, delete</string>
     <string name="empty_view">The list is empty. Click the \"+\" button to create a new rule. </string>
     <string name="operation_done">Operation completed</string>
     <string name="channel_notification_text">seeNot: the service is running</string>
@@ -24,16 +24,17 @@
     <string name="permission_overlay">Display over</string>
     <string name="permission_overlay_msg"> When setting rules, floating windows are required. </string>
     <string name="granted">Acquired</string>
-    <string name="ungranted">Not granted</string>
+    <string name="ungranted">Not yet</string>
     <string name="grant_now">Get</string>
     <string name="permission_accessibility">Accessib. service</string>
     <string name="permission_accessibility_msg">All accessibility services rely on this permission. </string>
     <string name="now_open_service">Enter the page, please scroll down, find "seeNot service"
-         and open it. If you can\'t find it, click "Downloaded apps". </string>
+         and open it. If you can\'t find it, click \"Downloaded apps\". </string>
     <string name="default_notification_channel">General notification</string>
-    <string name="permission_battery_msg">It is used to prevent the system from killing the service, and the battery life will not be significantly affected. </string>
+    <string name="permission_battery_msg">Used to prevent the system from killing the service,
+        and the battery life will not be significantly affected. </string>
     <string name="permission_battery">Ignore bat. optim.</string>
-    <string name="how_to_grant">Learn to grant</string>
+    <string name="how_to_grant">Learn about it</string>
     <string name="dunno_granted">Unable to judge, please ensure by yourself</string>
     <string name="permission_background_msg">The functions of these setting items include normal startup, running in the background and not being forced to close due to the so-called "power saving" functionality. They are all necessary for the proper functioning of seeNot the app. </string>
     <string name="permission_background">Other permissions</string>
@@ -55,17 +56,17 @@
     <string name="save_succeed">Saved successfully</string>
     <string name="fill_the_blanks">Some necessary information has not been set, or the input information does not meet the specifications</string>
     <string name="no_seenot_set">The rules cannot be set for the seeNot app itself and the system desktop (the "minus one screen" usually does not belong to the system desktop, and can be set)</string>
-    <string name="filter_ban_app">Forbid access to this program</string>
+    <string name="filter_ban_app">Forbid access to app</string>
     <string name="filter_ban_app_tip">When the switch is turned on, once you enter this application, you will exit directly. </string>
-    <string name="filter_ban_activity">Ban to enter this page</string>
+    <string name="filter_ban_activity">Forbid access to the activity</string>
     <string name="filter_ban_activity_tip">This is where you set the Activity you want to be forced to jump out of, press \"Refresh\" to get the latest results. Note: Some software may combine multiple pages into one Activity. At this time, you can consider using \"find text\" or \"find element\" rules to trigger exit by virtue of the unique features on the page. </string>
     <string name="filter_ban_text">Exit after finding the text</string>
     <string name="filter_ban_text_tip">Click \"Select\" to open the text selection mode, select the desired text, and click \"OK\" to save. Note: some text in a small number of apps cannot be parsed. </string>
-    <string name="filter_ban_id">Exit after finding the element</string>
+    <string name="filter_ban_id">Force back after finding the element</string>
     <string name="filter_ban_id_tip">Click \"Select\" to open the element selection mode, and select the required element, click \"OK\" to save. Suitable for some pages that cannot find a suitable trigger text. </string>
-    <string name="filter_auto_click_id">Automatically click after finding the element</string>
+    <string name="filter_auto_click_id">Auto. click after finding the element</string>
     <string name="filter_auto_click_id_tip">Click \"Select\" to open the element selection mode, and select the element to be automatically clicked to obtain its element ID, click \"OK\" to save. </string>
-    <string name="filter_auto_click_text">Automatically click after finding the text</string>
+    <string name="filter_auto_click_text">Auto. click after finding the text</string>
     <string name="filter_auto_click_text_tip">Click \"Select\" to open the text selection mode, and select the text to be clicked automatically, click \"OK\" to save. Note: some text in a small number of apps cannot be parsed. </string>
     <string name="delete">Delete</string>
     <string name="settings">Set</string>
@@ -81,7 +82,7 @@
     <string name="settings_export_single_tip">Click here to export the single rule you want to backup or share</string>
     <string name="settings_import">Data import</string>
     <string name="settings_import_tip">Click here to import all data of the application and overwrite the current data; to import a single rule, please click "Add Rule" on the homepage</string>
-    <string name="copied_to_clipboard"> has been copied to the clipboard</string>
+    <string name="copied_to_clipboard">Copied to the clipboard!</string>
     <string name="import_succeed">Data imported successfully</string>
     <string name="import_failed">Import failed</string>
     <string name="click_right_to_set">Click the right button to set</string>
@@ -112,17 +113,24 @@
     <string name="week_fri">Friday</string>
     <string name="week_sat">Saturday</string>
     <string name="week_sun">Sunday</string>
-    <string name="only_once">Only this day</string>
+    <string name="week_mon_s">Mon, </string>
+    <string name="week_tues_s">Tue, </string>
+    <string name="week_wed_s">Wed, </string>
+    <string name="week_thur_s">Thu, </string>
+    <string name="week_fri_s">Fri, </string>
+    <string name="week_sat_s">Sat, </string>
+    <string name="week_sun_s">Sun. </string>
+    <string name="only_once">Only today</string>
     <string name="start_time">Start time</string>
     <string name="end_time">End time</string>
     <string name="apply_week">How many days does the setting work? </string>
     <string name="rid">Block</string>
     <string name="floating_start_failed">Failed to create the floating window required for the seeNot service</string>
-    <string name="timed_on">Open during time period</string>
-    <string name="timed_off">Timed off</string>
+    <string name="timed_on">On</string>
+    <string name="timed_off">Off</string>
     <string name="timed_on_or_off">Turn this rule off or on during this time</string>
     <string name="timed_on_or_off_tip">If you want to enable it only during this period, please choose to disable the rule on the homepage; similarly, if you only want to turn it off during this period, you need to choose to enable the rule on the homepage to take effect. </string>
-    <string name="filter_swipe_text"> Swipe backwards after finding the text</string>
+    <string name="filter_swipe_text">Swipe backwards after finding the text</string>
     <string name="filter_swipe_id"> Swipe backwards after finding the element</string>
     <string name="filter_swipe_text_tip">Click \"Select\" to open the text selection mode, and select the text that will swipe up and return as soon as you encounter it, and click \"OK\" to save. Note: some text in a small number of apps cannot be parsed. </string>
     <string name="filter_swipe_id_tip">Click \"Select\" to open the element selection mode, and select the relevant element that swipe up and return as soon as you encounter it to get its element ID, and click \"OK\" to save. </string>
@@ -141,18 +149,20 @@
     <string name="import_single_dialog_msg">Input the text of a single rule exported in the setting interface to import a single rule that does not see you</string>
     <string name="export_log">Get service log</string>
     <string name="welcome">Welcome to see you</string>
-    <string name="welcome_msg">Apps are becoming more and more bloated, but you can keep your life simple by using seeNot</string>
-    <string name="start">Let\'s get started</string>
-    <string name="welcome_msg_2">The next generation of screen time management solution is here</string>
-    <string name="welcome_priv_msg">Continuing to use means agreeing</string>
-    <string name="welcome_priv_title">"Instructions to use seeNot"</string>
+    <string name="welcome_msg">Apps are becoming more and more bloated, but you can keep your
+        life simple by using seeNot. </string>
+    <string name="start">Get started</string>
+    <string name="welcome_msg_2">The next generation of screen time management solution is
+        here. </string>
+    <string name="welcome_priv_msg">Continuing to use means agreeing the </string>
+    <string name="welcome_priv_title">Agreement</string>
     <string name="must_need">You must first obtain these permissions before you can use seeNot the app</string>
     <string name="privacy_notice_page">Privacy Agreement</string>
     <string name="notif">Notification</string>
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Close</string>
-    <string name="notifications_title"> Notifications of the seeNot Team</string>
-    <string name="no_notification_or_bad_net">There is no notification for the time being, or the network is slow. </string>
+    <string name="notifications_title"> Headlines of seeNot</string>
+    <string name="no_notification_or_bad_net">No notification yet, or still loading…</string>
     <string name="all_offline">All data obtained by these permissions will only be processed locally and will not be uploaded, so your data is 100% safe</string>
     <string name="permission_back">OK, start</string>
     <string name="helper">Help</string>
@@ -160,4 +170,38 @@
     <string name="no_helper_msg">Try another page. </string>
     <string name="press_here_helper">Help</string>
     <string name="close_helper">Close help</string>
+    <string name="set_corresp_rule">Set corresp. rule</string>
+    <string name="untitled">Untitled</string>
+    <string name="rule_for_other">This rule is about %s, so can only be edited when that app is on. If you are already in it, please re-click the app or scroll the list in the app, and then retry again</string>
+    <string name="error_come">An error occurred</string>
+    <string name="multi_id_type3">This id is used multiple times in the page, it may not be suitable as a judgment condition</string>
+    <string name="multi_id_type4">This id is used multiple times on the page, it may not be possible to correctly determine which one should be clicked</string>
+    <string name="multi_id_other">This id is used multiple times on the page, which may cause misjudgment</string>
+    <string name="cannot_set_here">Not allowed to set rules here</string>
+    <string name="new_rule">New rule</string>
+    <string name="rule_for_not_set">Not set yet</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="everyday">Everyday</string>
+    <string name="week_day_pre">Day </string>
+    <string name="select_mode">select mode</string>
+    <string name="confirm_delete_with_content">Are you sure to delete %s? </string>
+    <string name="output">Export</string>
+    <string name="perform_action_to_rule">Perform action on the rule</string>
+    <string name="action_not_invertible">This action is not invertible, please delete it carefully.
+    </string>
+    <string name="have_timed_rule_on">Have timed task enabled</string>
+    <string name="service_not_enabled_short">The seeNot service is not enabled</string>
+    <string name="back_last_failed">Failed to return to the prev. page, exit the app
+        directly: </string>
+    <string name="service_destroyed">The seeNot service may have been destroyed by the
+        system mistakenly</string>
+    <string name="go_accessib_for_reopen">Please go to system accessibility settings to reopen it! </string>
+    <string name="welcome_disclaimer_msg">Disclaimer: All rules are set by the user, seeNot itself
+        does not provide, nor is it responsible for the user\'s rules and their consequences</string>
+    <string name="reserve_now">Reserve now</string>
+    <string name="reserve_still">%s min left in the reservation</string>
+    <string name="settings_export_single_msg">Please select "Export" in the rule menu on the homepage to export. </string>
+    <string name="get_service_log_msg">Please go to %s/logs in the system file application to manually export the required logs. </string>
+    <string name="havent_all_finish">Not finished setting yet, please try again</string>
 </resources>
