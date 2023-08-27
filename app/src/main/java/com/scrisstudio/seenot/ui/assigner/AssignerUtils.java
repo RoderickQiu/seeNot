@@ -1,6 +1,7 @@
 package com.scrisstudio.seenot.ui.assigner;
 
 import static android.content.Context.WINDOW_SERVICE;
+import static android.view.accessibility.AccessibilityNodeInfo.EXTRA_DATA_RENDERING_INFO_KEY;
 import static com.scrisstudio.seenot.SeeNot.getAppContext;
 import static com.scrisstudio.seenot.SeeNot.getLocale;
 import static com.scrisstudio.seenot.SeeNot.l;
@@ -20,7 +21,9 @@ import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Size;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -92,6 +95,10 @@ public class AssignerUtils {
 
     @SuppressLint("ClickableViewAccessibility")
     public static void initAssigner(int modeId, int position, int filterId) {
+        if (mService == null) {
+            le("mService null");
+            Toast.makeText(getAppContext(), resources.getString(R.string.open_assigner_failed), Toast.LENGTH_SHORT).show();
+        }
         mService.setTheme(R.style.Theme_SeeNot); // fix theme problem
 
         windowManager = (WindowManager) mService.getSystemService(WINDOW_SERVICE);
@@ -129,12 +136,8 @@ public class AssignerUtils {
                 windowManager.addView(viewTarget, outlineParams);
                 windowManager.addView(viewCustomization, customizationParams);
             } catch (Exception e1) {
-                le(e1.getLocalizedMessage());
-                try {
-                    sendToast(viewToast, resources.getString(R.string.open_assigner_failed), LENGTH_LONG);
-                } catch (Exception e2) {
-                    Toast.makeText(getAppContext(), resources.getString(R.string.open_assigner_failed), Toast.LENGTH_SHORT).show();
-                }
+                le("assigner open fail " + e1.getLocalizedMessage());
+                Toast.makeText(getAppContext(), resources.getString(R.string.open_assigner_failed), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -150,6 +153,7 @@ public class AssignerUtils {
         viewCustomization.findViewById(R.id.assigner_home).setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.assigner_set).setVisibility(mode == 2 ? View.VISIBLE : View.GONE);
         viewCustomization.findViewById(R.id.assigner_webview).setVisibility(View.GONE);
+        ((TextView) viewCustomization.findViewById(R.id.press_here_helper)).setText(R.string.press_here_helper);
 
         viewCustomization.findViewById(R.id.button_assigner_back).setVisibility(View.GONE);
         viewCustomization.findViewById(R.id.button_new_filter).setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
@@ -164,14 +168,14 @@ public class AssignerUtils {
                 customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
                 windowManager.updateViewLayout(viewCustomization, customizationParams);
             } catch (Exception e) {
-                le(e.getLocalizedMessage());
+                le("allow input " + e.getLocalizedMessage());
             }
         else
             try {
                 customizationParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
                 windowManager.updateViewLayout(viewCustomization, customizationParams);
             } catch (Exception e) {
-                le(e.getLocalizedMessage());
+                le("disable input " + e.getLocalizedMessage());
             }
 
         viewCustomization.findViewById(R.id.press_here_helper).setOnClickListener((v) -> {
@@ -482,7 +486,7 @@ public class AssignerUtils {
             try {
                 windowManager.addView(viewToast, toastParams);
             } catch (Exception e) {
-                le(e.getLocalizedMessage());
+                le("send toast run on ui " + e.getLocalizedMessage());
             }
         });
 
@@ -497,7 +501,7 @@ public class AssignerUtils {
                     try {
                         windowManager.updateViewLayout(viewToast, toastParams);
                     } catch (Exception e) {
-                        le(e.getLocalizedMessage());
+                        le("send toast run on ui2 " + e.getLocalizedMessage());
                     }
                 });
             }
@@ -511,7 +515,7 @@ public class AssignerUtils {
                     try {
                         windowManager.removeViewImmediate(viewToast);
                     } catch (Exception e) {
-                        le(e.getLocalizedMessage());
+                        le("send toast run on ui3 " + e.getLocalizedMessage());
                     }
                 });
             }
@@ -741,12 +745,18 @@ public class AssignerUtils {
 
     private static void findAllNode(AccessibilityNodeInfo root, ArrayList<AccessibilityNodeInfo> list) {
         Queue<AccessibilityNodeInfo> queue = new LinkedList<>();
+        //Queue<Integer> depth = new LinkedList<>();
         queue.add(root);
+        //depth.add(0);
         while (!queue.isEmpty()) {
             AccessibilityNodeInfo info = queue.poll();
+            //Integer dp = depth.poll();
+            //if (dp == null) dp = 0;
             if (info == null) continue;
+            //le(dp.toString() + info.getClassName());
             list.add(info);
             for (int k = 0; k < info.getChildCount(); k++) {
+                //depth.add(dp + 1);
                 queue.add(info.getChild(k));
             }
         }
