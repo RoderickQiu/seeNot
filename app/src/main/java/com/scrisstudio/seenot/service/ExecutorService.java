@@ -20,6 +20,7 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -96,7 +97,7 @@ public class ExecutorService extends AccessibilityService {
     public static ArrayList<View> mFloatingViews = new ArrayList<>();
     public static WindowManager mWindowManager;
     public static Process logCatProcess;
-    private static String[] filterTypeNames = new String[typesCnt];
+    private static final String[] filterTypeNames = new String[typesCnt];
 
     public static boolean isStart() {
         return mService != null;
@@ -515,6 +516,7 @@ public class ExecutorService extends AccessibilityService {
         gradientQueue.add(0);
 
         String temp = null;
+        Rect tempRect = new Rect();
         while (queue.size() > 0) {
             AccessibilityNodeInfo info = queue.remove(0);
             int gradient = gradientQueue.remove(0);
@@ -626,6 +628,28 @@ public class ExecutorService extends AccessibilityService {
                                     Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
                                             + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
                                 }
+                            }
+                            break;
+                        case 8: // coordinate force-back
+                            info.getBoundsInScreen(tempRect);
+                            if (tempRect.toString().equals(word)) {
+                                if (performGlobalAction(GLOBAL_ACTION_BACK)) {
+                                    Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
+                                            + "：\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    performGlobalAction(GLOBAL_ACTION_HOME);
+                                    Toast.makeText(SeeNot.getAppContext(), resources.getString(R.string.back_last_failed) + "\"" + word.replace(foregroundPackageName, "") + "\"", Toast.LENGTH_SHORT).show();
+                                }
+                                return;
+                            }
+                            break;
+                        case 9: // coordinate auto-click
+                            info.getBoundsInScreen(tempRect);
+                            if (tempRect.toString().equals(word)) {
+                                getClickable(info).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                Toast.makeText(SeeNot.getAppContext(), filterTypeNames[tempFilter.getType()]
+                                        + "：\"" + word + "\"", Toast.LENGTH_SHORT).show();
+                                return;
                             }
                             break;
                     }

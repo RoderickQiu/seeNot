@@ -238,7 +238,7 @@ public class AssignerUtils {
         btTargetSelectExit.setVisibility(View.GONE);
         btTargetDone.setVisibility(View.GONE);
         btRefresh.setVisibility(filter.getType() == 1 ? View.VISIBLE : View.GONE);
-        layoutTextFindForm.setVisibility((filter.getType() >= 2 && filter.getType() <= 7)
+        layoutTextFindForm.setVisibility((filter.getType() >= 2 && filter.getType() <= 9)
                 ? View.VISIBLE : View.GONE);
 
         triggerValue.setVisibility(View.VISIBLE);
@@ -330,6 +330,14 @@ public class AssignerUtils {
                 triggerValue = filter.getParam1();
                 tip = resources.getString(R.string.filter_swipe_id_tip);
                 break;
+            case 8:
+                triggerValue = filter.getParam1();
+                tip = resources.getString(R.string.filter_ban_coor_tip);
+                break;
+            case 9:
+                triggerValue = filter.getParam1();
+                tip = resources.getString(R.string.filter_auto_click_coor_tip);
+                break;
         }
         final String finalTriggerValue = triggerValue.equals("---") ? resources.getString(R.string.click_right_to_set) : triggerValue;
         final String finalTip = tip;
@@ -365,8 +373,10 @@ public class AssignerUtils {
                     SeeNot.getFilterTypeName(1),
                     SeeNot.getFilterTypeName(2),
                     SeeNot.getFilterTypeName(3),
-                    SeeNot.getFilterTypeName(4),
+                    SeeNot.getFilterTypeName(8),
                     SeeNot.getFilterTypeName(5),
+                    SeeNot.getFilterTypeName(4),
+                    SeeNot.getFilterTypeName(9),
                     SeeNot.getFilterTypeName(6),
                     SeeNot.getFilterTypeName(7)
             };
@@ -666,7 +676,7 @@ public class AssignerUtils {
                         tempText = (tempText.equals("")) ? (e.getTooltipText() != null ? e.getTooltipText() : "") : tempText;
                     }
                     if ((type == 2 || type == 5 || type == 6) && (tempText.equals(""))) continue;
-                    if ((type == 4 || type == 5) && !isParentClickable(e)) continue;
+                    if ((type == 4 || type == 5 || type == 9) && !isParentClickable(e)) continue;
 
                     if (idMap.containsKey(tempId)) {
                         Integer it = idMap.getOrDefault(tempId, 0);
@@ -707,6 +717,8 @@ public class AssignerUtils {
                                     }
                                 else
                                     triggerValue.setText(resources.getString(R.string.strange_error));
+                            } else if (type == 8 || type == 9) {
+                                triggerValue.setText(temRect.toString());
                             } else {
                                 triggerValue.setText(resources.getString(R.string.strange_error));
                             }

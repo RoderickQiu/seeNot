@@ -103,7 +103,7 @@ public class SeeNot extends Application {
         }
     }
 
-    public static int typesCnt = 7;
+    public static int typesCnt = 9;
 
     public static String getFilterTypeName(int type) {
         switch (type) {
@@ -112,17 +112,21 @@ public class SeeNot extends Application {
             case 1:
                 return locale.equals("zh") ? "禁止进入此页面" : "Forbid access to the activity";//R.string.filter_ban_activity;
             case 2:
-                return locale.equals("zh") ? "找到文字后退出" : "Force back after finding the text";//R.string.filter_ban_text;
+                return locale.equals("zh") ? "找到文字后退出" : "Find text and back";//R.string.filter_ban_text;
             case 5:
-                return locale.equals("zh") ? "找到文字后自动点击" : "Auto. click after finding the text";//R.string.filter_auto_click_text;
+                return locale.equals("zh") ? "找到文字后自动点击" : "Find text and click";//R.string.filter_auto_click_text;
             case 6:
-                return locale.equals("zh") ? "找到文字后反向划动" : "Swipe backwards after finding the text";//R.string.filter_swipe_text;
+                return locale.equals("zh") ? "找到文字后反向划动" : "Find text and swipe backwards";//R.string.filter_swipe_text;
             case 3:
-                return locale.equals("zh") ? "找到元素后退出" : "Force back after finding the elem.";//R.string.filter_ban_id;
+                return locale.equals("zh") ? "找到元素ID后退出" : "Find elem. id and back";//R.string.filter_ban_id;
             case 4:
-                return locale.equals("zh") ? "找到元素后自动点击" : "Auto. click after finding the element";//R.string.filter_auto_click_id;
+                return locale.equals("zh") ? "找到元素ID后自动点击" : "Find elem. id and click";//R.string.filter_auto_click_id;
             case 7:
-                return locale.equals("zh") ? "找到元素后反向划动" : "Swipe backwards after finding the elem.";//R.string.filter_swipe_id;
+                return locale.equals("zh") ? "找到元素ID后反向划动" : "Find elem. ID and swipe backwards";//R.string.filter_swipe_id;
+            case 8:
+                return locale.equals("zh") ? "找到指定坐标元素后退出" : "Find elem. coord. and back";//R.string.filter_ban_coor;
+            case 9:
+                return locale.equals("zh") ? "找到指定坐标元素后自动点击" : "Find elem. coord. and click";//R.string.filter_auto_click_coor;
         }
         return "未知规则";//R.string.type_not_found;
     }

@@ -15,7 +15,8 @@
     <string name="channel_name">service running protection</string>
     <string name="channel_description">If you don\'t allow this notification to be displayed all
          the time, the service may be automatically terminated by the system. </string>
-    <string name="service_start_failed">The seeNot service failed to start, please go to the system accessibility settings to start it manually</string>
+    <string name="service_start_failed">Please go to the system accessib. settings to start
+        seeNot service manually</string>
     <string name="hide_notification">Hide notification</string>
     <string name="reopen_function">Open the main switch</string>
     <string name="function_closed">The main switch is closed, the service will not work. </string>
@@ -56,18 +57,20 @@
     <string name="save_succeed">Saved successfully</string>
     <string name="fill_the_blanks">Some necessary information has not been set, or the input information does not meet the specifications</string>
     <string name="no_seenot_set">The rules cannot be set for the seeNot app itself and the system desktop (the "minus one screen" usually does not belong to the system desktop, and can be set)</string>
-    <string name="filter_ban_app">Forbid access to app</string>
     <string name="filter_ban_app_tip">When the switch is turned on, once you enter this application, you will exit directly. </string>
-    <string name="filter_ban_activity">Forbid access to the activity</string>
     <string name="filter_ban_activity_tip">This is where you set the Activity you want to be forced to jump out of, press \"Refresh\" to get the latest results. Note: Some software may combine multiple pages into one Activity. At this time, you can consider using \"find text\" or \"find element\" rules to trigger exit by virtue of the unique features on the page. </string>
-    <string name="filter_ban_text">Exit after finding the text</string>
     <string name="filter_ban_text_tip">Click \"Select\" to open the text selection mode, select the desired text, and click \"OK\" to save. Note: some text in a small number of apps cannot be parsed. </string>
-    <string name="filter_ban_id">Force back after finding the element</string>
     <string name="filter_ban_id_tip">Click \"Select\" to open the element selection mode, and select the required element, click \"OK\" to save. Suitable for some pages that cannot find a suitable trigger text. </string>
-    <string name="filter_auto_click_id">Auto. click after finding the element</string>
     <string name="filter_auto_click_id_tip">Click \"Select\" to open the element selection mode, and select the element to be automatically clicked to obtain its element ID, click \"OK\" to save. </string>
-    <string name="filter_auto_click_text">Auto. click after finding the text</string>
     <string name="filter_auto_click_text_tip">Click \"Select\" to open the text selection mode, and select the text to be clicked automatically, click \"OK\" to save. Note: some text in a small number of apps cannot be parsed. </string>
+    <string name="filter_swipe_text_tip">Click \"Select\" to open the text selection mode, and select the text that will swipe up and return as soon as you encounter it, and click \"OK\" to save. Note: some text in a small number of apps cannot be parsed. </string>
+    <string name="filter_swipe_id_tip">Click \"Select\" to open the element selection mode, and
+        select the relevant element that swipe up and return as soon as you encounter it to get
+        its element ID, and click \"OK\" to save. </string>
+    <string name="filter_ban_coor_tip">Click \"Select\" to open the element coordinate selection
+        mode, and select the required element to obtain its coordinates, click \"OK\" to save. It is suitable for some hilarious pages where neither the text nor the element ID can be obtained-note. Try to choose some unique elements\' coordinate to avoid misjudgment on other pages.</string>
+    <string name="filter_auto_click_coor_tip">Click \"Select\" to open the element coordinate
+        selection mode, and select the element to be automatically clicked to obtain its element coordinates, click \"OK\" to save. It is suitable for some hilarious pages where neither the text nor the element ID can be obtained-note. Try to choose some unique elements\' coordinate to avoid misjudgment on other pages.</string>
     <string name="delete">Delete</string>
     <string name="settings">Set</string>
     <string name="alreay_quit_app_filter">There is already a \"forbid access to the program\" rule, so new rules cannot be added</string>
@@ -87,7 +90,8 @@
     <string name="import_failed">Import failed</string>
     <string name="click_right_to_set">Click the right button to set</string>
     <string name="click_to_apply">Save &amp; close</string>
-    <string name="open_assigner_failed">Failed to open the settings panel, please check whether the accessibility service is turned on</string>
+    <string name="open_assigner_failed">Please check whether the accessibility service is turned
+        on</string>
     <string name="cannot_get_current_id">Unable to get the current element</string>
     <string name="cannot_get_current_text">Unable to get the current text</string>
     <string name="strange_error">Unknown error</string>
@@ -130,10 +134,6 @@
     <string name="timed_off">Off</string>
     <string name="timed_on_or_off">Turn this rule off or on during this time</string>
     <string name="timed_on_or_off_tip">If you want to enable it only during this period, please choose to disable the rule on the homepage; similarly, if you only want to turn it off during this period, you need to choose to enable the rule on the homepage to take effect. </string>
-    <string name="filter_swipe_text">Swipe backwards after finding the text</string>
-    <string name="filter_swipe_id"> Swipe backwards after finding the element</string>
-    <string name="filter_swipe_text_tip">Click \"Select\" to open the text selection mode, and select the text that will swipe up and return as soon as you encounter it, and click \"OK\" to save. Note: some text in a small number of apps cannot be parsed. </string>
-    <string name="filter_swipe_id_tip">Click \"Select\" to open the element selection mode, and select the relevant element that swipe up and return as soon as you encounter it to get its element ID, and click \"OK\" to save. </string>
     <string name="closure_title">Closed temporarily or permanently</string>
     <string name="closure_temp">Temporarily closed</string>
     <string name="closure_forever">Permanently closed</string>
@@ -188,8 +188,7 @@
     <string name="confirm_delete_with_content">Are you sure to delete %s? </string>
     <string name="output">Export</string>
     <string name="perform_action_to_rule">Perform action on the rule</string>
-    <string name="action_not_invertible">This action is not invertible, please delete it carefully.
-    </string>
+    <string name="action_not_invertible">This action is not invertible, please delete it carefully.</string>
     <string name="have_timed_rule_on">Have timed task enabled</string>
     <string name="service_not_enabled_short">The seeNot service is not enabled</string>
     <string name="back_last_failed">Failed to return to the prev. page, exit the app
