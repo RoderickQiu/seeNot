@@ -110,7 +110,7 @@ public class SeeNot extends Application {
             case 0:
                 return locale.equals("zh") ? "禁止进入此程序" : "Forbid access to app";//R.string.filter_ban_app;
             case 1:
-                return locale.equals("zh") ? "禁止进入此页面" : "Forbid access to the activity";//R.string.filter_ban_activity;
+                return locale.equals("zh") ? "禁止进入此页面" : "Forbid access to the page";//R.string.filter_ban_activity;
             case 2:
                 return locale.equals("zh") ? "找到文字后退出" : "Find text and back";//R.string.filter_ban_text;
             case 5:
