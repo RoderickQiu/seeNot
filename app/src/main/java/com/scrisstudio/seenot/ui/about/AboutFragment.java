@@ -1,10 +1,15 @@
 package com.scrisstudio.seenot.ui.about;
 
+import static com.scrisstudio.seenot.MainActivity.runOnUI;
+import static com.scrisstudio.seenot.MainActivity.sharedPreferences;
+import static com.scrisstudio.seenot.SeeNot.le;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +17,17 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.scrisstudio.seenot.databinding.FragmentAboutBinding;
 import com.scrisstudio.seenot.service.APKVersionInfoUtils;
+import com.scrisstudio.seenot.struct.FetcherInfo;
+import com.scrisstudio.seenot.struct.PushedInfo;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
 
 public class AboutFragment extends Fragment {
 
@@ -36,6 +50,20 @@ public class AboutFragment extends Fragment {
             startActivity(intent);
         });
 
+        binding.webpage.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+        binding.webpage.getPaint().setAntiAlias(true);
+        binding.webpage.setOnClickListener((v) -> {
+            Uri uri = Uri.parse("https://seenot.r-q.name");
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        });
+
+        binding.updateManually.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+        binding.updateManually.getPaint().setAntiAlias(true);
+        binding.updateManually.setOnClickListener((v) -> {
+            getUpdateMsg(false);
+        });
+
         binding.licensePage.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         binding.licensePage.getPaint().setAntiAlias(true);
         binding.licensePage.setOnClickListener((v) -> {
@@ -52,7 +80,33 @@ public class AboutFragment extends Fragment {
             startActivity(intent);
         });
 
+        getUpdateMsg(true);
+
         return root;
+    }
+
+    private void getUpdateMsg(boolean isAuto) {
+        Gson gson = new Gson();
+        new Thread(() -> {
+            URL url;
+            Looper.prepare();
+            try {
+                url = new URL("https://seenot-1259749012.cos.ap-hongkong.myqcloud.com/push.json");
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(url.openStream()));
+                String inputLine;
+                StringBuilder rawData = new StringBuilder();
+                while ((inputLine = in.readLine()) != null)
+                    rawData.append(inputLine);
+                FetcherInfo fetched = gson.fromJson(String.valueOf(rawData), new TypeToken<FetcherInfo>() {
+                }.getType());
+                runOnUI(() -> APKVersionInfoUtils.openVersionDialog(requireContext(), fetched,
+                        getResources(), sharedPreferences, isAuto));
+                in.close();
+            } catch (Exception e) {
+                le("ERR: " + e);
+            }
+        }).start();
     }
 
     @Override

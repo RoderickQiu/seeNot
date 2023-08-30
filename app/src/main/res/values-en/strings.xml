@@ -7,7 +7,7 @@
     <string name="menu_about">About</string>
     <string name="menu_permission">Permission</string>
     <string name="app_full_name">seeNot</string>
-    <string name="roderick_qiu_app">Author @RoderickQiu</string>
+    <string name="roderick_qiu_app">By @RoderickQiu</string>
     <string name="delete_confirm">Yes, delete</string>
     <string name="empty_view">The list is empty. Click the \"+\" button to create a new rule. </string>
     <string name="operation_done">Operation completed</string>
@@ -157,7 +157,7 @@
     <string name="welcome_priv_msg">Continuing to use means agreeing the </string>
     <string name="welcome_priv_title">Agreement</string>
     <string name="must_need">You must first obtain these permissions before you can use seeNot the app</string>
-    <string name="privacy_notice_page">Privacy Agreement</string>
+    <string name="privacy_notice_page">Privacy</string>
     <string name="notif">Notification</string>
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Close</string>
@@ -203,4 +203,14 @@
     <string name="settings_export_single_msg">Please select "Export" in the rule menu on the homepage to export. </string>
     <string name="get_service_log_msg">Please go to %s/logs in the system file application to manually export the required logs. </string>
     <string name="havent_all_finish">Not finished setting yet, please try again</string>
+    <string name="webpage">Web Page</string>
+    <string name="update_msg">Updated for: </string>
+    <string name="update_title">Update available</string>
+    <string name="update_now">Download now</string>
+    <string name="auto_update_check">Auto. check for updates</string>
+    <string name="update_manually">Check for update now</string>
+    <string name="might_bad">Might be a bug for seeNot</string>
+    <string name="remove_view_failed">Remove views failed</string>
+    <string name="no_update_cur">No update available currently~</string>
+    <string name="update_check_in_progress">Checking for update…</string>
 </resources>

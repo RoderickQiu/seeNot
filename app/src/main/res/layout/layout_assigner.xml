@@ -43,7 +43,8 @@
             app:layout_constraintBottom_toTopOf="@id/guideline_assigner_bottom"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:ignore="WebViewLayout" />
+            tools:ignore="WebViewLayout"
+            android:layout_marginBottom="10dp" />
 
         <ProgressBar
             android:id="@+id/assigner_webview_progress"

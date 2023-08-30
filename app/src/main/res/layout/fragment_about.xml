@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="2dp">
+            android:paddingBottom="4dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -36,6 +36,14 @@
                 android:textAlignment="textStart"
                 android:textSize="34sp" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="4dp">
+
             <TextView
                 android:id="@+id/version"
                 android:paddingStart="2dp"
@@ -43,6 +51,20 @@
                 android:layout_height="wrap_content"
                 android:textAlignment="textStart"
                 android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" | "
+                android:textSize="14sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/update_manually"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/update_manually"
+                android:textSize="14sp" />
 
         </LinearLayout>
 
@@ -56,6 +78,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/roderick_qiu_app"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" | "
+                android:textSize="14sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/webpage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/webpage"
                 android:textSize="14sp" />
 
             <TextView

@@ -191,4 +191,14 @@
     <string name="settings_export_single_msg">请在首页该规则菜单中选择”导出“以导出。</string>
     <string name="get_service_log_msg">请到系统文件应用中前往 %s/logs 以手动导出所需要的日志。</string>
     <string name="havent_all_finish">还没设置完呢，请重试</string>
+    <string name="webpage">官网</string>
+    <string name="update_msg">本次更新有以下内容：</string>
+    <string name="update_title">有软件更新！</string>
+    <string name="update_now">现在就下载</string>
+    <string name="auto_update_check">自动检测更新</string>
+    <string name="update_manually">手动检测更新</string>
+    <string name="might_bad">不见君可能出了个错？</string>
+    <string name="remove_view_failed">消除遮罩失败</string>
+    <string name="no_update_cur">当前没有更新，祝生活愉快～</string>
+    <string name="update_check_in_progress">正在查询中……</string>
 </resources>

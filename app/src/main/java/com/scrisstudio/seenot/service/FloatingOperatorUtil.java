@@ -115,8 +115,10 @@ public class FloatingOperatorUtil {
             mFloatingViews.clear();
         } catch (Exception e) {
             le("remove failed" + e.getLocalizedMessage());
-            Toast.makeText(SeeNot.getAppContext(), "消除遮罩失败", Toast.LENGTH_LONG).show();
-            sendSimpleNotification("见否可能出了个错？", "消除遮罩失败");
+            Toast.makeText(SeeNot.getAppContext(),
+                    ExecutorService.resources.getString(R.string.remove_view_failed), Toast.LENGTH_LONG).show();
+            sendSimpleNotification(ExecutorService.resources.getString(R.string.might_bad),
+                    ExecutorService.resources.getString(R.string.remove_view_failed));
         }
     }
 

@@ -23,7 +23,7 @@ public class SeeNot extends Application {
     public static String lastTimeDestination = "";
     public static int shouldNavigateTo = 0;
 
-    private static String locale;
+    private static String locale = "zh";
 
     public static Context getAppContext() {
         return SeeNot.context;
@@ -55,7 +55,7 @@ public class SeeNot extends Application {
 
     public static void setLocale(Resources resources) {
         locale = resources.getConfiguration().getLocales().get(0).getLanguage();
-        le(locale);
+        le("Locale " + locale);
         if (!locale.equals("zh")) {
             locale = "en";
             LocaleListCompat appLocale = LocaleListCompat.forLanguageTags("en-US");

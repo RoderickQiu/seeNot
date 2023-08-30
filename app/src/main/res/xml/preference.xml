@@ -27,6 +27,12 @@
             app:summary="@string/settings_import_tip"
             app:title="@string/settings_import" />
 
+        <SwitchPreferenceCompat
+            app:key="auto-update-check"
+            app:title="@string/auto_update_check"
+            app:defaultValue="true"
+            android:widgetLayout="@layout/preference_material_switch" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

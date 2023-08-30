@@ -10,9 +10,11 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -61,6 +63,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import io.github.g00fy2.versioncompare.Version;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -235,18 +239,21 @@ public class MainActivity extends AppCompatActivity {
         }
 
         new Thread(() -> {
-            URL url = null;
+            URL url;
+            Looper.prepare();
             try {
                 url = new URL("https://seenot-1259749012.cos.ap-hongkong.myqcloud.com/push.json");
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(url.openStream()));
                 String inputLine;
-                StringBuilder rawData = new StringBuilder("");
+                StringBuilder rawData = new StringBuilder();
                 while ((inputLine = in.readLine()) != null)
                     rawData.append(inputLine);
                 FetcherInfo fetched = gson.fromJson(String.valueOf(rawData), new TypeToken<FetcherInfo>() {
                 }.getType());
                 ArrayList<PushedInfo> list = fetched.getPush();
+                runOnUI(() -> APKVersionInfoUtils.openVersionDialog(MainActivity.this, fetched,
+                        resources, sharedPreferences, true));
                 for (PushedInfo info : list) {
                     if (!pushedReadList.contains(info.getId())) {
                         try {
