@@ -33,7 +33,8 @@
          and open it. If you can\'t find it, click \"Downloaded apps\". </string>
     <string name="default_notification_channel">General notification</string>
     <string name="permission_battery_msg">Used to prevent the system from killing the service,
-        and the battery life will not be significantly affected. </string>
+        and the battery life will not be significantly affected. If you are given several
+        selections, please select the one that sounds like \"no limit\".</string>
     <string name="permission_battery">Ignore bat. optim.</string>
     <string name="how_to_grant">Learn about it</string>
     <string name="dunno_granted">Unable to judge, please ensure by yourself</string>

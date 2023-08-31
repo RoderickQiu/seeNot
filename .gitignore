@@ -19,3 +19,5 @@ local.properties
 *.apk
 app/debug/output-metadata.json
 *.key0
+.idea/.name
+app/release/output-metadata.json

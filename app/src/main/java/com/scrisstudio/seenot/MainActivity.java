@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             ruleInitEditor.apply();
         }
         if (!sharedPreferences.contains("rl-time") ||
-                new Date().getTime() - sharedPreferences.getLong("rl-time", new Date().getTime() - 1000000L) > 10 * 60000L) {
+                new Date().getTime() - sharedPreferences.getLong("rl-time", new Date().getTime() - 1000000L) > 10L * 60000L) {
             SharedPreferences.Editor ruleInitEditor = sharedPreferences.edit();
             ruleInitEditor.putLong("rl-time", new Date().getTime() + 1000000L);
             ruleInitEditor.apply();

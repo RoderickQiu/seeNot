@@ -29,14 +29,14 @@
     <string name="permission_accessibility_msg">一切见否服务都依靠此权限。</string>
     <string name="now_open_service">进入页面，请往下拉，找到“seeNot 不见君”并打开。若找不到，请点击“已下载的应用”。</string>
     <string name="default_notification_channel">常规通知</string>
-    <string name="permission_battery_msg">用于防止系统杀死服务，续航其实并不会被显著影响。</string>
+    <string name="permission_battery_msg">用于防止系统强制关闭服务，续航其实并不会被显著影响。如果跳转到的页面让你从多个选项中选择，则需要选择“无限制”才能使不见君正常运行，即不被强制关闭。</string>
     <string name="permission_battery">系统省电白名单</string>
     <string name="how_to_grant">了解获取方式</string>
     <string name="dunno_granted">无法判断，请自行确保</string>
     <string name="permission_background_msg">这些设置项作用包括正常开机自启、在后台运行并不因所谓"省电"被强制关闭。它们对不见君的功能正常运行都十分必要。</string>
     <string name="permission_background">其他的重要权限</string>
     <string name="permission_notification">通知权限</string>
-    <string name="permission_notification_msg">用于发送必要通知和防止服务被杀死。</string>
+    <string name="permission_notification_msg">用于发送必要通知和防止服务被强制关闭。</string>
     <string name="press_here_move">按住空白处拖动</string>
     <string name="exit">退出</string>
     <string name="rule_for_msg">对于：</string>

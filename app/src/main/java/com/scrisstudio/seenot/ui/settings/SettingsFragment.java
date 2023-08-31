@@ -75,12 +75,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                         editor.putString(entry.getKey(), (String) entry.getValue());
                     } else if (entry.getValue().getClass().equals(Boolean.class)) {
                         editor.putBoolean(entry.getKey(), (boolean) entry.getValue());
-                    } else if (entry.getValue().getClass().equals(Integer.class)) {
-                        editor.putInt(entry.getKey(), (int) entry.getValue());
-                    } else if (entry.getValue().getClass().equals(Double.class)) {
-                        editor.putInt(entry.getKey(), (int) Math.round((double) entry.getValue()));
-                    } else if (entry.getValue().getClass().equals(Float.class)) {
-                        editor.putInt(entry.getKey(), Math.round((float) entry.getValue()));
+                    } else if (entry.getValue().getClass().equals(Integer.class)
+                            || entry.getValue().getClass().equals(Long.class)
+                            || entry.getValue().getClass().equals(Double.class)) {
+                        // long value mistaken for double class
+                        if (entry.getKey().equals("timed-id-max") || entry.getKey().equals("rule-id-max"))
+                            editor.putInt(entry.getKey(), (int) ((Number) entry.getValue()).longValue());
+                        else if (entry.getKey().equals("last-update-check") || entry.getKey().equals("rl-time"))
+                            editor.putLong(entry.getKey(), ((Number) entry.getValue()).longValue());
                     } else le("Illegal type: " + entry.getValue().getClass());
                 }
 
