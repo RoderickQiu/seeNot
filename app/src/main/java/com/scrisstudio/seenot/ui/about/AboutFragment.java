@@ -64,6 +64,14 @@ public class AboutFragment extends Fragment {
             getUpdateMsg(false);
         });
 
+        binding.gplLicensed.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+        binding.gplLicensed.getPaint().setAntiAlias(true);
+        binding.gplLicensed.setOnClickListener((v) -> {
+            Uri uri = Uri.parse("https://www.gnu.org/licenses/gpl-3.0.html");
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        });
+
         binding.licensePage.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         binding.licensePage.getPaint().setAntiAlias(true);
         binding.licensePage.setOnClickListener((v) -> {

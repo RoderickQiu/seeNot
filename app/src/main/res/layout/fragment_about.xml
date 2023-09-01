@@ -60,11 +60,27 @@
                 tools:ignore="HardcodedText" />
 
             <TextView
+                android:id="@+id/gpl_licensed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GPLv3 Licensed"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" | "
+                android:textSize="14sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
                 android:id="@+id/update_manually"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/update_manually"
                 android:textSize="14sp" />
+
 
         </LinearLayout>
 
