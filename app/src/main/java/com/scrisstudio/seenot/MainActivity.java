@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
                 Intent intent = new Intent(MainActivity.this, MainActivity.class);
                 intent.putExtra("password", "success");
-                startActivity(intent);
+                startActivity(intent);//sometime breaks, need more diag
             }
             lastTimeDestination = destination.toString();
         });
